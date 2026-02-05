@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>공구 — 프로토타입 v3</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --b-primary:#B56CED;--b-secondary:#FF6B8A;--b-accent:#FFD4E8;--b-base:#FFF9F5;
+  --b-grad:linear-gradient(135deg,#B56CED 0%,#D946A8 50%,#FF6B8A 100%);
+  --b-grad-soft:linear-gradient(135deg,rgba(181,108,237,.10) 0%,rgba(255,107,138,.06) 100%);
+  --b-glow:0 8px 32px rgba(181,108,237,.15);
+  --m-primary:#F4A896;--m-secondary:#7EC8A9;--m-accent:#FFE4B5;--m-base:#FFF8F2;
+  --m-grad:linear-gradient(135deg,#F4A896 0%,#FBCEB1 50%,#7EC8A9 100%);
+  --m-grad-soft:linear-gradient(135deg,rgba(244,168,150,.10) 0%,rgba(126,200,169,.06) 100%);
+  --m-glow:0 8px 32px rgba(244,168,150,.15);
+  --primary:#B56CED;--secondary:#FF6B8A;--accent:#FFD4E8;--base:#FFF9F5;--text:#2D2D2D;
+  --grad:var(--b-grad);--grad-soft:var(--b-grad-soft);--glow:var(--b-glow);
+  --r:16px;--rs:10px;--rx:6px;--nav-h:72px;--hdr-h:48px;--status-h:44px;
+  --glass:rgba(255,255,255,.78);--glass-b:rgba(255,255,255,.45);
+  --sh-s:0 1px 4px rgba(0,0,0,.04);--sh-m:0 4px 16px rgba(0,0,0,.07);--sh-l:0 12px 40px rgba(0,0,0,.12);
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,system-ui,sans-serif;
+  background:#E8E4DF;color:var(--text);overflow:hidden;height:100dvh;
+  display:flex;align-items:center;justify-content:center}
+
+/* ══════ PHONE ══════ */
+.phone{width:375px;height:812px;background:var(--base);border-radius:44px;
+  box-shadow:0 0 0 3px #2a2a2a,0 0 0 6px #1a1a1a,0 0 0 8px rgba(0,0,0,.15),0 30px 60px rgba(0,0,0,.3),0 60px 120px rgba(0,0,0,.15);
+  position:relative;overflow:hidden;transition:background .45s ease}
+.island{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:126px;height:36px;
+  background:#000;border-radius:20px;z-index:200;display:flex;align-items:center;justify-content:center}
+.island-cam{width:10px;height:10px;border-radius:50%;background:#1a1a2e;border:2px solid #2a2a3e;margin-left:30px}
+.home-ind{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:134px;height:5px;
+  border-radius:3px;background:rgba(0,0,0,.18);z-index:200}
+
+/* ══════ STATUS BAR ══════ */
+.status-bar{position:absolute;top:0;left:0;right:0;height:var(--status-h);z-index:150;
+  display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 4px;
+  font-size:12px;font-weight:600;color:var(--text)}
+.status-time{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.status-right{display:flex;align-items:center;gap:5px}
+.status-right svg{width:16px;height:16px}
+
+/* ══════ HEADER ══════ */
+.hdr{position:absolute;top:var(--status-h);left:0;right:0;height:var(--hdr-h);
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;
+  background:rgba(255,255,255,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(0,0,0,.03);transition:box-shadow .3s}
+.hdr.scrolled{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.hdr-logo{font-size:20px;font-weight:900;background:var(--grad);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  transition:all .45s;letter-spacing:-.5px}
+.hdr-icons{display:flex;gap:14px;align-items:center}
+.hdr-icon{width:24px;height:24px;opacity:.55;cursor:pointer;transition:.2s;position:relative}
+.hdr-icon:hover{opacity:1;transform:scale(1.1)}
+.hdr-badge{position:absolute;top:-4px;right:-6px;width:16px;height:16px;border-radius:50%;
+  background:var(--secondary);color:#fff;font-size:9px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+
+/* ══════ NOTIFICATION PANEL ══════ */
+.noti-panel{position:absolute;top:calc(var(--status-h)+var(--hdr-h));left:12px;right:12px;
+  max-height:0;overflow:hidden;z-index:95;border-radius:0 0 var(--r) var(--r);
+  background:rgba(255,255,255,.96);backdrop-filter:blur(20px);box-shadow:var(--sh-l);
+  transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0}
+.noti-panel.show{max-height:350px;opacity:1}
+.noti-panel h3{font-size:13px;font-weight:700;padding:14px 16px 8px}
+.noti-item{display:flex;gap:10px;padding:10px 16px;cursor:pointer;transition:.15s}
+.noti-item:hover{background:rgba(0,0,0,.02)}
+.noti-item .ni-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:15px;flex-shrink:0}
+.noti-item .ni-text{flex:1;font-size:12px;line-height:1.4}
+.noti-item .ni-time{font-size:10px;color:#aaa;flex-shrink:0;margin-top:2px}
+.noti-overlay{position:absolute;inset:0;z-index:94;display:none}
+.noti-overlay.show{display:block}
+
+/* ══════ SCREENS ══════ */
+.screens{position:absolute;top:calc(var(--status-h) + var(--hdr-h));
+  left:0;right:0;bottom:var(--nav-h);overflow:hidden}
+.scr{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:14px 16px 28px;opacity:0;pointer-events:none;
+  transition:all .35s cubic-bezier(.4,0,.2,1);scrollbar-width:none;
+  transform:translateX(60px);will-change:transform,opacity}
+.scr::-webkit-scrollbar{display:none}
+.scr.on{opacity:1;transform:translateX(0);pointer-events:auto}
+.scr.exit-left{transform:translateX(-60px);opacity:0}
+
+/* ══════ BOTTOM NAV ══════ */
+.bnav{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(0,0,0,.04);display:flex;align-items:flex-start;
+  justify-content:space-around;padding-top:8px;z-index:90}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+  padding:4px 12px;border-radius:12px;transition:.25s;position:relative;min-width:56px}
+.bnav-item svg{width:22px;height:22px;transition:.3s;color:#aaa;fill:none;stroke:currentColor;stroke-width:1.8}
+.bnav-item span{font-size:10px;font-weight:500;color:#aaa;transition:.3s}
+.bnav-item.on svg{color:var(--primary);stroke-width:2.2}
+.bnav-item.on span{color:var(--primary);font-weight:700}
+.bnav-item.on::before{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--primary);animation:pop .3s ease}
+.bnav-item .nbadge{position:absolute;top:0;right:4px;min-width:14px;height:14px;
+  border-radius:7px;background:#FF3B30;color:#fff;font-size:8px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;border:1.5px solid #fff}
+@keyframes pop{from{transform:translateX(-50%) scale(0)}to{transform:translateX(-50%) scale(1)}}
+
+/* ══════ STORY ROW ══════ */
+.story-row{display:flex;gap:12px;overflow-x:auto;padding:2px 0 12px;margin-bottom:6px;scrollbar-width:none}
+.story-row::-webkit-scrollbar{display:none}
+.story-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.story-ring{width:56px;height:56px;border-radius:50%;padding:2.5px;background:var(--grad);transition:.2s;position:relative}
+.story-ring:hover{transform:scale(1.08)}
+.story-ring.gray{background:#ddd}
+.story-ring.viewed{background:linear-gradient(135deg,#ccc,#ddd);opacity:.6}
+.story-avatar{width:100%;height:100%;border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #fff}
+.story-name{font-size:10px;font-weight:500;color:#666;max-width:56px;
+  text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-badge{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
+  background:#FF3B30;color:#fff;font-size:7px;font-weight:800;padding:1px 5px;
+  border-radius:4px;border:1.5px solid #fff;letter-spacing:.5px}
+
+/* ══════ COUPON BAR ══════ */
+.coupon-bar{display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:var(--grad);border-radius:var(--r);margin-bottom:14px;
+  cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.coupon-bar:hover{transform:scale(1.01)}
+.coupon-bar::after{content:'';position:absolute;top:0;right:0;width:60px;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15))}
+.coupon-bar .c-icon{font-size:22px}
+.coupon-bar .c-text{flex:1;color:#fff}
+.coupon-bar .c-title{font-size:13px;font-weight:700}
+.coupon-bar .c-desc{font-size:10px;opacity:.85}
+.coupon-bar .c-btn{background:rgba(255,255,255,.25);color:#fff;border:none;
+  padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;
+  backdrop-filter:blur(8px);transition:.2s;font-family:inherit}
+
+/* ══════ SLOGAN ══════ */
+.slogan{font-size:13px;font-weight:500;text-align:center;padding:10px 16px;margin-bottom:14px;
+  background:var(--grad-soft);border-radius:var(--r);color:var(--primary);letter-spacing:-.2px;
+  border:1px solid rgba(255,255,255,.6)}
+
+/* ══════ BANNER ══════ */
+.banner{position:relative;border-radius:var(--r);overflow:hidden;height:155px;margin-bottom:18px}
+.banner-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.banner-slide{min-width:100%;height:100%;padding:20px 22px;display:flex;flex-direction:column;
+  justify-content:flex-end;position:relative;color:#fff}
+.banner-slide::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,.5) 100%)}
+.banner-slide>*{position:relative;z-index:1}
+.banner-slide .b-tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;
+  font-weight:700;background:rgba(255,255,255,.25);backdrop-filter:blur(6px);margin-bottom:6px;width:fit-content}
+.banner-slide h3{font-size:17px;font-weight:800;margin-bottom:3px;text-shadow:0 1px 3px rgba(0,0,0,.2)}
+.banner-slide p{font-size:11px;opacity:.9}
+.banner-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
+.banner-dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);transition:.3s;cursor:pointer}
+.banner-dots i.on{background:#fff;width:16px;border-radius:3px}
+
+/* ══════ SECTION HEAD ══════ */
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
+.sec-h h2{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.sec-h .more{font-size:11px;color:var(--primary);cursor:pointer;font-weight:600}
+
+/* ══════ TIMEDEAL (NEW) ══════ */
+.td-row{display:flex;gap:10px;overflow-x:auto;padding:2px 0 8px;margin-bottom:18px;scrollbar-width:none}
+.td-row::-webkit-scrollbar{display:none}
+.td-card{flex-shrink:0;width:140px;background:#fff;border-radius:var(--r);padding:12px;
+  box-shadow:var(--sh-s);cursor:pointer;transition:.25s;text-align:center;position:relative;overflow:hidden}
+.td-card:hover{transform:translateY(-3px);box-shadow:var(--glow)}
+.td-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+.td-emoji{font-size:36px;margin-bottom:6px}
+.td-name{font-size:11px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.td-price{font-size:13px;font-weight:800;color:var(--secondary);margin-bottom:6px}
+.td-timer{background:rgba(0,0,0,.85);color:#fff;padding:4px 10px;border-radius:8px;
+  font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.5px;display:inline-block}
+.td-timer .colon{animation:blink2 1s steps(1) infinite}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ══════ CATEGORY ICONS (NEW) ══════ */
+.cat-row{display:flex;gap:10px;overflow-x:auto;padding:4px 0 12px;margin-bottom:14px;scrollbar-width:none}
+.cat-row::-webkit-scrollbar{display:none}
+.cat-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;
+  transition:.2s;min-width:54px}
+.cat-item:hover{transform:translateY(-2px)}
+.cat-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:18px;background:rgba(0,0,0,.03);transition:.25s;
+  border:1.5px solid transparent}
+.cat-item.on .cat-icon{background:var(--grad);border-color:transparent;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.cat-item.on .cat-icon span{filter:grayscale(0) brightness(1.2)}
+.cat-label{font-size:10px;font-weight:500;color:#888;white-space:nowrap}
+.cat-item.on .cat-label{color:var(--primary);font-weight:700}
+
+/* ══════ PILLS ══════ */
+.pills{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;margin-bottom:12px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex-shrink:0;padding:7px 15px;border-radius:20px;font-size:12px;font-weight:500;
+  cursor:pointer;background:rgba(0,0,0,.035);color:#777;transition:.25s;border:1.5px solid transparent;white-space:nowrap}
+.pill.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+
+/* ══════ PRODUCT CARD ══════ */
+.pcard{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-s);
+  transition:all .25s;cursor:pointer;position:relative}
+.pcard:hover{transform:translateY(-3px);box-shadow:var(--glow)}
+.pcard:active{transform:scale(.97)}
+.pcard-img{width:100%;aspect-ratio:1;position:relative;overflow:hidden}
+.pcard-img .bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px}
+.pcard-img .bg.beauty-bg{background:linear-gradient(145deg,#f5e6ff 0%,#ffe6f0 50%,#fff0e6 100%)}
+.pcard-img .bg.mom-bg{background:linear-gradient(145deg,#fff0e6 0%,#e6fff0 50%,#e6f5ff 100%)}
+.pcard-img .bg.mixed-bg{background:linear-gradient(145deg,#f0e8ff 0%,#ffe8ee 40%,#e8fff4 100%)}
+.timer{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
+  color:#fff;padding:3px 9px;border-radius:14px;font-size:10px;font-weight:600;
+  display:flex;align-items:center;gap:4px;z-index:2}
+.timer::before{content:'';width:5px;height:5px;border-radius:50%;background:#FF6B8A;animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.heart-btn{position:absolute;top:7px;left:7px;width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(6px);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;z-index:2;transition:.2s;border:none;font-size:14px}
+.heart-btn:hover{transform:scale(1.15)}
+.heart-btn.liked{background:var(--secondary);color:#fff}
+@keyframes heartPop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+.pcard-body{padding:10px 12px 12px}
+.pcard-body .brand{font-size:10px;color:#aaa;font-weight:600;margin-bottom:2px;letter-spacing:.3px;text-transform:uppercase}
+.pcard-body .name{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:5px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price-row{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.price-row .disc{font-size:15px;font-weight:800;color:var(--secondary)}
+.price-row .now{font-size:14px;font-weight:700}
+.price-row .was{font-size:10px;color:#bbb;text-decoration:line-through}
+.badge-row{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.tbadge{padding:2px 7px;border-radius:8px;font-size:9px;font-weight:700}
+.tbadge.kc{background:#E8F5E9;color:#2E7D32}
+.tbadge.fda{background:#E3F2FD;color:#1565C0}
+.tbadge.org{background:#FFF3E0;color:#E65100}
+.tbadge.free{background:#F3E8FF;color:#7C3AED}
+.gauge{margin-top:7px}
+.gauge-bar{height:5px;border-radius:3px;background:rgba(0,0,0,.05);overflow:hidden}
+.gauge-fill{height:100%;border-radius:3px;background:var(--grad);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.gauge-lbl{display:flex;justify-content:space-between;margin-top:3px;font-size:9px;color:#aaa}
+.gauge-lbl b{color:var(--primary);font-weight:700}
+
+/* ══════ BENTO GRID ══════ */
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.bento .pcard:first-child{grid-column:1/-1}
+.bento .pcard:first-child .pcard-img{aspect-ratio:2.2/1}
+
+/* ══════ TOP5 ══════ */
+.top5{margin-bottom:18px}
+.t5{display:flex;align-items:center;gap:10px;padding:9px 4px;
+  border-bottom:1px solid rgba(0,0,0,.035);cursor:pointer;transition:.15s}
+.t5:last-child{border-bottom:none}
+.t5:hover{background:rgba(0,0,0,.01);padding-left:8px}
+.t5-r{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.t5-r.r1{background:var(--grad)}.t5-r.r2{background:linear-gradient(135deg,#667eea,#764ba2)}
+.t5-r.r3{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.t5-r.r4,.t5-r.r5{background:#e5e5e5;color:#aaa}
+.t5-img{width:42px;height:42px;border-radius:var(--rs);overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+.t5-img.beauty-bg{background:linear-gradient(145deg,#f5e6ff,#ffe6f0)}
+.t5-img.mom-bg{background:linear-gradient(145deg,#fff0e6,#e6fff0)}
+.t5-info{flex:1;min-width:0}
+.t5-info .t5n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t5-info .t5p{font-size:11px;color:var(--secondary);font-weight:700}
+.t5-end{text-align:right;flex-shrink:0}
+.t5-end .t5t{font-size:9px;color:#aaa;white-space:nowrap}
+.t5-end .t5ppl{font-size:9px;color:var(--primary);font-weight:600}
+
+/* ══════ INFLUENCER PICK (NEW) ══════ */
+.inf-row{display:flex;gap:10px;overflow-x:auto;padding:2px 0 8px;margin-bottom:18px;scrollbar-width:none}
+.inf-row::-webkit-scrollbar{display:none}
+.inf-card{flex-shrink:0;width:160px;background:#fff;border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--sh-s);cursor:pointer;transition:.25s}
+.inf-card:hover{transform:translateY(-3px);box-shadow:var(--glow)}
+.inf-card-top{height:70px;display:flex;align-items:center;gap:8px;padding:0 12px;position:relative}
+.inf-card-top::before{content:'';position:absolute;inset:0;background:var(--grad-soft)}
+.inf-card-top>*{position:relative;z-index:1}
+.inf-av2{width:36px;height:36px;border-radius:50%;background:var(--grad);display:flex;
+  align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700;flex-shrink:0}
+.inf-meta{flex:1;min-width:0}
+.inf-meta .fn{font-size:11px;font-weight:700}
+.inf-meta .fd{font-size:9px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inf-card-body{padding:8px 12px 10px}
+.inf-card-body .inf-emoji{font-size:22px;margin-bottom:3px}
+.inf-card-body .inf-pn{font-size:10px;font-weight:600;color:#555;line-height:1.3}
+.inf-card-body .inf-pp{font-size:11px;font-weight:800;color:var(--secondary);margin-top:2px}
+
+/* ══════ FEED ══════ */
+.feed{background:#fff;border-radius:var(--r);overflow:hidden;margin-bottom:12px;
+  box-shadow:var(--sh-s);transition:.25s;cursor:pointer}
+.feed:hover{box-shadow:var(--glow)}
+.feed-top{display:flex;align-items:center;gap:10px;padding:11px 13px}
+.feed-av{width:34px;height:34px;border-radius:50%;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0}
+.feed-who{flex:1}.feed-who .fn{font-size:12px;font-weight:700}
+.feed-who .fd{font-size:10px;color:#aaa}
+.feed-follow{padding:4px 12px;border-radius:14px;font-size:10px;font-weight:700;
+  background:var(--grad-soft);color:var(--primary);border:1.5px solid var(--primary);cursor:pointer;transition:.2s}
+.feed-follow:hover{background:var(--grad);color:#fff}
+.feed-pic{width:100%;height:190px;position:relative;overflow:hidden}
+.feed-pic .bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px}
+.feed-actions{display:flex;align-items:center;gap:16px;padding:10px 13px 4px}
+.feed-action{display:flex;align-items:center;gap:4px;font-size:12px;color:#666;cursor:pointer;transition:.15s}
+.feed-action:hover{color:var(--primary)}
+.feed-action svg{width:18px;height:18px}
+.feed-body{padding:6px 13px 13px}
+.feed-body .fn2{font-size:13px;font-weight:600;margin-bottom:5px}
+.feed-body .f-stats{display:flex;gap:10px;font-size:11px;color:#999;margin-bottom:5px}
+.feed-body .f-stats .hot{color:var(--secondary);font-weight:600}
+
+/* ══════ SHORTFORM ══════ */
+.sf-row{display:flex;gap:9px;overflow-x:auto;padding:2px 0 8px;margin-bottom:18px;scrollbar-width:none}
+.sf-row::-webkit-scrollbar{display:none}
+.sf-item{flex-shrink:0;width:95px;cursor:pointer}
+.sf-thumb{width:95px;height:130px;border-radius:var(--r);position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;padding:7px;box-shadow:var(--sh-s);transition:.25s}
+.sf-thumb:hover{transform:scale(1.04);box-shadow:var(--sh-m)}
+.sf-bg{position:absolute;inset:0}
+.sf-bg.b1{background:linear-gradient(160deg,#B56CED,#FF6B8A)}
+.sf-bg.b2{background:linear-gradient(160deg,#667eea,#B56CED)}
+.sf-bg.b3{background:linear-gradient(160deg,#FF6B8A,#FF8E53)}
+.sf-bg.b4{background:linear-gradient(160deg,#D946A8,#B56CED)}
+.sf-bg.b5{background:linear-gradient(160deg,#f093fb,#f5576c)}
+.sf-bg.b6{background:linear-gradient(160deg,#764ba2,#667eea)}
+.sf-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.88);
+  display:flex;align-items:center;justify-content:center;z-index:2}
+.sf-play::after{content:'';width:0;height:0;border-style:solid;
+  border-width:5px 0 5px 9px;border-color:transparent transparent transparent var(--primary);margin-left:1.5px}
+.sf-views{position:absolute;bottom:7px;left:7px;font-size:9px;color:#fff;font-weight:600;
+  display:flex;align-items:center;gap:2px;z-index:2;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.sf-emoji{position:absolute;top:8px;right:8px;font-size:18px;z-index:2}
+.sf-name{font-size:10px;font-weight:500;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ══════ AI SECTION ══════ */
+.ai-sec{background:var(--grad);border-radius:var(--r);padding:18px;margin-bottom:18px;
+  color:#fff;position:relative;overflow:hidden}
+.ai-sec::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.18) 0%,transparent 55%)}
+.ai-sec>*{position:relative;z-index:1}
+.ai-sec h3{font-size:14px;font-weight:700;margin-bottom:3px}
+.ai-sec p{font-size:11px;opacity:.85;margin-bottom:10px}
+.ai-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.ai-row::-webkit-scrollbar{display:none}
+.ai-c{flex-shrink:0;width:110px;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.22);border-radius:var(--rs);padding:10px;cursor:pointer;transition:.2s}
+.ai-c:hover{background:rgba(255,255,255,.28);transform:translateY(-2px)}
+.ai-c .ae{font-size:26px;margin-bottom:5px}
+.ai-c .an{font-size:10px;font-weight:600;margin-bottom:1px}
+.ai-c .ap{font-size:9px;opacity:.75}
+
+/* ══════ AGE SELECTOR ══════ */
+.age-row{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px;padding:2px 0;scrollbar-width:none}
+.age-row::-webkit-scrollbar{display:none}
+.age-b{flex-shrink:0;padding:8px 14px;border-radius:var(--r);background:#fff;
+  border:1.5px solid rgba(0,0,0,.06);cursor:pointer;transition:.25s;text-align:center}
+.age-b:hover,.age-b.on{border-color:var(--primary);background:var(--grad-soft)}
+.age-b .ai2{font-size:18px;margin-bottom:1px}
+.age-b .al{font-size:10px;font-weight:600;white-space:nowrap}
+
+/* ══════ HORIZONTAL CAROUSEL (NEW) ══════ */
+.hc-row{display:flex;gap:10px;overflow-x:auto;padding:2px 0 8px;margin-bottom:18px;scrollbar-width:none}
+.hc-row::-webkit-scrollbar{display:none}
+.hc-card{flex-shrink:0;width:120px;background:#fff;border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--sh-s);cursor:pointer;transition:.25s}
+.hc-card:hover{transform:translateY(-2px)}
+.hc-card-img{width:120px;height:100px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative}
+.hc-card-img.beauty-bg{background:linear-gradient(145deg,#f5e6ff,#ffe6f0)}
+.hc-card-img.mom-bg{background:linear-gradient(145deg,#fff0e6,#e6fff0)}
+.hc-card-wishbadge{position:absolute;top:5px;right:5px;background:var(--secondary);color:#fff;
+  font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
+.hc-card-body{padding:7px 9px 9px}
+.hc-card-body .hcn{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-card-body .hcp{font-size:11px;font-weight:800;color:var(--secondary);margin-top:1px}
+
+/* ══════ REVIEW ══════ */
+.rev{background:#fff;border-radius:var(--r);padding:13px;margin-bottom:10px;box-shadow:var(--sh-s)}
+.rev-top{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.rev-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:13px;flex-shrink:0}
+.rev-av.mom{background:linear-gradient(135deg,#fff0e6,#e6fff0)}
+.rev-meta{flex:1}
+.rev-meta .rn{font-size:11px;font-weight:600}
+.rev-meta .ri{font-size:9px;color:#aaa}
+.rev-stars{color:#FFC107;font-size:10px;letter-spacing:1px}
+.rev-photos{display:flex;gap:5px;margin-bottom:7px}
+.rev-photo{width:52px;height:52px;border-radius:8px;overflow:hidden;font-size:22px;
+  display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0e6,#e6fff0)}
+.rev-text{font-size:11px;color:#555;line-height:1.55}
+.rev-helpful{display:flex;align-items:center;gap:4px;margin-top:7px;font-size:10px;color:#aaa;cursor:pointer}
+.rev-helpful:hover{color:var(--primary)}
+
+/* ══════ CALENDAR ══════ */
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-h h2{font-size:17px;font-weight:700}
+.cal-nav{display:flex;gap:6px}
+.cal-nav button{width:30px;height:30px;border:none;border-radius:50%;background:rgba(0,0,0,.04);
+  cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:inherit}
+.cal-nav button:hover{background:var(--primary);color:#fff}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+.cal-dn{text-align:center;font-size:10px;font-weight:600;color:#aaa;padding:6px 0}
+.cal-d{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:var(--rs);font-size:12px;cursor:pointer;transition:.15s;position:relative;gap:1px}
+.cal-d:hover{background:rgba(0,0,0,.03)}
+.cal-d.today{background:var(--grad);color:#fff;font-weight:700}
+.cal-d.ev::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--secondary)}
+.cal-d.oth{opacity:.25}
+.cal-events{margin-top:6px}
+.cal-ev{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--rs);
+  background:#fff;margin-bottom:7px;box-shadow:var(--sh-s);cursor:pointer;transition:.15s}
+.cal-ev:hover{transform:translateX(3px);box-shadow:var(--sh-m)}
+.cal-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cal-info{flex:1}.cal-info .en{font-size:12px;font-weight:600}.cal-info .ed{font-size:10px;color:#aaa}
+.cal-cat{font-size:9px;padding:2px 8px;border-radius:8px;font-weight:600}
+
+/* ══════ MY PAGE ══════ */
+.my-top{text-align:center;padding:16px 0 14px}
+.my-av{width:64px;height:64px;border-radius:50%;background:var(--grad);margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;
+  box-shadow:0 4px 16px rgba(181,108,237,.3)}
+.my-name{font-size:17px;font-weight:700;margin-bottom:2px}
+.my-email{font-size:11px;color:#aaa}
+.my-edit{display:inline-block;margin-top:8px;padding:5px 16px;border-radius:14px;
+  font-size:11px;font-weight:600;border:1.5px solid rgba(0,0,0,.08);background:#fff;
+  cursor:pointer;color:#666;transition:.2s;font-family:inherit}
+.my-edit:hover{border-color:var(--primary);color:var(--primary)}
+.membership{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;
+  padding:10px 16px;background:linear-gradient(135deg,#FFF6E0,#FFECD2);border-radius:var(--r)}
+.membership .tier{font-size:13px;font-weight:800;color:#D4880F}
+.membership .tier-bar{flex:1;height:4px;border-radius:2px;background:#FFE4A8;overflow:hidden;max-width:100px}
+.membership .tier-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#F5C842,#D4880F);width:65%}
+.membership .tier-next{font-size:9px;color:#B5860A}
+.my-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.my-s{background:#fff;border-radius:var(--r);padding:12px 8px;text-align:center;
+  box-shadow:var(--sh-s);cursor:pointer;transition:.2s}
+.my-s:hover{transform:translateY(-2px)}
+.my-s .num{font-size:20px;font-weight:800;color:var(--primary)}
+.my-s .lbl{font-size:9px;color:#aaa;margin-top:2px}
+.my-order{background:#fff;border-radius:var(--r);padding:14px;margin-bottom:14px;box-shadow:var(--sh-s)}
+.my-order h3{font-size:13px;font-weight:700;margin-bottom:10px}
+.order-track{display:flex;align-items:center;justify-content:space-between;position:relative}
+.order-track::before{content:'';position:absolute;top:16px;left:24px;right:24px;height:2px;background:#eee}
+.order-step{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;z-index:1}
+.order-dot{width:32px;height:32px;border-radius:50%;background:#f5f5f5;display:flex;
+  align-items:center;justify-content:center;font-size:14px;transition:.2s}
+.order-dot.done{background:var(--grad);box-shadow:0 2px 8px rgba(181,108,237,.3)}
+.order-lbl{font-size:9px;color:#aaa;font-weight:500}
+.order-step.done .order-lbl{color:var(--primary);font-weight:600}
+.my-menu{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-s);margin-bottom:14px}
+.my-mi{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;
+  border-bottom:1px solid rgba(0,0,0,.03);cursor:pointer;transition:.12s}
+.my-mi:last-child{border-bottom:none}
+.my-mi:hover{background:rgba(0,0,0,.015);padding-left:18px}
+.my-mi .ml{display:flex;align-items:center;gap:11px}
+.my-mi .mic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:13px}
+.my-mi .mil{font-size:13px;font-weight:500}
+.my-mi .mir{display:flex;align-items:center;gap:6px}
+.my-mi .mib{background:var(--secondary);color:#fff;font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:8px}
+.my-mi .mia{font-size:13px;color:#ccc}
+
+/* ══════ TOAST ══════ */
+.toast{position:absolute;bottom:calc(var(--nav-h) + 16px);left:50%;transform:translateX(-50%) translateY(80px);
+  background:rgba(30,30,30,.9);backdrop-filter:blur(10px);color:#fff;padding:10px 20px;
+  border-radius:24px;font-size:12px;font-weight:500;z-index:300;white-space:nowrap;
+  transition:all .35s cubic-bezier(.4,0,.2,1);opacity:0;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ══════ ACTIVITY TOAST (NEW) ══════ */
+.activity-toast{position:absolute;bottom:calc(var(--nav-h) + 50px);left:16px;right:16px;
+  background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-radius:12px;
+  padding:8px 12px;font-size:11px;color:#555;box-shadow:var(--sh-m);z-index:80;
+  transition:all .4s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateY(20px);pointer-events:none}
+.activity-toast.show{opacity:1;transform:translateY(0)}
+.activity-toast .at-dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#4CAF50;margin-right:6px;animation:blink 1.5s infinite}
+
+/* ══════ FLOATING CHAT (NEW) ══════ */
+.chat-float{position:absolute;bottom:calc(var(--nav-h) + 12px);right:14px;width:44px;height:44px;
+  border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-size:20px;cursor:pointer;z-index:88;
+  box-shadow:0 4px 16px rgba(181,108,237,.4);transition:.2s;border:none}
+.chat-float:hover{transform:scale(1.1)}
+.chat-float::after{content:'';position:absolute;inset:-3px;border-radius:50%;
+  border:2px solid var(--primary);opacity:.4;animation:chatPulse 2s infinite}
+@keyframes chatPulse{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.15);opacity:0}}
+
+/* ══════ MODAL ══════ */
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:250;
+  opacity:0;pointer-events:none;transition:.3s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal-sheet{position:absolute;bottom:0;left:0;right:0;background:#fff;
+  border-radius:20px 20px 0 0;padding:12px 20px 28px;z-index:260;
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:70%}
+.modal-sheet.show{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 14px}
+.modal-prod{display:flex;gap:14px;margin-bottom:14px}
+.modal-img{width:80px;height:80px;border-radius:var(--rs);display:flex;align-items:center;
+  justify-content:center;font-size:36px;flex-shrink:0}
+.modal-img.beauty-bg{background:linear-gradient(145deg,#f5e6ff,#ffe6f0)}
+.modal-img.mom-bg{background:linear-gradient(145deg,#fff0e6,#e6fff0)}
+.modal-detail{flex:1}
+.modal-detail .md-brand{font-size:10px;color:#aaa;font-weight:600;text-transform:uppercase}
+.modal-detail .md-name{font-size:14px;font-weight:700;margin:2px 0 6px}
+.modal-btns{display:flex;gap:8px;margin-top:10px}
+.modal-btn{flex:1;padding:12px;border-radius:var(--rs);font-size:13px;font-weight:700;
+  cursor:pointer;border:none;font-family:inherit;transition:.2s}
+.modal-btn.primary{background:var(--grad);color:#fff;box-shadow:0 4px 12px rgba(181,108,237,.3)}
+.modal-btn.primary:hover{transform:translateY(-1px)}
+.modal-btn.outline{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
+.modal-share{display:flex;gap:10px;justify-content:center;margin-top:12px}
+.modal-share-btn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:18px;cursor:pointer;transition:.2s;border:none}
+.modal-share-btn:hover{transform:scale(1.1)}
+.modal-share-btn.kakao{background:#FEE500;color:#3C1E1E}
+.modal-share-btn.link{background:#f0f0f0;color:#333}
+.modal-share-btn.insta{background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737);color:#fff}
+
+/* ══════ SEARCH OVERLAY ══════ */
+.search-ov{position:absolute;inset:0;background:var(--base);z-index:200;
+  padding:60px 20px 20px;opacity:0;transform:translateY(-10px);
+  pointer-events:none;transition:.25s}
+.search-ov.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.search-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.search-input{flex:1;height:40px;border:1.5px solid rgba(0,0,0,.08);border-radius:20px;
+  padding:0 16px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:.2s}
+.search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(181,108,237,.1)}
+.search-cancel{font-size:13px;color:var(--primary);font-weight:600;cursor:pointer}
+.search-recent h3{font-size:13px;font-weight:700;margin-bottom:10px}
+.search-tags{display:flex;flex-wrap:wrap;gap:6px}
+.search-tag{padding:6px 14px;border-radius:16px;background:rgba(0,0,0,.04);
+  font-size:12px;color:#666;cursor:pointer;transition:.15s}
+.search-tag:hover{background:var(--grad-soft);color:var(--primary)}
+
+/* ══════ ANIM ══════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .45s cubic-bezier(.4,0,.2,1) both}
+.d1{animation-delay:.04s}.d2{animation-delay:.08s}.d3{animation-delay:.12s}
+.d4{animation-delay:.16s}.d5{animation-delay:.2s}.d6{animation-delay:.24s}.d7{animation-delay:.28s}
+</style>
+</head>
+<body>
+<div class="phone" id="app">
+  <div class="island"><div class="island-cam"></div></div>
+  <div class="home-ind"></div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time" id="statusTime">9:41</div>
+    <div class="status-right">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 11h2v4H1zM5 8h2v7H5zM9 5h2v10H9zM13 1h2v14h-2z" opacity=".3"/><path d="M1 11h2v4H1zM5 8h2v7H5zM9 5h2v10H9z"/></svg>
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 3C5 3 2.4 4.6 1 7l1 1c1.2-2 3.3-3.5 6-3.5S11.8 6 13 8l1-1C12.6 4.6 11 3 8 3z" opacity=".3"/><path d="M8 6C6.2 6 4.6 6.8 3.5 8l1 1C5.5 7.8 6.7 7.2 8 7.2S10.5 7.8 11.5 9l1-1C11.4 6.8 9.8 6 8 6z"/><circle cx="8" cy="11" r="1.5"/></svg>
+      <svg viewBox="0 0 20 10" fill="currentColor"><rect x="0" y="1" width="15" height="8" rx="1.5" stroke="currentColor" stroke-width=".8" fill="none"/><rect x="1.2" y="2.2" width="10" height="5.6" rx=".5"/><path d="M16 3.5h1.5a1 1 0 011 1v1a1 1 0 01-1 1H16z" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="hdr" id="hdr">
+    <div class="hdr-logo" id="hdrLogo">공구</div>
+    <div class="hdr-icons">
+      <svg class="hdr-icon" id="searchBtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <div style="position:relative" id="bellWrap">
+        <svg class="hdr-icon" id="bellBtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg>
+        <div class="hdr-badge">5</div>
+      </div>
+      <svg class="hdr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div class="noti-overlay" id="notiOv"></div>
+  <div class="noti-panel" id="notiPanel">
+    <h3>알림</h3>
+    <div class="noti-item"><div class="ni-icon" style="background:#EDE9FE">🎉</div><div class="ni-text">COSRX 토너 공구가 오픈되었어요!</div><div class="ni-time">3분 전</div></div>
+    <div class="noti-item"><div class="ni-icon" style="background:#DBEAFE">📦</div><div class="ni-text">주문하신 상품이 배송 시작되었어요!</div><div class="ni-time">15분 전</div></div>
+    <div class="noti-item"><div class="ni-icon" style="background:#FCE7F3">💰</div><div class="ni-text">찜한 상품 가격이 떨어졌어요!</div><div class="ni-time">1시간 전</div></div>
+    <div class="noti-item"><div class="ni-icon" style="background:#D1FAE5">👥</div><div class="ni-text">하기스 기저귀 공구 300명 달성!</div><div class="ni-time">2시간 전</div></div>
+    <div class="noti-item"><div class="ni-icon" style="background:#FEF3C7">⏰</div><div class="ni-text">rom&nd 틴트 공구 마감 1시간 전!</div><div class="ni-time">3시간 전</div></div>
+  </div>
+
+  <!-- Search Overlay -->
+  <div class="search-ov" id="searchOv">
+    <div class="search-bar">
+      <input class="search-input" placeholder="브랜드, 상품명으로 검색">
+      <span class="search-cancel" id="searchClose">취소</span>
+    </div>
+    <div class="search-recent"><h3>최근 검색어</h3>
+      <div class="search-tags">
+        <span class="search-tag">COSRX 토너</span><span class="search-tag">하기스 기저귀</span>
+        <span class="search-tag">rom&nd 틴트</span><span class="search-tag">선크림</span>
+        <span class="search-tag">이유식</span><span class="search-tag">아기띠</span>
+      </div>
+    </div>
+    <div class="search-recent" style="margin-top:20px"><h3>인기 검색어</h3>
+      <div class="search-tags">
+        <span class="search-tag">1. 글로우 세럼</span><span class="search-tag">2. 매직핏 기저귀</span>
+        <span class="search-tag">3. 어성초 토너</span><span class="search-tag">4. 콜라겐 마스크</span>
+        <span class="search-tag">5. 유기농 이유식</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screens -->
+  <div class="screens">
+    <!-- HOME -->
+    <div class="scr on" id="scr-home">
+      <div class="story-row anim" id="storyRow"></div>
+      <div class="coupon-bar anim d1" onclick="showToast('🎉 15% 할인 쿠폰이 발급되었어요!')">
+        <span class="c-icon">🎫</span>
+        <div class="c-text"><div class="c-title">첫 공구 15% 할인 쿠폰</div><div class="c-desc">지금 바로 받고 사용하세요</div></div>
+        <button class="c-btn">받기</button>
+      </div>
+      <div class="banner anim d2" id="homeBan">
+        <div class="banner-track" id="homeTrack">
+          <div class="banner-slide" style="background:linear-gradient(135deg,#B56CED,#FF6B8A)">
+            <span class="b-tag">WEEKLY BEST</span><h3>이번 주 HOT 공구</h3><p>뷰티+맘 인기 아이템 총집합</p></div>
+          <div class="banner-slide" style="background:linear-gradient(135deg,#F4A896,#7EC8A9)">
+            <span class="b-tag">NEW OPEN</span><h3>유기농 이유식 공구</h3><p>무농약 채소로 만든 프리미엄 이유식</p></div>
+          <div class="banner-slide" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+            <span class="b-tag">EVENT</span><h3>친구 초대 이벤트</h3><p>친구와 함께하면 추가 5% 할인!</p></div>
+        </div>
+        <div class="banner-dots"><i class="on"></i><i></i><i></i></div>
+      </div>
+      <div class="sec-h anim d3"><h2>⚡ 타임딜 · 지금 놓치면 끝!</h2></div>
+      <div class="td-row anim d3" id="homeTD"></div>
+      <div class="sec-h anim d4"><h2>실시간 인기 공구 TOP 5</h2><span class="more">전체보기 ›</span></div>
+      <div class="top5 anim d4" id="homeTop5"></div>
+      <div class="sec-h anim d5"><h2>지금 뜨는 공구</h2></div>
+      <div class="bento anim d5" id="homeBento"></div>
+      <div class="sec-h anim d6"><h2>숏폼 리뷰</h2><span class="more">더보기 ›</span></div>
+      <div class="sf-row anim d6" id="homeSF"></div>
+    </div>
+
+    <!-- BEAUTY -->
+    <div class="scr" id="scr-beauty">
+      <div class="slogan anim">✨ 나를 위한 발견, 트렌드를 함께 사는 법</div>
+      <div class="banner anim d1">
+        <div class="banner-track" id="beautyTrack">
+          <div class="banner-slide" style="background:linear-gradient(135deg,#B56CED,#D946A8)">
+            <span class="b-tag">INFLUENCER PICK</span><h3>글로우 세럼 공구</h3><p>인플루언서 민지님 추천 · 43% OFF</p></div>
+          <div class="banner-slide" style="background:linear-gradient(135deg,#FF6B8A,#FF8E53)">
+            <span class="b-tag">SUMMER SALE</span><h3>여름 선크림 특가</h3><p>SPF50+ 순한 선크림 모음전</p></div>
+        </div>
+        <div class="banner-dots"><i class="on"></i><i></i></div>
+      </div>
+      <div class="cat-row anim d2" id="beautyCats"></div>
+      <div class="sec-h anim d2"><h2>실시간 인기 TOP 5</h2><span class="more">전체보기 ›</span></div>
+      <div class="top5 anim d3" id="beautyTop5"></div>
+      <div class="sec-h anim d3"><h2>인플루언서 PICK</h2><span class="more">더보기 ›</span></div>
+      <div class="inf-row anim d4" id="beautyInf"></div>
+      <div class="sec-h anim d4"><h2>트렌드 피드</h2></div>
+      <div id="beautyFeed" class="anim d5"></div>
+      <div class="sec-h anim d5"><h2>숏폼 리뷰</h2><span class="more">더보기 ›</span></div>
+      <div class="sf-row anim d6" id="beautySF"></div>
+      <div class="ai-sec anim d6">
+        <h3>🤖 AI 맞춤 추천</h3><p>지성 피부 · 트러블 케어 관심</p>
+        <div class="ai-row" id="beautyAI"></div>
+      </div>
+    </div>
+
+    <!-- MOM -->
+    <div class="scr" id="scr-mom">
+      <div class="slogan anim">🧸 엄마의 시간을 아끼는 똑똑한 공구</div>
+      <div class="banner anim d1">
+        <div class="banner-track" id="momTrack">
+          <div class="banner-slide" style="background:linear-gradient(135deg,#F4A896,#FBCEB1)">
+            <span class="b-tag">ORGANIC</span><h3>이유식 재료 모음전</h3><p>유기농 인증 · 무농약 채소 공구</p></div>
+          <div class="banner-slide" style="background:linear-gradient(135deg,#7EC8A9,#A8E6CF)">
+            <span class="b-tag">MEGA DEAL</span><h3>기저귀 대용량 특가</h3><p>팀구매 달성 시 최대 52% 할인</p></div>
+        </div>
+        <div class="banner-dots"><i class="on"></i><i></i></div>
+      </div>
+      <div class="sec-h anim d1"><h2>우리 아이 맞춤 추천</h2></div>
+      <div class="age-row anim d2">
+        <div class="age-b on"><div class="ai2">👶</div><div class="al">0~6개월</div></div>
+        <div class="age-b"><div class="ai2">🍼</div><div class="al">7~12개월</div></div>
+        <div class="age-b"><div class="ai2">🧒</div><div class="al">13~24개월</div></div>
+        <div class="age-b"><div class="ai2">👦</div><div class="al">25~36개월</div></div>
+        <div class="age-b"><div class="ai2">🎒</div><div class="al">37개월+</div></div>
+      </div>
+      <div class="cat-row anim d2" id="momCats"></div>
+      <div class="sec-h anim d3"><h2>안전 인증 공구</h2></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" class="anim d3">
+        <span class="tbadge kc">✓ KC인증</span><span class="tbadge fda">✓ 식약처</span><span class="tbadge org">✓ 유기농</span>
+      </div>
+      <div class="bento anim d3" id="momTrust"></div>
+      <div class="sec-h anim d4"><h2>대용량 가성비 공구</h2><span class="more">전체보기 ›</span></div>
+      <div class="bento anim d4" id="momValue"></div>
+      <div class="sec-h anim d5"><h2>❤️ 엄마들이 지금 많이 찜하는</h2></div>
+      <div class="hc-row anim d5" id="momWish"></div>
+      <div class="sec-h anim d5"><h2>엄마 BEST 리뷰</h2><span class="more">더보기 ›</span></div>
+      <div id="momRevs" class="anim d6"></div>
+      <div class="sec-h anim d6"><h2>이번 달 공구 캘린더</h2></div>
+      <div style="background:#fff;border-radius:var(--r);padding:14px;box-shadow:var(--sh-s)" class="anim d7" id="momMiniCal"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="scr" id="scr-calendar">
+      <div class="cal-h anim"><h2 id="calMon">2025년 2월</h2><div class="cal-nav"><button onclick="chgMon(-1)">◂</button><button onclick="chgMon(1)">▸</button></div></div>
+      <div class="cal-grid anim d1" id="calGrid"></div>
+      <div class="pills anim d2" id="calPills">
+        <span class="pill on">전체</span><span class="pill">뷰티</span><span class="pill">육아</span><span class="pill">식품</span>
+      </div>
+      <div class="sec-h anim d2"><h2>예정된 공구</h2></div>
+      <div class="cal-events anim d3" id="calEvs"></div>
+    </div>
+
+    <!-- MY -->
+    <div class="scr" id="scr-my">
+      <div class="my-top anim">
+        <div class="my-av">💜</div>
+        <div class="my-name">김소연</div>
+        <div class="my-email">soyeon@email.com</div>
+        <button class="my-edit">프로필 수정</button>
+      </div>
+      <div class="membership anim d1">
+        <span class="tier">💎 GOLD 멤버</span>
+        <div class="tier-bar"><div class="tier-fill"></div></div>
+        <span class="tier-next">PLATINUM까지 35%</span>
+      </div>
+      <div class="my-stats anim d1">
+        <div class="my-s"><div class="num">12</div><div class="lbl">참여공구</div></div>
+        <div class="my-s"><div class="num">5</div><div class="lbl">찜목록</div></div>
+        <div class="my-s"><div class="num">3</div><div class="lbl">리뷰</div></div>
+        <div class="my-s"><div class="num">2</div><div class="lbl">쿠폰</div></div>
+      </div>
+      <div class="my-order anim d2">
+        <h3>최근 주문</h3>
+        <div class="order-track">
+          <div class="order-step done"><div class="order-dot done">📦</div><div class="order-lbl">주문완료</div></div>
+          <div class="order-step done"><div class="order-dot done">✅</div><div class="order-lbl">결제완료</div></div>
+          <div class="order-step done"><div class="order-dot done">🚚</div><div class="order-lbl">배송중</div></div>
+          <div class="order-step"><div class="order-dot">🏠</div><div class="order-lbl">배송완료</div></div>
+        </div>
+      </div>
+      <div class="sec-h anim d3"><h2>최근 본 상품</h2></div>
+      <div class="hc-row anim d3" id="myRecent"></div>
+      <div class="my-menu anim d4">
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#EDE9FE">📦</div><span class="mil">주문/배송 조회</span></div><div class="mir"><span class="mib">2</span><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#FCE7F3">💳</div><span class="mil">결제 수단 관리</span></div><div class="mir"><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#DBEAFE">🎫</div><span class="mil">쿠폰함</span></div><div class="mir"><span class="mib">2</span><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#FEF3C7">⭐</div><span class="mil">나의 리뷰</span></div><div class="mir"><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#D1FAE5">👶</div><span class="mil">아이 정보 관리</span></div><div class="mir"><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#FEE2E2">🎁</div><span class="mil">친구 초대</span></div><div class="mir"><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#FFF7ED">🔔</div><span class="mil">알림 설정</span></div><div class="mir"><span class="mia">›</span></div></div>
+        <div class="my-mi"><div class="ml"><div class="mic" style="background:#F3F4F6">⚙️</div><span class="mil">설정</span></div><div class="mir"><span class="mia">›</span></div></div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:#ccc;padding-bottom:8px">공구 v3.0.0</div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bnav" id="bnav">
+    <div class="bnav-item on" data-s="home"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span>홈</span></div>
+    <div class="bnav-item" data-s="beauty"><svg viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 007.92 12.446a9 9 0 11-8.313-12.454z"/><path d="m17 4 .5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5z"/></svg><span>Beauty</span></div>
+    <div class="bnav-item" data-s="mom"><svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/></svg><span>Mom&Life</span><div class="nbadge">N</div></div>
+    <div class="bnav-item" data-s="calendar"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg><span>캘린더</span></div>
+    <div class="bnav-item" data-s="my"><svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>MY</span></div>
+  </div>
+
+  <!-- Floating -->
+  <button class="chat-float" onclick="showToast('💬 고객센터에 연결 중...')">💬</button>
+  <div class="activity-toast" id="actToast"><span class="at-dot"></span><span id="actMsg"></span></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOv" onclick="closeModal()"></div>
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-prod">
+      <div class="modal-img beauty-bg" id="modalImg">🧴</div>
+      <div class="modal-detail">
+        <div class="md-brand" id="modalBrand">COSRX</div>
+        <div class="md-name" id="modalName">AHA/BHA 클래리파잉 토너</div>
+        <div class="price-row"><span class="disc" id="modalDisc">38%</span><span class="now" id="modalPrice">12,900원</span><span class="was" id="modalOrig">20,800원</span></div>
+        <div class="gauge" style="margin-top:8px"><div class="gauge-bar"><div class="gauge-fill" id="modalGauge" style="width:72%"></div></div>
+        <div class="gauge-lbl"><span><b id="modalPpl">156명</b> 참여</span><span id="modalLeft">28% 남음</span></div></div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn outline" onclick="showToast('❤️ 찜 목록에 추가했어요')">찜하기</button>
+      <button class="modal-btn primary" onclick="showToast('🎉 공구에 참여했어요!')">공구 참여하기</button>
+    </div>
+    <div class="modal-share">
+      <button class="modal-share-btn kakao" onclick="showToast('카카오톡으로 공유했어요')">💬</button>
+      <button class="modal-share-btn insta" onclick="showToast('인스타 스토리에 공유했어요')">📸</button>
+      <button class="modal-share-btn link" onclick="showToast('링크가 복사되었어요')">🔗</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════ DATA ══════
+const BP=[
+  {e:'🧴',b:'COSRX',n:'AHA/BHA 클래리파잉 토너',d:38,p:'12,900',o:'20,800',ts:9135,g:72,ppl:156,bg:'beauty-bg'},
+  {e:'💄',b:'rom&nd',n:'쥬시 래스팅 틴트 #13 치즈후룸',d:42,p:'8,500',o:'14,800',ts:19062,g:58,ppl:89,bg:'beauty-bg'},
+  {e:'✨',b:'Anua',n:'어성초 77 수딩 토너 250ml',d:35,p:'16,200',o:'25,000',ts:6308,g:85,ppl:234,bg:'beauty-bg'},
+  {e:'🌸',b:'innisfree',n:'레티놀 시카 리페어 세럼 30ml',d:40,p:'19,800',o:'33,000',ts:11313,g:45,ppl:67,bg:'beauty-bg'},
+  {e:'💋',b:'3CE',n:'벨벳 립 틴트 #눈물범벅',d:33,p:'11,200',o:'16,800',ts:24739,g:62,ppl:143,bg:'beauty-bg'},
+  {e:'🧖',b:'Medicube',n:'콜라겐 래핑 마스크 10매',d:45,p:'15,900',o:'29,000',ts:15655,g:78,ppl:198,bg:'beauty-bg'},
+];
+const MP=[
+  {e:'🍼',b:'닥터브라운',n:'옵션스+ 젖병 세트 (4개입)',d:35,p:'32,900',o:'50,800',ts:11722,g:68,ppl:87,bg:'mom-bg',bd:'kc',bn:'KC인증'},
+  {e:'🧷',b:'하기스',n:'매직핏 기저귀 4단계 (192매)',d:52,p:'38,500',o:'79,900',ts:6487,g:92,ppl:312,bg:'mom-bg',bd:'fda',bn:'안전인증'},
+  {e:'🧸',b:'뽀로로',n:'코딩 로봇 교구 세트',d:30,p:'29,900',o:'42,800',ts:19841,g:55,ppl:56,bg:'mom-bg',bd:'kc',bn:'KC인증'},
+  {e:'👶',b:'에르고베이비',n:'옴니 360 아기띠',d:38,p:'149,000',o:'239,000',ts:7518,g:71,ppl:134,bg:'mom-bg',bd:'fda',bn:'안전인증'},
+  {e:'🥣',b:'베베쿡',n:'유기농 이유식 10팩 세트',d:28,p:'35,800',o:'49,800',ts:25973,g:42,ppl:45,bg:'mom-bg',bd:'org',bn:'유기농'},
+  {e:'🧴',b:'아토팜',n:'MLE 로션 300ml 대용량',d:40,p:'18,900',o:'31,500',ts:17729,g:65,ppl:178,bg:'mom-bg',bd:'fda',bn:'식약처'},
+];
+const INF=[
+  {n:'민지',d:'뷰티 크리에이터 · 52만',i:'민',e:'👩‍🦰'},{n:'수아',d:'스킨케어 전문 · 38만',i:'수',e:'👩'},
+  {n:'하린',d:'메이크업 아티스트 · 27만',i:'하',e:'👩‍🎤'},{n:'은서',d:'육아맘 블로거 · 19만',i:'은',e:'👩‍👦'},
+  {n:'지유',d:'뷰티 에디터 · 15만',i:'지',e:'💆‍♀️'},{n:'서연',d:'라이프 크리에이터 · 22만',i:'서',e:'🧑‍🍳'},
+];
+const SF=[
+  {n:'글로우 세럼 발색',e:'✨',v:'3.2만'},{n:'수분 크림 텍스쳐',e:'💧',v:'2.8만'},
+  {n:'립 틴트 지속력',e:'💋',v:'5.1만'},{n:'선크림 백탁 테스트',e:'☀️',v:'1.9만'},
+  {n:'파데 밀착력',e:'🪞',v:'4.3만'},{n:'마스크팩 후기',e:'🧖',v:'2.1만'},
+];
+const CE=[
+  {n:'COSRX 토너 공구',dt:'2월 5일 ~ 7일',c:'스킨케어',cl:'#B56CED',cb:'#EDE9FE',cc:'#7C3AED'},
+  {n:'하기스 기저귀 대용량',dt:'2월 8일 ~ 10일',c:'육아',cl:'#F4A896',cb:'#FFF1E6',cc:'#EA580C'},
+  {n:'rom&nd 신상 틴트',dt:'2월 12일 ~ 14일',c:'메이크업',cl:'#FF6B8A',cb:'#FCE7F3',cc:'#DB2777'},
+  {n:'유기농 이유식 세트',dt:'2월 15일 ~ 18일',c:'이유식',cl:'#7EC8A9',cb:'#D1FAE5',cc:'#059669'},
+  {n:'에르고베이비 아기띠',dt:'2월 20일 ~ 22일',c:'육아',cl:'#F4A896',cb:'#FFF1E6',cc:'#EA580C'},
+  {n:'Anua 어성초 토너',dt:'2월 24일 ~ 26일',c:'스킨케어',cl:'#B56CED',cb:'#EDE9FE',cc:'#7C3AED'},
+];
+const REVS=[
+  {n:'현지맘',i:'12개월 · 3개월 사용',s:'★★★★★',t:'하기스 매직핏 진짜 최고에요! 대용량이라 가성비 좋고, 아기 엉덩이에 자극도 없어요.',pe:['🧷','👶'],h:24},
+  {n:'서윤맘',i:'8개월 · 1개월 사용',s:'★★★★☆',t:'베베쿡 이유식 간편하고 좋아요. 유기농이라 믿고 먹일 수 있고, 아이가 잘 먹어서 재구매!',pe:['🥣','🥄'],h:18},
+  {n:'하은맘',i:'24개월 · 2주 사용',s:'★★★★★',t:'뽀로로 코딩 로봇 아이가 정말 좋아해요! 단계별로 배울 수 있어서 교육용으로도 딱이에요.',pe:['🧸'],h:31},
+];
+const ACT=['김서연님이 COSRX 토너 공구에 참여했어요','이지은님이 하기스 기저귀를 찜했어요','박수아님이 rom&nd 틴트를 주문했어요','정민지님이 이유식 공구에 참여했어요','최은서님이 아기띠 공구 리뷰를 남겼어요'];
+
+// ══════ THEME ══════
+const R=document.documentElement,A=document.getElementById('app');
+function setTh(m){
+  const t=m==='mom'?{p:'#F4A896',s:'#7EC8A9',a:'#FFE4B5',ba:'#FFF8F2',tx:'#3D3D3D',
+    g:'linear-gradient(135deg,#F4A896 0%,#FBCEB1 50%,#7EC8A9 100%)',
+    gs:'linear-gradient(135deg,rgba(244,168,150,.10) 0%,rgba(126,200,169,.06) 100%)',
+    gl:'0 8px 32px rgba(244,168,150,.15)'}:
+  {p:'#B56CED',s:'#FF6B8A',a:'#FFD4E8',ba:'#FFF9F5',tx:'#2D2D2D',
+    g:'linear-gradient(135deg,#B56CED 0%,#D946A8 50%,#FF6B8A 100%)',
+    gs:'linear-gradient(135deg,rgba(181,108,237,.10) 0%,rgba(255,107,138,.06) 100%)',
+    gl:'0 8px 32px rgba(181,108,237,.15)'};
+  ['primary','secondary','accent','base','text','grad','grad-soft','glow'].forEach((k,i)=>{
+    R.style.setProperty('--'+k,[t.p,t.s,t.a,t.ba,t.tx,t.g,t.gs,t.gl][i])});
+  A.style.background=t.ba;
+}
+
+// ══════ NAV ══════
+const tabs=['home','beauty','mom','calendar','my'];
+let curTab=0;
+document.querySelectorAll('.bnav-item').forEach((it,idx)=>{
+  it.addEventListener('click',()=>{
+    const s=it.dataset.s,newIdx=tabs.indexOf(s),dir=newIdx>curTab?1:-1;
+    document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('on'));
+    it.classList.add('on');
+    const oldScr=document.querySelector('.scr.on');
+    if(oldScr){oldScr.classList.remove('on');oldScr.style.transform=`translateX(${-dir*60}px)`}
+    const newScr=document.getElementById('scr-'+s);
+    newScr.scrollTop=0;newScr.style.transform=`translateX(${dir*60}px)`;
+    requestAnimationFrame(()=>{newScr.classList.add('on');newScr.style.transform='translateX(0)'});
+    curTab=newIdx;
+    setTh(s==='mom'?'mom':'beauty');
+    const L=document.getElementById('hdrLogo');
+    L.textContent=s==='beauty'?'공구 Beauty':s==='mom'?'공구 Mom&Life':s==='calendar'?'공구 캘린더':s==='my'?'공구 MY':'공구';
+    closeNoti();
+  });
+});
+
+// ══════ SCROLL HEADER SHADOW ══════
+document.querySelectorAll('.scr').forEach(sc=>{
+  sc.addEventListener('scroll',()=>{
+    document.getElementById('hdr').classList.toggle('scrolled',sc.scrollTop>10);
+  });
+});
+
+// ══════ RENDERS ══════
+function fmtSec(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`}
+function fmtTimer(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return`${h}시간 ${String(m).padStart(2,'0')}분`}
+
+function mkStory(){
+  const el=document.getElementById('storyRow');
+  el.innerHTML=[{n:'내 스토리',e:'➕',ring:'gray'},...INF].map((s,i)=>{
+    const cls=i===0?'gray':i===4||i===5?'viewed':'';
+    const live=i===1?'<div class="live-badge">LIVE</div>':'';
+    return`<div class="story-item"><div class="story-ring ${cls}"><div class="story-avatar">${s.e}</div>${live}</div><div class="story-name">${s.n}</div></div>`;
+  }).join('');
+}
+
+function mkTimeDeal(){
+  const items=[BP[0],BP[1],MP[1],BP[5]];
+  document.getElementById('homeTD').innerHTML=items.map(p=>`
+    <div class="td-card" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="td-emoji">${p.e}</div>
+      <div class="td-name">${p.n}</div>
+      <div class="td-price">${p.d}% ${p.p}원</div>
+      <div class="td-timer" data-sec="${p.ts}">${fmtSec(p.ts)}</div>
+    </div>
+  `).join('');
+}
+
+function mkTop5(id,arr){
+  document.getElementById(id).innerHTML=arr.slice(0,5).map((p,i)=>`
+    <div class="t5" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="t5-r r${i+1}">${i+1}</div>
+      <div class="t5-img ${p.bg}">${p.e}</div>
+      <div class="t5-info"><div class="t5n">${p.b} ${p.n}</div><div class="t5p">${p.d}% ${p.p}원</div></div>
+      <div class="t5-end"><div class="t5t">${fmtTimer(p.ts)}</div><div class="t5ppl">${p.ppl}명 참여</div></div>
+    </div>
+  `).join('');
+}
+
+function mkBento(id,arr,cnt=5){
+  document.getElementById(id).innerHTML=arr.slice(0,cnt).map(p=>`
+    <div class="pcard" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="pcard-img"><div class="bg ${p.bg}">${p.e}</div>
+        <div class="timer">${fmtTimer(p.ts)}</div>
+        <button class="heart-btn" onclick="event.stopPropagation();toggleHeart(this)">♡</button>
+      </div>
+      <div class="pcard-body">
+        <div class="brand">${p.b}</div><div class="name">${p.n}</div>
+        <div class="price-row"><span class="disc">${p.d}%</span><span class="now">${p.p}원</span><span class="was">${p.o}원</span></div>
+        ${p.bn?`<div class="badge-row"><span class="tbadge ${p.bd}">✓ ${p.bn}</span><span class="tbadge free">무료배송</span></div>`:'<div class="badge-row"><span class="tbadge free">무료배송</span></div>'}
+        <div class="gauge"><div class="gauge-bar"><div class="gauge-fill" style="width:${p.g}%"></div></div>
+        <div class="gauge-lbl"><span><b>${p.ppl}명</b> 참여</span><span>${100-p.g}% 남음</span></div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function mkCatRow(id,cats){
+  document.getElementById(id).innerHTML=cats.map((c,i)=>`
+    <div class="cat-item${i===0?' on':''}" onclick="document.querySelectorAll('#${id} .cat-item').forEach(x=>x.classList.remove('on'));this.classList.add('on')">
+      <div class="cat-icon"><span>${c.e}</span></div><div class="cat-label">${c.n}</div>
+    </div>`).join('');
+}
+
+function mkInfPick(){
+  document.getElementById('beautyInf').innerHTML=INF.slice(0,4).map((inf,i)=>{
+    const p=BP[i];return`
+    <div class="inf-card" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="inf-card-top"><div class="inf-av2">${inf.i}</div><div class="inf-meta"><div class="fn">${inf.n}</div><div class="fd">${inf.n}님의 추천</div></div></div>
+      <div class="inf-card-body"><div class="inf-emoji">${p.e}</div><div class="inf-pn">${p.n}</div><div class="inf-pp">${p.d}% ${p.p}원</div></div>
+    </div>`;
+  }).join('');
+}
+
+function mkFeed(id,arr){
+  document.getElementById(id).innerHTML=arr.slice(0,2).map((p,i)=>{
+    const inf=INF[i];return`<div class="feed" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="feed-top"><div class="feed-av">${inf.i}</div><div class="feed-who"><div class="fn">${inf.n}</div><div class="fd">${inf.d}</div></div>
+        <button class="feed-follow" onclick="event.stopPropagation();this.textContent='팔로잉';this.style.background='var(--grad)';this.style.color='#fff';this.style.borderColor='transparent'">팔로우</button></div>
+      <div class="feed-pic"><div class="bg ${p.bg}">${p.e}</div></div>
+      <div class="feed-actions">
+        <div class="feed-action" onclick="event.stopPropagation();this.style.color='var(--secondary)'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/></svg>${Math.floor(Math.random()*300+50)}</div>
+        <div class="feed-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${Math.floor(Math.random()*50+5)}</div>
+        <div class="feed-action" onclick="event.stopPropagation();showToast('🔗 링크가 복사되었어요')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" x2="12" y1="2" y2="15"/></svg></div>
+      </div>
+      <div class="feed-body"><div class="fn2">${p.b} ${p.n}</div>
+        <div class="price-row"><span class="disc">${p.d}%</span><span class="now">${p.p}원</span><span class="was">${p.o}원</span></div>
+        <div class="f-stats"><span class="hot">🔥 ${p.ppl}명 참여</span><span>⏰ ${fmtTimer(p.ts)} 남음</span></div>
+        <div class="gauge"><div class="gauge-bar"><div class="gauge-fill" style="width:${p.g}%"></div></div>
+        <div class="gauge-lbl"><span>팀 공구 <b>${p.g}%</b></span><span>목표 300명</span></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mkSF(id){
+  document.getElementById(id).innerHTML=SF.map((s,i)=>`
+    <div class="sf-item"><div class="sf-thumb"><div class="sf-bg b${(i%6)+1}"></div><div class="sf-play"></div>
+      <div class="sf-views">▶ ${s.v}</div><div class="sf-emoji">${s.e}</div></div>
+    <div class="sf-name">${s.n}</div></div>
+  `).join('');
+}
+
+function mkAI(id,arr){
+  document.getElementById(id).innerHTML=arr.slice(0,4).map(p=>`
+    <div class="ai-c" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="ae">${p.e}</div><div class="an">${p.n}</div><div class="ap">${p.d}% ${p.p}원</div></div>
+  `).join('');
+}
+
+function mkWishRow(id,arr){
+  document.getElementById(id).innerHTML=arr.slice(0,5).map(p=>`
+    <div class="hc-card" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="hc-card-img ${p.bg}">${p.e}<div class="hc-card-wishbadge">❤️ ${p.ppl}명</div></div>
+      <div class="hc-card-body"><div class="hcn">${p.n}</div><div class="hcp">${p.d}% ${p.p}원</div></div>
+    </div>
+  `).join('');
+}
+
+function mkRecent(){
+  const arr=[...BP.slice(0,3),...MP.slice(0,2)];
+  document.getElementById('myRecent').innerHTML=arr.map(p=>`
+    <div class="hc-card" onclick='openModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+      <div class="hc-card-img ${p.bg}">${p.e}</div>
+      <div class="hc-card-body"><div class="hcn">${p.n}</div><div class="hcp">${p.d}% ${p.p}원</div></div>
+    </div>
+  `).join('');
+}
+
+function mkRevs(id){
+  document.getElementById(id).innerHTML=REVS.map(r=>`
+    <div class="rev"><div class="rev-top"><div class="rev-av mom">${r.pe[0]}</div>
+      <div class="rev-meta"><div class="rn">${r.n}</div><div class="ri">${r.i}</div></div>
+      <div class="rev-stars">${r.s}</div></div>
+    <div class="rev-photos">${r.pe.map(p=>`<div class="rev-photo">${p}</div>`).join('')}</div>
+    <div class="rev-text">${r.t}</div>
+    <div class="rev-helpful" onclick="this.innerHTML='👍 도움이 됐어요 (${r.h+1})';this.style.color='var(--primary)'">👍 도움이 됐어요 (${r.h})</div></div>
+  `).join('');
+}
+
+function mkMiniCal(){
+  document.getElementById('momMiniCal').innerHTML=CE.slice(0,3).map(ev=>`
+    <div class="cal-ev" style="margin-bottom:6px"><div class="cal-dot" style="background:${ev.cl}"></div>
+    <div class="cal-info"><div class="en">${ev.n}</div><div class="ed">${ev.dt}</div></div>
+    <span class="cal-cat" style="background:${ev.cb};color:${ev.cc}">${ev.c}</span></div>
+  `).join('');
+}
+
+// ══════ CALENDAR ══════
+let cY=2025,cM=1;
+function mkCal(){
+  document.getElementById('calMon').textContent=`${cY}년 ${cM+1}월`;
+  const g=document.getElementById('calGrid');
+  const dn=['일','월','화','수','목','금','토'];
+  let h=dn.map(d=>`<div class="cal-dn">${d}</div>`).join('');
+  const fd=new Date(cY,cM,1).getDay(),dm=new Date(cY,cM+1,0).getDate(),pd=new Date(cY,cM,0).getDate();
+  const td=new Date(),evd=[5,6,7,8,9,10,12,13,14,15,16,17,18,20,21,22,24,25,26];
+  for(let i=fd-1;i>=0;i--)h+=`<div class="cal-d oth">${pd-i}</div>`;
+  for(let d=1;d<=dm;d++){
+    const it=d===td.getDate()&&cM===td.getMonth()&&cY===td.getFullYear();
+    h+=`<div class="cal-d${it?' today':''}${evd.includes(d)?' ev':''}">${d}</div>`;
+  }
+  const rm=42-(fd+dm);for(let i=1;i<=rm&&i<=7;i++)h+=`<div class="cal-d oth">${i}</div>`;
+  g.innerHTML=h;
+  document.getElementById('calEvs').innerHTML=CE.map(ev=>`
+    <div class="cal-ev"><div class="cal-dot" style="background:${ev.cl}"></div>
+    <div class="cal-info"><div class="en">${ev.n}</div><div class="ed">${ev.dt}</div></div>
+    <span class="cal-cat" style="background:${ev.cb};color:${ev.cc}">${ev.c}</span></div>
+  `).join('');
+}
+function chgMon(d){cM+=d;if(cM<0){cM=11;cY--}if(cM>11){cM=0;cY++}mkCal()}
+
+// ══════ BANNER SLIDER ══════
+function mkBannerSlide(tid,cnt){
+  let idx=0;const tk=document.getElementById(tid);if(!tk)return;
+  const dots=tk.parentElement.querySelector('.banner-dots');
+  setInterval(()=>{idx=(idx+1)%cnt;tk.style.transform=`translateX(-${idx*100}%)`;
+    if(dots)dots.querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',i===idx));
+  },3500);
+}
+
+// ══════ INTERACTIONS ══════
+document.querySelectorAll('.pills').forEach(row=>{
+  row.addEventListener('click',e=>{if(e.target.classList.contains('pill')){
+    row.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));e.target.classList.add('on')}})});
+document.querySelectorAll('.age-b').forEach(b=>{
+  b.addEventListener('click',()=>{document.querySelectorAll('.age-b').forEach(x=>x.classList.remove('on'));b.classList.add('on')})});
+
+function toggleHeart(el){
+  el.classList.toggle('liked');
+  el.innerHTML=el.classList.contains('liked')?'<span style="animation:heartPop .4s ease">♥</span>':'♡';
+  if(el.classList.contains('liked'))showToast('❤️ 찜 목록에 추가했어요');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function openModal(p){
+  document.getElementById('modalImg').textContent=p.e;
+  document.getElementById('modalImg').className='modal-img '+(p.bg||'beauty-bg');
+  document.getElementById('modalBrand').textContent=p.b;
+  document.getElementById('modalName').textContent=p.n;
+  document.getElementById('modalDisc').textContent=p.d+'%';
+  document.getElementById('modalPrice').textContent=p.p+'원';
+  document.getElementById('modalOrig').textContent=p.o+'원';
+  document.getElementById('modalGauge').style.width=p.g+'%';
+  document.getElementById('modalPpl').textContent=p.ppl+'명';
+  document.getElementById('modalLeft').textContent=(100-p.g)+'% 남음';
+  document.getElementById('modalOv').classList.add('show');
+  document.getElementById('modalSheet').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalOv').classList.remove('show');
+  document.getElementById('modalSheet').classList.remove('show');
+}
+
+// ══════ SEARCH ══════
+document.getElementById('searchBtn').addEventListener('click',()=>document.getElementById('searchOv').classList.add('show'));
+document.getElementById('searchClose').addEventListener('click',()=>document.getElementById('searchOv').classList.remove('show'));
+
+// ══════ NOTIFICATION ══════
+document.getElementById('bellBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  const p=document.getElementById('notiPanel'),o=document.getElementById('notiOv');
+  p.classList.toggle('show');o.classList.toggle('show');
+});
+document.getElementById('notiOv').addEventListener('click',closeNoti);
+function closeNoti(){document.getElementById('notiPanel').classList.remove('show');document.getElementById('notiOv').classList.remove('show')}
+
+// ══════ STATUS TIME ══════
+function updTime(){
+  const d=new Date();document.getElementById('statusTime').textContent=
+    d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+}
+setInterval(updTime,30000);updTime();
+
+// ══════ LIVE TIMERS ══════
+function tickTimers(){
+  document.querySelectorAll('.td-timer[data-sec]').forEach(el=>{
+    let s=parseInt(el.dataset.sec);if(s>0){s--;el.dataset.sec=s;
+      const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
+      el.innerHTML=`${h}<span class="colon">:</span>${String(m).padStart(2,'0')}<span class="colon">:</span>${String(ss).padStart(2,'0')}`;
+    }
+  });
+}
+setInterval(tickTimers,1000);
+
+// ══════ ACTIVITY TOAST ══════
+let actIdx=0;
+function rotateAct(){
+  const el=document.getElementById('actToast'),msg=document.getElementById('actMsg');
+  el.classList.remove('show');
+  setTimeout(()=>{msg.textContent=ACT[actIdx%ACT.length];el.classList.add('show');actIdx++},400);
+  setTimeout(()=>el.classList.remove('show'),3600);
+}
+setInterval(rotateAct,5000);
+setTimeout(rotateAct,2000);
+
+// ══════ INIT ══════
+(function(){
+  const all=[...BP,...MP].sort(()=>Math.random()-.5);
+  mkStory();mkTimeDeal();
+  mkTop5('homeTop5',all);mkBento('homeBento',all,5);mkSF('homeSF');
+  mkCatRow('beautyCats',[{e:'✨',n:'전체'},{e:'🧴',n:'스킨케어'},{e:'💄',n:'메이크업'},{e:'💇‍♀️',n:'헤어'},{e:'🛁',n:'바디'},{e:'🔮',n:'뷰티디바이스'},{e:'👜',n:'패션소품'}]);
+  mkTop5('beautyTop5',BP);mkInfPick();mkFeed('beautyFeed',BP);mkSF('beautySF');mkAI('beautyAI',BP);
+  mkCatRow('momCats',[{e:'🌟',n:'전체'},{e:'🍼',n:'수유/이유식'},{e:'🧷',n:'기저귀'},{e:'🧸',n:'장난감/교구'},{e:'👕',n:'유아의류'},{e:'🏠',n:'생활용품'},{e:'🍳',n:'주방'},{e:'🥗',n:'식품'}]);
+  mkBento('momTrust',MP.filter(p=>p.bd),4);mkBento('momValue',MP,5);
+  mkWishRow('momWish',MP);mkRevs('momRevs');mkMiniCal();mkRecent();
+  mkCal();
+  mkBannerSlide('homeTrack',3);mkBannerSlide('beautyTrack',2);mkBannerSlide('momTrack',2);
+  setTimeout(()=>{document.querySelectorAll('.gauge-fill').forEach(g=>{
+    const w=g.style.width;g.style.width='0%';setTimeout(()=>g.style.width=w,80)})},400);
+  tickTimers();
+})();
+</script>
+</body>
+</html>

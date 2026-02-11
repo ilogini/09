@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>펫런 PetRun - 반려동물 산책 경쟁 웹앱</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Leaflet.js (무료, API 키 불필요) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --nav-height: 72px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-logo { display: flex; align-items: center; gap: 8px; }
+        .header-logo .paw-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .header-logo span { font-size: 20px; font-weight: 800; color: var(--text); }
+        .header-logo span em { font-style: normal; color: var(--primary); }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s; }
+        .header-btn:hover { background: var(--border); }
+        .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
+
+        /* ===== GPS Badge ===== */
+        .gps-badge { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--bg); color: var(--text-light); transition: all 0.3s; }
+        .gps-badge.on { background: var(--primary-light); color: var(--primary-dark); }
+        .gps-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-light); }
+        .gps-badge.on .gps-dot { background: var(--primary); animation: gpsPulse 1.5s infinite; }
+        @keyframes gpsPulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{opacity:0.7;box-shadow:0 0 0 4px rgba(16,185,129,0)} }
+
+        /* ===== Main Content ===== */
+        .content { padding-bottom: calc(var(--nav-height) + 20px); }
+
+        /* ===== Weather ===== */
+        .weather-bar { background: linear-gradient(135deg, #EEF2FF 0%, #DBEAFE 100%); margin: 16px 16px 0; padding: 14px 18px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; }
+        .weather-info { display: flex; align-items: center; gap: 10px; }
+        .weather-icon { font-size: 28px; }
+        .weather-text h4 { font-size: 14px; font-weight: 600; }
+        .weather-text p { font-size: 12px; color: var(--secondary-dark); margin-top: 2px; }
+        .weather-temp { font-size: 24px; font-weight: 700; color: var(--secondary-dark); }
+
+        /* ===== Weekly Card ===== */
+        .weekly-card { margin: 16px; background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+        .weekly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .weekly-header h3 { font-size: 16px; font-weight: 700; }
+        .weekly-header .period { font-size: 12px; color: var(--text-light); background: var(--bg); padding: 4px 10px; border-radius: 20px; }
+        .weekly-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1.2; }
+        .stat-value .unit { font-size: 14px; font-weight: 600; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .progress-section { margin-top: 4px; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .progress-header span { font-size: 13px; color: var(--text-secondary); }
+        .progress-header strong { font-size: 13px; color: var(--primary); }
+        .progress-bar { height: 10px; background: var(--primary-light); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 10px; transition: width 1s ease; position: relative; }
+        .progress-fill::after { content:''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background: var(--white); border: 3px solid var(--primary); border-radius: 50%; box-shadow: var(--shadow-sm); }
+
+        /* ===== Walk Start ===== */
+        .walk-start-section { margin: 0 16px; }
+        .walk-start-btn { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius); font-size: 18px; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 24px rgba(16,185,129,0.35); transition: all 0.3s; position: relative; overflow: hidden; }
+        .walk-start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16,185,129,0.45); }
+        .walk-start-btn:active { transform: translateY(0); }
+        .walk-start-btn .btn-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .walk-start-btn .btn-text { text-align: left; }
+        .walk-start-btn .btn-text .sub { font-size: 12px; font-weight: 500; opacity: 0.85; margin-top: 2px; }
+        .walk-start-btn .btn-arrow { margin-left: auto; font-size: 24px; opacity: 0.7; }
+
+        /* ===== Section Title ===== */
+        .section-title { padding: 24px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .section-title .more { font-size: 13px; color: var(--text-light); text-decoration: none; cursor: pointer; }
+        .section-title .more:hover { color: var(--primary); }
+
+        /* ===== Ranking ===== */
+        .ranking-card { margin: 0 16px; background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+        .ranking-tabs { display: flex; border-bottom: 1px solid var(--border); }
+        .ranking-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-light); border: none; background: none; cursor: pointer; font-family: inherit; position: relative; transition: color 0.2s; }
+        .ranking-tab.active { color: var(--primary); }
+        .ranking-tab.active::after { content:''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; }
+        .ranking-list { padding: 8px 0; }
+        .ranking-item { display: flex; align-items: center; padding: 12px 18px; gap: 14px; transition: background 0.2s; }
+        .ranking-item:hover { background: var(--bg); }
+        .ranking-item.me { background: var(--primary-light); }
+        .rank-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-secondary); background: var(--bg); flex-shrink: 0; }
+        .rank-1 { background: #FEF3C7; color: #D97706; }
+        .rank-2 { background: #F3F4F6; color: #6B7280; }
+        .rank-3 { background: #FED7AA; color: #C2410C; }
+        .rank-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--border)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .rank-info { flex: 1; min-width: 0; }
+        .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rank-pet { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .rank-distance { font-size: 15px; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
+        .rank-distance .unit { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+
+        /* ===== Challenge ===== */
+        .challenge-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .challenge-scroll::-webkit-scrollbar { display: none; }
+        .challenge-item { min-width: 200px; background: var(--white); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow); scroll-snap-align: start; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; }
+        .challenge-item:hover { transform: translateY(-2px); }
+        .challenge-badge { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; }
+        .challenge-badge.distance { background: #DBEAFE; }
+        .challenge-badge.streak { background: #FEE2E2; }
+        .challenge-badge.explore { background: #FEF3C7; }
+        .challenge-badge.speed { background: #EDE9FE; }
+        .challenge-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .challenge-item p { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+        .challenge-progress { display: flex; align-items: center; gap: 8px; }
+        .challenge-progress .bar { flex: 1; height: 6px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+        .challenge-progress .bar-fill { height: 100%; border-radius: 6px; }
+        .bar-fill.green { background: var(--primary); }
+        .bar-fill.red { background: var(--danger); }
+        .bar-fill.amber { background: var(--accent); }
+        .bar-fill.purple { background: #8B5CF6; }
+        .challenge-progress span { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+
+        /* ===== Pets ===== */
+        .pets-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+        .pets-scroll::-webkit-scrollbar { display: none; }
+        .pet-card { min-width: 140px; background: var(--white); border-radius: var(--radius-sm); padding: 16px; text-align: center; box-shadow: var(--shadow-sm); border: 2px solid transparent; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .pet-card:hover, .pet-card.selected { border-color: var(--primary); box-shadow: var(--shadow); }
+        .pet-avatar { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .pet-avatar.dog { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .pet-avatar.cat { background: linear-gradient(135deg, #FCE7F3, #F9A8D4); }
+        .pet-avatar.add { background: var(--bg); border: 2px dashed var(--border); }
+        .pet-card h4 { font-size: 14px; font-weight: 600; }
+        .pet-card p { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .pet-card .pet-stat { margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--primary); }
+
+        /* ===== Nearby ===== */
+        .nearby-map-box { margin: 0 16px; height: 180px; border-radius: var(--radius); overflow: hidden; }
+        .nearby-map-box .leaflet-control-attribution { font-size: 8px !important; opacity: 0.5; }
+        .nearby-list { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+        .nearby-item { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s; }
+        .nearby-item:hover { box-shadow: var(--shadow); transform: translateX(4px); }
+        .nearby-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .nearby-icon.park { background: #D1FAE5; }
+        .nearby-icon.cafe { background: #FEF3C7; }
+        .nearby-icon.hospital { background: #DBEAFE; }
+        .nearby-info { flex: 1; min-width: 0; }
+        .nearby-name { font-size: 14px; font-weight: 600; }
+        .nearby-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+        .nearby-dist { font-size: 13px; font-weight: 600; color: var(--secondary); white-space: nowrap; }
+
+        /* ===== Ad / Premium ===== */
+        .ad-banner { margin: 20px 16px 0; padding: 14px 18px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative; }
+        .ad-badge { font-size: 10px; font-weight: 600; color: var(--accent); background: rgba(245,158,11,0.15); padding: 2px 6px; border-radius: 4px; position: absolute; top: 8px; right: 8px; }
+        .ad-banner .ad-icon { font-size: 32px; }
+        .ad-banner .ad-text h4 { font-size: 13px; font-weight: 700; color: #92400E; }
+        .ad-banner .ad-text p { font-size: 11px; color: #A16207; margin-top: 2px; }
+
+        .recent-walks { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+        .walk-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s; }
+        .walk-item:hover { box-shadow: var(--shadow); }
+        .walk-route-mini { width: 52px; height: 52px; border-radius: 12px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .walk-route-mini svg { width: 32px; height: 32px; }
+        .walk-info { flex: 1; min-width: 0; }
+        .walk-date { font-size: 12px; color: var(--text-light); }
+        .walk-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
+        .walk-meta { display: flex; gap: 12px; margin-top: 4px; }
+        .walk-meta span { font-size: 12px; color: var(--text-secondary); }
+        .walk-meta span strong { color: var(--text); }
+
+        .premium-banner { margin: 20px 16px 0; padding: 16px 18px; background: linear-gradient(135deg, #1E1B4B, #312E81); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.2s; }
+        .premium-banner:hover { transform: translateY(-2px); }
+        .premium-badge { width: 44px; height: 44px; background: linear-gradient(135deg, #F59E0B, #EAB308); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .premium-text h4 { font-size: 14px; font-weight: 700; color: white; }
+        .premium-text p { font-size: 12px; color: #A5B4FC; margin-top: 2px; }
+        .premium-price { margin-left: auto; text-align: right; }
+        .premium-price .price { font-size: 16px; font-weight: 700; color: #FCD34D; }
+        .premium-price .period { font-size: 11px; color: #A5B4FC; }
+
+        /* ===== Bottom Nav ===== */
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: var(--nav-height); background: var(--white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 200; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; border: none; background: none; cursor: pointer; font-family: inherit; transition: all 0.2s; position: relative; min-width: 52px; }
+        .nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
+        .nav-item:hover .nav-icon { transform: translateY(-2px); }
+        .nav-item.center-btn { position: relative; top: -14px; }
+        .nav-item.center-btn .nav-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 16px rgba(16,185,129,0.4); color: white; }
+        .nav-item.center-btn:hover .nav-icon { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(16,185,129,0.5); }
+
+        /* ===== Walk Screen (Full-screen overlay) ===== */
+        .walk-screen {
+            display: none;
+            position: fixed; inset: 0; z-index: 300;
+            background: var(--bg);
+            max-width: 480px; margin: 0 auto;
+            flex-direction: column;
+        }
+        .walk-screen.active { display: flex; }
+
+        .walk-screen-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0; z-index: 10;
+        }
+        .walk-screen-header h3 { font-size: 15px; font-weight: 700; }
+        .walk-close-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* Walk Map */
+        .walk-map-area { flex: 1; position: relative; min-height: 0; }
+        #walkMap { width: 100%; height: 100%; z-index: 1; }
+        .leaflet-control-zoom { display: none !important; }
+
+        .walk-map-controls {
+            position: absolute; top: 12px; right: 12px; z-index: 10;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .wmap-btn {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+            border: none; border-radius: 10px; box-shadow: var(--shadow);
+            font-size: 17px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .wmap-btn:active { transform: scale(0.92); }
+        .wmap-btn.on { background: var(--primary); color: white; }
+
+        .walk-dist-chip {
+            position: absolute; bottom: 12px; left: 12px; z-index: 10;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+            border-radius: 12px; padding: 10px 16px; box-shadow: var(--shadow);
+        }
+        .walk-dist-chip .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: gpsPulse 1s infinite; }
+        .walk-dist-chip .dist-num { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .walk-dist-chip .dist-unit { font-size: 11px; color: var(--text-secondary); }
+
+        /* Walk Stats Panel */
+        .walk-stats-panel {
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            padding: 16px 20px 28px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            flex-shrink: 0; z-index: 10;
+        }
+
+        .walk-pet-label { text-align: center; font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 4px; }
+        .walk-pause-label { text-align: center; font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 4px; display: none; }
+        .walk-pause-label.on { display: block; }
+
+        .walk-timer {
+            text-align: center; font-size: 48px; font-weight: 800;
+            color: var(--text); letter-spacing: 2px;
+            margin-bottom: 12px; font-variant-numeric: tabular-nums;
+        }
+        .walk-stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+        .walk-stat { text-align: center; background: var(--bg); border-radius: var(--radius-sm); padding: 12px 6px; }
+        .walk-stat .value { font-size: 20px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+        .walk-stat .value .unit { font-size: 10px; font-weight: 500; color: var(--text-secondary); }
+        .walk-stat .label { font-size: 10px; color: var(--text-light); margin-top: 3px; }
+
+        .walk-controls { display: flex; align-items: center; justify-content: center; gap: 20px; }
+        .walk-ctrl-btn { border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s; }
+        .walk-ctrl-btn:active { transform: scale(0.92); }
+        .walk-ctrl-btn.pause { width: 50px; height: 50px; background: var(--bg); font-size: 19px; }
+        .walk-ctrl-btn.stop { width: 66px; height: 66px; background: linear-gradient(135deg, var(--danger), #DC2626); color: white; font-size: 24px; box-shadow: 0 4px 16px rgba(239,68,68,0.4); }
+        .walk-ctrl-btn.camera { width: 50px; height: 50px; background: var(--bg); font-size: 19px; }
+
+        /* ===== Result Modal ===== */
+        .result-modal { display: none; position: fixed; inset: 0; z-index: 400; background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center; max-width: 480px; margin: 0 auto; }
+        .result-modal.active { display: flex; }
+        .result-content { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px 24px 36px; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        .result-header { text-align: center; margin-bottom: 20px; }
+        .result-header .emoji { font-size: 48px; margin-bottom: 8px; }
+        .result-header h2 { font-size: 22px; font-weight: 800; }
+        .result-header p { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+        .result-map-preview { width: 100%; height: 160px; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 18px; background: var(--bg); }
+        .result-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
+        .result-stat { background: var(--bg); border-radius: var(--radius-xs); padding: 14px; text-align: center; }
+        .result-stat .icon { font-size: 18px; margin-bottom: 4px; }
+        .result-stat .value { font-size: 20px; font-weight: 700; color: var(--text); }
+        .result-stat .label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .result-badges { margin-bottom: 18px; }
+        .result-badges h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .badge-list { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge-item { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; background: var(--accent-light); font-size: 12px; font-weight: 600; color: #92400E; }
+        .result-actions { display: flex; gap: 12px; }
+        .result-btn { flex: 1; padding: 14px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: all 0.2s; }
+        .result-btn.share { background: var(--bg); color: var(--text); }
+        .result-btn.save { background: var(--primary); color: white; }
+        .result-btn:hover { transform: translateY(-1px); }
+
+        /* ===== Toast ===== */
+        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Animation ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+
+        @media (max-width: 360px) {
+            .weekly-stats .stat-value { font-size: 24px; }
+            .walk-timer { font-size: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-logo">
+            <div class="paw-icon">🐾</div>
+            <span>Pet<em>Run</em></span>
+        </div>
+        <div class="header-actions">
+            <div class="gps-badge" id="gpsBadge">
+                <span class="gps-dot"></span>
+                <span id="gpsLabel">GPS 대기</span>
+            </div>
+            <button class="header-btn" aria-label="알림">
+                🔔<span class="notification-dot"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Weather -->
+        <div class="weather-bar animate-in">
+            <div class="weather-info">
+                <span class="weather-icon">☀️</span>
+                <div class="weather-text">
+                    <h4>산책하기 좋은 날이에요!</h4>
+                    <p>미세먼지 좋음 · 습도 45%</p>
+                </div>
+            </div>
+            <div class="weather-temp">12°</div>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="weekly-card animate-in">
+            <div class="weekly-header">
+                <h3>📊 이번 주 산책</h3>
+                <span class="period">2.3 ~ 2.9</span>
+            </div>
+            <div class="weekly-stats">
+                <div class="stat-item"><div class="stat-value">12.5<span class="unit">km</span></div><div class="stat-label">총 거리</div></div>
+                <div class="stat-item"><div class="stat-value">5<span class="unit">회</span></div><div class="stat-label">산책 횟수</div></div>
+                <div class="stat-item"><div class="stat-value">2:15</div><div class="stat-label">총 시간</div></div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-header"><span>주간 목표 20km</span><strong>62%</strong></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>
+            </div>
+        </div>
+
+        <!-- Walk Start -->
+        <div class="walk-start-section animate-in">
+            <button class="walk-start-btn" onclick="openWalkScreen()">
+                <span class="btn-icon">🐕</span>
+                <div class="btn-text">
+                    <div>산책 시작하기</div>
+                    <div class="sub">초코와 함께 걸어볼까요?</div>
+                </div>
+                <span class="btn-arrow">→</span>
+            </button>
+        </div>
+
+        <!-- My Pets -->
+        <div class="section-title"><h3>🐾 내 반려동물</h3><a class="more" href="#">관리 →</a></div>
+        <div class="pets-scroll">
+            <div class="pet-card selected" onclick="selectPet(this,'초코')">
+                <div class="pet-avatar dog">🐕</div><h4>초코</h4><p>골든 리트리버 · 3살</p><div class="pet-stat">총 142.5km</div>
+            </div>
+            <div class="pet-card" onclick="selectPet(this,'나비')">
+                <div class="pet-avatar cat">🐈</div><h4>나비</h4><p>코리안 숏헤어 · 2살</p><div class="pet-stat">총 28.3km</div>
+            </div>
+            <div class="pet-card">
+                <div class="pet-avatar add">➕</div><h4>추가하기</h4><p>반려동물 등록</p>
+            </div>
+        </div>
+
+        <!-- Ranking -->
+        <div class="section-title"><h3>🏆 동네 랭킹</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="ranking-card">
+            <div class="ranking-tabs">
+                <button class="ranking-tab active">주간</button>
+                <button class="ranking-tab">월간</button>
+                <button class="ranking-tab">전체</button>
+            </div>
+            <div class="ranking-list">
+                <div class="ranking-item"><span class="rank-num rank-1">1</span><div class="rank-avatar">🧑</div><div class="rank-info"><div class="rank-name">초코아빠</div><div class="rank-pet">🐕 골든 리트리버</div></div><div class="rank-distance">45.2 <span class="unit">km</span></div></div>
+                <div class="ranking-item me"><span class="rank-num rank-2">2</span><div class="rank-avatar">👤</div><div class="rank-info"><div class="rank-name">나 ⭐</div><div class="rank-pet">🐕 초코</div></div><div class="rank-distance">38.1 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num rank-3">3</span><div class="rank-avatar">👩</div><div class="rank-info"><div class="rank-name">달이맘</div><div class="rank-pet">🐩 푸들</div></div><div class="rank-distance">32.7 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num">4</span><div class="rank-avatar">🧑</div><div class="rank-info"><div class="rank-name">바둑이집사</div><div class="rank-pet">🐕 진돗개</div></div><div class="rank-distance">28.4 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num">5</span><div class="rank-avatar">👩</div><div class="rank-info"><div class="rank-name">콩이엄마</div><div class="rank-pet">🐈 러시안블루</div></div><div class="rank-distance">21.9 <span class="unit">km</span></div></div>
+            </div>
+        </div>
+
+        <!-- Challenges -->
+        <div class="section-title"><h3>🎯 진행 중인 챌린지</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="challenge-scroll">
+            <div class="challenge-item"><div class="challenge-badge distance">🏃</div><h4>주간 50km 달성</h4><p>이번 주 총 50km 걷기</p><div class="challenge-progress"><div class="bar"><div class="bar-fill green" style="width:76%"></div></div><span>38/50km</span></div></div>
+            <div class="challenge-item"><div class="challenge-badge streak">🔥</div><h4>7일 연속 산책</h4><p>매일 1회 이상 산책</p><div class="challenge-progress"><div class="bar"><div class="bar-fill red" style="width:71%"></div></div><span>5/7일</span></div></div>
+            <div class="challenge-item"><div class="challenge-badge explore">🧭</div><h4>공원 탐험가</h4><p>다른 공원 5곳 방문</p><div class="challenge-progress"><div class="bar"><div class="bar-fill amber" style="width:40%"></div></div><span>2/5곳</span></div></div>
+            <div class="challenge-item"><div class="challenge-badge speed">⚡</div><h4>스피드 워커</h4><p>평균 속도 5km/h 이상</p><div class="challenge-progress"><div class="bar"><div class="bar-fill purple" style="width:90%"></div></div><span>9/10회</span></div></div>
+        </div>
+
+        <!-- Nearby (Real Map) -->
+        <div class="section-title"><h3>📍 내 주변</h3><a class="more" href="#">지도보기 →</a></div>
+        <div class="nearby-map-box" id="nearbyMap"></div>
+        <div class="nearby-list">
+            <div class="nearby-item"><div class="nearby-icon park">🌳</div><div class="nearby-info"><div class="nearby-name">보라매공원 반려동물 놀이터</div><div class="nearby-detail">반려동물 전용 · 무료 입장</div></div><div class="nearby-dist">450m</div></div>
+            <div class="nearby-item"><div class="nearby-icon cafe">☕</div><div class="nearby-info"><div class="nearby-name">멍멍카페</div><div class="nearby-detail">반려동물 동반 카페 · 대형견 OK</div></div><div class="nearby-dist">800m</div></div>
+            <div class="nearby-item"><div class="nearby-icon hospital">🏥</div><div class="nearby-info"><div class="nearby-name">해피 동물병원</div><div class="nearby-detail">24시 진료 · 평점 4.8</div></div><div class="nearby-dist">1.2km</div></div>
+        </div>
+
+        <!-- Ad -->
+        <div class="ad-banner"><span class="ad-badge">AD</span><span class="ad-icon">🦴</span><div class="ad-text"><h4>프리미엄 강아지 간식 20% 할인!</h4><p>산책 후 맛있는 간식 어때요?</p></div></div>
+
+        <!-- Recent Walks -->
+        <div class="section-title"><h3>🕐 최근 산책</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="recent-walks">
+            <div class="walk-item"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 L10 14 L18 18 L26 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="26" r="3" fill="#10B981"/><circle cx="26" cy="6" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">오늘 오전 7:30</div><div class="walk-title">보라매공원 코스 🐕 초코</div><div class="walk-meta"><span>📏 <strong>3.2km</strong></span><span>⏱ <strong>42분</strong></span><span>🔥 <strong>165kcal</strong></span></div></div></div>
+            <div class="walk-item"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M8 24 L16 8 L24 20" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="24" r="3" fill="#10B981"/><circle cx="24" cy="20" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">어제 오후 6:15</div><div class="walk-title">한강 산책로 🐕 초코</div><div class="walk-meta"><span>📏 <strong>4.7km</strong></span><span>⏱ <strong>58분</strong></span><span>🔥 <strong>231kcal</strong></span></div></div></div>
+        </div>
+
+        <!-- Premium -->
+        <div class="premium-banner"><div class="premium-badge">👑</div><div class="premium-text"><h4>PetRun 프리미엄</h4><p>광고 제거 + 상세 통계 + 무제한 챌린지</p></div><div class="premium-price"><div class="price">₩3,900</div><div class="period">/월</div></div></div>
+        <div style="height:24px"></div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab(this)"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></button>
+        <button class="nav-item" onclick="switchTab(this)"><span class="nav-icon">🗺️</span><span class="nav-label">지도</span></button>
+        <button class="nav-item center-btn" onclick="openWalkScreen()"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></button>
+        <button class="nav-item" onclick="switchTab(this)"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></button>
+        <button class="nav-item" onclick="switchTab(this)"><span class="nav-icon">👤</span><span class="nav-label">MY</span></button>
+    </nav>
+
+    <!-- ===== Walk Screen (Full-screen with REAL MAP) ===== -->
+    <div class="walk-screen" id="walkScreen">
+        <div class="walk-screen-header">
+            <div class="gps-badge" id="walkGpsBadge"><span class="gps-dot"></span><span id="walkGpsLabel">GPS</span></div>
+            <h3 id="walkScreenTitle">🐕 산책 준비</h3>
+            <button class="walk-close-btn" onclick="closeWalk()">✕</button>
+        </div>
+
+        <div class="walk-map-area">
+            <div id="walkMap"></div>
+            <div class="walk-map-controls">
+                <button class="wmap-btn" onclick="centerMe()" title="내 위치">📍</button>
+                <button class="wmap-btn on" id="followBtn" onclick="toggleFollow()" title="따라가기">🎯</button>
+                <button class="wmap-btn" onclick="wMap.zoomIn()">＋</button>
+                <button class="wmap-btn" onclick="wMap.zoomOut()">－</button>
+            </div>
+            <div class="walk-dist-chip" id="walkDistChip" style="display:none">
+                <span class="live-dot"></span>
+                <span class="dist-num" id="mapDistNum">0.00</span>
+                <span class="dist-unit">km</span>
+            </div>
+        </div>
+
+        <div class="walk-stats-panel">
+            <div class="walk-pet-label" id="walkPetLabel">🐕 초코와 산책</div>
+            <div class="walk-pause-label" id="walkPauseLabel">⏸ 일시정지</div>
+            <div class="walk-timer" id="walkTimer">00:00:00</div>
+            <div class="walk-stats-grid">
+                <div class="walk-stat"><div class="value"><span id="wDist">0.00</span> <span class="unit">km</span></div><div class="label">거리</div></div>
+                <div class="walk-stat"><div class="value"><span id="wSpd">0.0</span> <span class="unit">km/h</span></div><div class="label">속도</div></div>
+                <div class="walk-stat"><div class="value"><span id="wCal">0</span> <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+            </div>
+            <div class="walk-controls" id="preStartControls">
+                <button class="walk-start-btn" onclick="beginTracking()" style="width:100%;padding:16px;font-size:16px;box-shadow:0 6px 20px rgba(16,185,129,0.35)">
+                    🐾 GPS 산책 시작!
+                </button>
+            </div>
+            <div class="walk-controls" id="walkingControls" style="display:none">
+                <button class="walk-ctrl-btn pause" id="pauseBtn" onclick="togglePause()">⏸</button>
+                <button class="walk-ctrl-btn stop" onclick="stopWalk()">⏹</button>
+                <button class="walk-ctrl-btn camera" onclick="toast('📷 사진 기능은 앱 버전에서!')">📷</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <div class="result-header">
+                <div class="emoji">🎉</div>
+                <h2>산책 완료!</h2>
+                <p id="resultPetMsg">초코와 즐거운 산책이었어요</p>
+            </div>
+            <div class="result-map-preview" id="resultMapEl"></div>
+            <div class="result-stats">
+                <div class="result-stat"><div class="icon">📏</div><div class="value" id="rDist">0 km</div><div class="label">거리</div></div>
+                <div class="result-stat"><div class="icon">⏱</div><div class="value" id="rTime">0:00</div><div class="label">시간</div></div>
+                <div class="result-stat"><div class="icon">🏃</div><div class="value" id="rSpd">0 km/h</div><div class="label">평균 속도</div></div>
+                <div class="result-stat"><div class="icon">🔥</div><div class="value" id="rCal">0 kcal</div><div class="label">칼로리</div></div>
+            </div>
+            <div class="result-badges" id="resBadges" style="display:none">
+                <h4>🏅 획득한 배지</h4>
+                <div class="badge-list" id="badgeList"></div>
+            </div>
+            <div class="result-actions">
+                <button class="result-btn share" onclick="closeResult()">닫기</button>
+                <button class="result-btn save" onclick="saveAndClose()">✅ 저장하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    // ============================================================
+    //  PetRun - OpenStreetMap + Leaflet.js (무료, API 키 불필요)
+    // ============================================================
+
+    // --- State ---
+    let curPos = null;
+    let curAcc = null;
+    let selectedPet = '초코';
+    let nearbyMapObj = null;
+    let nearbyMarker = null;
+    let wMap = null;
+    let wMarker = null;
+    let wAccCircle = null;
+    let wPolyline = null;
+    let wStartMarker = null;
+    let resMapObj = null;
+
+    let follow = true;
+    let walking = false;
+    let paused = false;
+    let secs = 0;
+    let dist = 0;
+    let route = [];
+    let tickId = null;
+    let gpsWatchId = null;
+
+    // --- Haversine ---
+    function hav(lat1,lon1,lat2,lon2){
+        const R=6371000,toR=d=>d*Math.PI/180;
+        const dLat=toR(lat2-lat1),dLon=toR(lon2-lon1);
+        const a=Math.sin(dLat/2)**2+Math.cos(toR(lat1))*Math.cos(toR(lat2))*Math.sin(dLon/2)**2;
+        return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    }
+
+    // --- Leaflet marker icon ---
+    function makeDot(color, size){
+        return L.divIcon({
+            html:`<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>`,
+            iconSize:[size,size], iconAnchor:[size/2,size/2], className:''
+        });
+    }
+
+    // --- Init nearby mini-map on home ---
+    function initNearbyMap(lat, lng){
+        if(nearbyMapObj) return;
+        nearbyMapObj = L.map('nearbyMap',{zoomControl:false, attributionControl:true, dragging:true}).setView([lat,lng],15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OSM'}).addTo(nearbyMapObj);
+        nearbyMarker = L.marker([lat,lng],{icon:makeDot('#10B981',16)}).addTo(nearbyMapObj);
+    }
+
+    // --- Init walk map (fullscreen) ---
+    function initWalkMap(lat, lng){
+        if(wMap){
+            wMap.setView([lat,lng],17);
+            wMarker.setLatLng([lat,lng]);
+            wAccCircle.setLatLng([lat,lng]);
+            return;
+        }
+        wMap = L.map('walkMap',{zoomControl:false, attributionControl:false}).setView([lat,lng],17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(wMap);
+
+        wMarker = L.marker([lat,lng],{icon:makeDot('#10B981',20)}).addTo(wMap);
+        wAccCircle = L.circle([lat,lng],{radius:30,color:'#10B981',fillColor:'#10B981',fillOpacity:0.08,weight:1,opacity:0.3}).addTo(wMap);
+        wPolyline = L.polyline([],{color:'#10B981',weight:5,opacity:0.85,lineJoin:'round',lineCap:'round'}).addTo(wMap);
+    }
+
+    // --- GPS ---
+    function initGPS(){
+        if(!navigator.geolocation){ toast('⚠️ GPS를 지원하지 않는 브라우저입니다'); return; }
+
+        navigator.geolocation.getCurrentPosition(
+            p=>{
+                const {latitude:lat,longitude:lng,accuracy}=p.coords;
+                curPos={lat,lng}; curAcc=accuracy;
+                setGPS(true);
+                initNearbyMap(lat,lng);
+                toast('📍 현재 위치를 찾았습니다');
+            },
+            e=>{
+                setGPS(false);
+                initNearbyMap(37.5665,126.978);
+                toast('⚠️ GPS: '+e.message);
+            },
+            {enableHighAccuracy:true, timeout:15000, maximumAge:5000}
+        );
+
+        gpsWatchId = navigator.geolocation.watchPosition(
+            p=>{
+                const {latitude:lat,longitude:lng,accuracy}=p.coords;
+                const newPos={lat,lng};
+
+                if(walking && !paused && curPos){
+                    const d=hav(curPos.lat,curPos.lng,lat,lng);
+                    if(d>=2 && accuracy<50){
+                        dist+=d;
+                        route.push({lat,lng,t:Date.now()});
+                        if(wPolyline) wPolyline.addLatLng([lat,lng]);
+                    }
+                }
+
+                curPos=newPos; curAcc=accuracy;
+                setGPS(true);
+
+                if(nearbyMarker) nearbyMarker.setLatLng([lat,lng]);
+                if(wMarker){
+                    wMarker.setLatLng([lat,lng]);
+                    wAccCircle.setLatLng([lat,lng]).setRadius(accuracy);
+                    if(follow && wMap) wMap.panTo([lat,lng]);
+                }
+            },
+            e=>{ setGPS(false); },
+            {enableHighAccuracy:true, maximumAge:3000, timeout:10000}
+        );
+    }
+
+    function setGPS(on){
+        ['gpsBadge','walkGpsBadge'].forEach(id=>{
+            const el=document.getElementById(id);
+            if(el) el.classList.toggle('on',on);
+        });
+        document.getElementById('gpsLabel').textContent = on?'GPS 활성':'GPS 오류';
+        const wl=document.getElementById('walkGpsLabel');
+        if(wl) wl.textContent = on ? (curAcc?`±${Math.round(curAcc)}m`:'GPS') : 'GPS 오류';
+    }
+
+    // --- Walk Screen ---
+    function openWalkScreen(){
+        const ws = document.getElementById('walkScreen');
+        ws.classList.add('active');
+
+        // Reset UI
+        document.getElementById('preStartControls').style.display='flex';
+        document.getElementById('walkingControls').style.display='none';
+        document.getElementById('walkDistChip').style.display='none';
+        document.getElementById('walkPauseLabel').classList.remove('on');
+        document.getElementById('walkTimer').textContent='00:00:00';
+        document.getElementById('wDist').textContent='0.00';
+        document.getElementById('wSpd').textContent='0.0';
+        document.getElementById('wCal').textContent='0';
+        document.getElementById('walkScreenTitle').textContent=`🐕 산책 준비`;
+        document.getElementById('walkPetLabel').textContent=
+            selectedPet==='나비'?'🐈 나비와 산책':'🐕 '+selectedPet+'와 산책';
+
+        setTimeout(()=>{
+            const lat = curPos ? curPos.lat : 37.5665;
+            const lng = curPos ? curPos.lng : 126.978;
+            initWalkMap(lat, lng);
+            setTimeout(()=>{ if(wMap) wMap.invalidateSize(); },100);
+        }, 50);
+    }
+
+    function beginTracking(){
+        if(!curPos){ toast('⚠️ GPS 위치를 먼저 확인해주세요'); return; }
+
+        walking=true; paused=false; secs=0; dist=0;
+        route=[{lat:curPos.lat, lng:curPos.lng, t:Date.now()}];
+
+        if(wPolyline) wPolyline.setLatLngs([[curPos.lat,curPos.lng]]);
+        if(wStartMarker) wMap.removeLayer(wStartMarker);
+        wStartMarker = L.circleMarker([curPos.lat,curPos.lng],{
+            radius:8, color:'#fff', fillColor:'#10B981', fillOpacity:1, weight:3
+        }).addTo(wMap);
+
+        document.getElementById('preStartControls').style.display='none';
+        document.getElementById('walkingControls').style.display='flex';
+        document.getElementById('walkDistChip').style.display='flex';
+        document.getElementById('walkScreenTitle').textContent=
+            selectedPet==='나비'?'🐈 나비와 산책 중':'🐕 '+selectedPet+'와 산책 중';
+
+        wMap.setZoom(18);
+
+        tickId = setInterval(()=>{
+            if(!paused){
+                secs++;
+                updateWalkUI();
+            }
+        },1000);
+
+        toast(`🐾 ${selectedPet}와(과) 산책을 시작합니다!`);
+    }
+
+    function togglePause(){
+        paused=!paused;
+        document.getElementById('pauseBtn').textContent=paused?'▶️':'⏸';
+        document.getElementById('walkPauseLabel').classList.toggle('on',paused);
+        toast(paused?'⏸ 일시정지':'▶️ 산책 재개');
+    }
+
+    function stopWalk(){
+        if(secs<3){ toast('조금만 더 걸어보세요! 🐾'); return; }
+        if(!confirm('산책을 종료하시겠습니까?')) return;
+
+        walking=false; paused=false;
+        clearInterval(tickId);
+
+        const km=dist/1000, hrs=secs/3600;
+        const spd=hrs>0?km/hrs:0;
+        const cal=Math.round(km*55);
+        const mm=Math.floor(secs/60), ss=secs%60;
+
+        document.getElementById('rDist').textContent=km.toFixed(2)+' km';
+        document.getElementById('rTime').textContent=`${mm}분 ${ss}초`;
+        document.getElementById('rSpd').textContent=spd.toFixed(1)+' km/h';
+        document.getElementById('rCal').textContent=cal+' kcal';
+        document.getElementById('resultPetMsg').textContent=`${selectedPet}와(과) 즐거운 산책이었어요`;
+
+        // Badges
+        const badges=[];
+        if(km>=1) badges.push('🏃 1km 달성');
+        if(km>=3) badges.push('🥇 3km 달성');
+        if(km>=5) badges.push('💎 5km 달성');
+        if(mm>=30) badges.push('⏱ 30분 산책');
+        if(mm>=60) badges.push('🔥 1시간 산책');
+        if(spd>=5) badges.push('⚡ 스피드 워커');
+        const bd=document.getElementById('resBadges'), bl=document.getElementById('badgeList');
+        if(badges.length>0){
+            bd.style.display='block';
+            bl.innerHTML=badges.map(b=>`<span class="badge-item">${b}</span>`).join('');
+        } else { bd.style.display='none'; }
+
+        document.getElementById('walkScreen').classList.remove('active');
+        document.getElementById('resultModal').classList.add('active');
+        setTimeout(()=>buildResultMap(),300);
+
+        // Save
+        const h=JSON.parse(localStorage.getItem('petrun_walks')||'[]');
+        h.unshift({pet:selectedPet,distance:km,duration:secs,speed:spd,calories:cal,route,date:new Date().toISOString()});
+        if(h.length>50)h.pop();
+        localStorage.setItem('petrun_walks',JSON.stringify(h));
+    }
+
+    function closeWalk(){
+        if(walking){
+            if(confirm('산책을 종료하시겠습니까?')) stopWalk();
+        } else {
+            document.getElementById('walkScreen').classList.remove('active');
+        }
+    }
+
+    function updateWalkUI(){
+        const h=String(Math.floor(secs/3600)).padStart(2,'0');
+        const m=String(Math.floor((secs%3600)/60)).padStart(2,'0');
+        const s=String(secs%60).padStart(2,'0');
+        document.getElementById('walkTimer').textContent=`${h}:${m}:${s}`;
+
+        const km=dist/1000, hrs=secs/3600;
+        const spd=hrs>0?km/hrs:0;
+        const cal=Math.round(km*55);
+        document.getElementById('wDist').textContent=km.toFixed(2);
+        document.getElementById('wSpd').textContent=spd.toFixed(1);
+        document.getElementById('wCal').textContent=cal;
+        document.getElementById('mapDistNum').textContent=km.toFixed(2);
+    }
+
+    // --- Result Map ---
+    function buildResultMap(){
+        if(route.length<2) return;
+        const el=document.getElementById('resultMapEl');
+        if(resMapObj){resMapObj.remove();resMapObj=null;}
+        resMapObj=L.map(el,{zoomControl:false,attributionControl:false,dragging:false});
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(resMapObj);
+        const pts=route.map(r=>[r.lat,r.lng]);
+        L.polyline(pts,{color:'#10B981',weight:4}).addTo(resMapObj);
+        L.circleMarker(pts[0],{radius:7,color:'#fff',fillColor:'#10B981',fillOpacity:1,weight:3}).addTo(resMapObj);
+        L.circleMarker(pts[pts.length-1],{radius:7,color:'#fff',fillColor:'#EF4444',fillOpacity:1,weight:3}).addTo(resMapObj);
+        resMapObj.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
+    }
+
+    // --- Map helpers ---
+    function centerMe(){ if(curPos&&wMap){ wMap.setView([curPos.lat,curPos.lng],17); toast('📍 내 위치'); } }
+    function toggleFollow(){ follow=!follow; document.getElementById('followBtn').classList.toggle('on',follow); toast(follow?'🎯 따라가기 ON':'🎯 따라가기 OFF'); }
+
+    // --- UI helpers ---
+    function selectPet(el,name){
+        document.querySelectorAll('.pet-card').forEach(c=>c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedPet=name;
+    }
+    function switchTab(el){
+        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+        el.classList.add('active');
+    }
+    function closeResult(){
+        document.getElementById('resultModal').classList.remove('active');
+        if(resMapObj){resMapObj.remove();resMapObj=null;}
+    }
+    function saveAndClose(){ toast('✅ 산책 기록이 저장되었습니다'); closeResult(); }
+
+    // Ranking tabs
+    document.querySelectorAll('.ranking-tab').forEach(tab=>{
+        tab.addEventListener('click',()=>{
+            document.querySelectorAll('.ranking-tab').forEach(t=>t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+
+    // Toast
+    let toastTimer;
+    function toast(msg){
+        const el=document.getElementById('toastEl');
+        el.textContent=msg; el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+    }
+
+    // --- Init ---
+    initGPS();
+    </script>
+</body>
+</html>

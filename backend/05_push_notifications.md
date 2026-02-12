@@ -1,23 +1,44 @@
 # 푸시 알림 - 멍이랑 (withbowwow)
 
 > 코어 파일: [00_overview.md](./00_overview.md)
+> 구현: firebase-admin (Python)
 
 ---
 
 ## 1. 인프라
 
-| 플랫폼 | 서비스 | SDK |
-|--------|--------|-----|
-| Android | Firebase Cloud Messaging (FCM) | expo-notifications |
-| iOS | APNs (via FCM) | expo-notifications |
+| 플랫폼 | 서비스 | SDK (서버) | SDK (클라이언트) |
+|--------|--------|-----------|----------------|
+| Android | Firebase Cloud Messaging (FCM) | firebase-admin | expo-notifications |
+| iOS | APNs (via FCM) | firebase-admin | expo-notifications |
 
 ### 1.1 토큰 등록 플로우
 
 ```
 앱 시작 → expo-notifications 권한 요청
   → FCM 토큰 발급 (Android) / APNs 토큰 발급 (iOS)
-  → push_tokens 테이블에 저장/업데이트
+  → POST /push-tokens 으로 서버에 저장
   → 로그아웃 시 is_active = FALSE
+```
+
+### 1.2 Firebase Admin 초기화
+
+```python
+# app/services/push_service.py
+import firebase_admin
+from firebase_admin import credentials, messaging
+import base64
+import json
+from app.config import settings
+
+
+def init_firebase():
+    """앱 시작 시 1회 호출"""
+    cred_json = json.loads(
+        base64.b64decode(settings.FIREBASE_CREDENTIALS_JSON)
+    )
+    cred = credentials.Certificate(cred_json)
+    firebase_admin.initialize_app(cred)
 ```
 
 ---
@@ -108,65 +129,114 @@
 
 ---
 
-## 4. send-push Edge Function
+## 4. push_service 구현
 
-```typescript
-// supabase/functions/send-push/index.ts
-import * as admin from 'firebase-admin';
+```python
+# app/services/push_service.py
+from firebase_admin import messaging
+from sqlalchemy import select, func
+from datetime import datetime, timedelta
+from dataclasses import dataclass
 
-interface PushPayload {
-  userId: string;
-  type: string;
-  title: string;
-  body: string;
-  data?: Record<string, string>;
-}
 
-async function sendPush(supabase: any, payload: PushPayload) {
-  // 1. 알림 설정 확인
-  const settings = await getUserNotificationSettings(supabase, payload.userId);
-  if (!isNotificationEnabled(settings, payload.type)) return;
+@dataclass
+class PushPayload:
+    type: str
+    title: str
+    body: str
+    data: dict | None = None
 
-  // 2. 빈도 제한 확인
-  if (await isRateLimited(supabase, payload.userId, payload.type)) return;
 
-  // 3. 푸시 토큰 조회
-  const { data: tokens } = await supabase
-    .from('push_tokens')
-    .select('token, platform')
-    .eq('user_id', payload.userId)
-    .eq('is_active', true);
+class PushService:
 
-  // 4. FCM 전송
-  for (const t of tokens) {
-    await admin.messaging().send({
-      token: t.token,
-      notification: {
-        title: payload.title,
-        body: payload.body,
-      },
-      data: payload.data,
-      android: {
-        priority: 'high',
-        notification: { channelId: 'walk_notifications' },
-      },
-      apns: {
-        payload: {
-          aps: { sound: 'default', badge: 1 },
-        },
-      },
-    });
-  }
+    async def send(self, db: AsyncSession, user_id: str, payload: PushPayload):
+        # 1. 알림 설정 확인
+        user = await db.get(User, user_id)
+        if not self._is_notification_enabled(user, payload.type):
+            return
 
-  // 5. notifications 테이블에 기록
-  await supabase.from('notifications').insert({
-    user_id: payload.userId,
-    type: payload.type,
-    title: payload.title,
-    body: payload.body,
-    data: payload.data,
-  });
-}
+        # 2. 빈도 제한 확인
+        if await self._is_rate_limited(db, user_id, payload.type):
+            return
+
+        # 3. 푸시 토큰 조회
+        stmt = (
+            select(PushToken)
+            .where(PushToken.user_id == user_id, PushToken.is_active == True)
+        )
+        tokens = (await db.execute(stmt)).scalars().all()
+
+        # 4. FCM 전송
+        for t in tokens:
+            message = messaging.Message(
+                token=t.token,
+                notification=messaging.Notification(
+                    title=payload.title,
+                    body=payload.body,
+                ),
+                data=payload.data or {},
+                android=messaging.AndroidConfig(
+                    priority="high",
+                    notification=messaging.AndroidNotification(
+                        channel_id="walk_notifications",
+                    ),
+                ),
+                apns=messaging.APNSConfig(
+                    payload=messaging.APNSPayload(
+                        aps=messaging.Aps(sound="default", badge=1),
+                    ),
+                ),
+            )
+            try:
+                messaging.send(message)
+            except messaging.UnregisteredError:
+                # 만료된 토큰 비활성화
+                t.is_active = False
+
+        # 5. notifications 테이블에 기록
+        notification = Notification(
+            user_id=user_id,
+            type=payload.type,
+            title=payload.title,
+            body=payload.body,
+            data=payload.data,
+        )
+        db.add(notification)
+        await db.commit()
+
+    def _is_notification_enabled(self, user: User, notification_type: str) -> bool:
+        settings = user.notification_settings or {}
+        return settings.get(notification_type, True)
+
+    async def _is_rate_limited(self, db: AsyncSession, user_id: str, notification_type: str) -> bool:
+        # 일일 최대 10회 체크
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0)
+        stmt = (
+            select(func.count(Notification.id))
+            .where(
+                Notification.user_id == user_id,
+                Notification.created_at >= today_start,
+            )
+        )
+        daily_count = (await db.execute(stmt)).scalar()
+        if daily_count >= 10:
+            return True
+
+        # 랭킹 하락은 1일 1회
+        if notification_type == "ranking_change":
+            stmt = (
+                select(func.count(Notification.id))
+                .where(
+                    Notification.user_id == user_id,
+                    Notification.type == "ranking_change",
+                    Notification.created_at >= today_start,
+                )
+            )
+            count = (await db.execute(stmt)).scalar()
+            if count >= 1:
+                return True
+
+        return False
 ```
 
 ---
@@ -184,9 +254,9 @@ async function sendPush(supabase: any, payload: PushPayload) {
 | 시즌 뱃지 마감 | ON | season_deadline |
 | 시스템 알림 | ON | system |
 
-설정 저장: `AsyncStorage` (로컬) + `users` 테이블 `notification_settings JSONB` (서버 백업)
+설정 저장: `AsyncStorage` (로컬) + `users.notification_settings JSONB` (서버 백업)
 
 ---
 
 *작성일: 2026-02-12*
-*버전: 1.0*
+*버전: 2.0 — firebase-admin (Python)으로 전환*

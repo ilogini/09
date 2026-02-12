@@ -1,7 +1,8 @@
 # 데이터베이스 스키마 - 멍이랑 (withbowwow)
 
 > 코어 파일: [00_overview.md](./00_overview.md)
-> PostgreSQL 15+ / PostGIS 확장 / Supabase 관리형
+> PostgreSQL 15+ / PostGIS 확장 / 자체 운영 DB
+> ORM: SQLAlchemy 2.0 + GeoAlchemy2 / 마이그레이션: Alembic
 
 ---
 
@@ -42,26 +43,31 @@ users (1) ──── (N) pets (1) ──── (N) pet_health
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_id UUID UNIQUE NOT NULL,           -- Supabase Auth UID
   email TEXT,
   nickname TEXT NOT NULL,                  -- 2~12자, 한글/영문/숫자
-  profile_photo_url TEXT,                  -- 대표 반려동물 사진 (선택)
+  profile_photo_url TEXT,
+  provider TEXT NOT NULL,                  -- kakao / naver / apple
+  provider_id TEXT NOT NULL,               -- 소셜 로그인 고유 ID
   region_sido TEXT,                        -- 시/도 (예: "서울특별시")
   region_sigungu TEXT,                     -- 시/군/구 (예: "성동구")
   region_dong TEXT,                        -- 동 (예: "성수동1가")
   is_premium BOOLEAN DEFAULT FALSE,
   premium_until TIMESTAMPTZ,
-  weekly_goal_km NUMERIC DEFAULT 20,      -- 주간 목표 (km)
-  walk_unit TEXT DEFAULT 'km',            -- km / mile
+  weekly_goal_km NUMERIC DEFAULT 20,
+  walk_unit TEXT DEFAULT 'km',
+  notification_settings JSONB DEFAULT '{}',
+  hashed_refresh_token TEXT,               -- 리프레시 토큰 해시 저장
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  deleted_at TIMESTAMPTZ                   -- 소프트 삭제 (30일 유예)
+  deleted_at TIMESTAMPTZ,                  -- 소프트 삭제 (30일 유예)
+  UNIQUE(provider, provider_id)
 );
 
 -- 인덱스
-CREATE INDEX idx_users_auth_id ON users(auth_id);
+CREATE INDEX idx_users_provider ON users(provider, provider_id);
 CREATE INDEX idx_users_region ON users(region_sigungu, region_dong);
 CREATE INDEX idx_users_premium ON users(is_premium) WHERE is_premium = TRUE;
+CREATE INDEX idx_users_nickname ON users(nickname);
 ```
 
 ### 2.2 pets (반려동물)
@@ -70,14 +76,14 @@ CREATE INDEX idx_users_premium ON users(is_premium) WHERE is_premium = TRUE;
 CREATE TABLE pets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,                      -- 반려동물 이름
+  name TEXT NOT NULL,
   species TEXT NOT NULL DEFAULT 'dog',     -- dog / cat
-  breed TEXT,                              -- 견종/묘종 (예: "골든리트리버")
+  breed TEXT,
   size TEXT,                               -- small / medium / large
-  birth_date DATE,                         -- 생년월일
-  weight_kg NUMERIC,                       -- 현재 체중 (kg)
-  photo_url TEXT,                          -- 프로필 사진 URL
-  is_primary BOOLEAN DEFAULT FALSE,        -- 대표 반려동물 여부
+  birth_date DATE,
+  weight_kg NUMERIC,
+  photo_url TEXT,
+  is_primary BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -96,8 +102,8 @@ CREATE TABLE pet_health (
   pet_id UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
   record_type TEXT NOT NULL,               -- weight / vaccination / hospital_visit
   record_date DATE NOT NULL,
-  value_numeric NUMERIC,                   -- 체중 기록 시 kg 값
-  title TEXT,                              -- "광견병 예방접종", "정기 건강검진" 등
+  value_numeric NUMERIC,
+  title TEXT,
   memo TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -119,18 +125,18 @@ CREATE TABLE walks (
   pet_id UUID NOT NULL REFERENCES pets(id),
   started_at TIMESTAMPTZ NOT NULL,
   ended_at TIMESTAMPTZ,
-  duration_sec INTEGER,                    -- 총 산책 시간 (초)
-  distance_m INTEGER,                      -- 총 거리 (미터)
-  calories INTEGER,                        -- 소모 칼로리
-  avg_speed_kmh NUMERIC(4,1),              -- 평균 속도 (km/h)
+  duration_sec INTEGER,
+  distance_m INTEGER,
+  calories INTEGER,
+  avg_speed_kmh NUMERIC(4,1),
   route_geojson JSONB,                     -- GeoJSON LineString (전체 경로)
-  route_geometry GEOMETRY(LineString, 4326), -- PostGIS 공간 인덱스용
-  start_point GEOMETRY(Point, 4326),       -- 시작 지점
-  end_point GEOMETRY(Point, 4326),         -- 종료 지점
-  weather JSONB,                           -- {"temp": 12, "sky": "맑음", "pm10": 30, "pm25": 15}
-  memo TEXT,                               -- "오늘 산책 한마디"
-  is_valid BOOLEAN DEFAULT TRUE,           -- 유효성 검증 통과 여부
-  shared_to_feed BOOLEAN DEFAULT FALSE,    -- 소셜 피드 공개 여부
+  route_geometry GEOMETRY(LineString, 4326),
+  start_point GEOMETRY(Point, 4326),
+  end_point GEOMETRY(Point, 4326),
+  weather JSONB,                           -- {"temp": 12, "sky": "맑음", "pm10": 30}
+  memo TEXT,
+  is_valid BOOLEAN DEFAULT TRUE,
+  shared_to_feed BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -151,9 +157,9 @@ CREATE INDEX idx_walks_feed ON walks(created_at DESC) WHERE shared_to_feed = TRU
 CREATE TABLE walk_photos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   walk_id UUID NOT NULL REFERENCES walks(id) ON DELETE CASCADE,
-  photo_url TEXT NOT NULL,                 -- Supabase Storage URL
-  thumbnail_url TEXT,                      -- 썸네일 URL
-  location GEOMETRY(Point, 4326),          -- 촬영 위치 GPS
+  photo_url TEXT NOT NULL,                 -- Cloudflare R2 URL
+  thumbnail_url TEXT,
+  location GEOMETRY(Point, 4326),
   taken_at TIMESTAMPTZ DEFAULT NOW(),
   sort_order INTEGER DEFAULT 0
 );
@@ -168,16 +174,16 @@ CREATE INDEX idx_walk_photos_walk_id ON walk_photos(walk_id);
 CREATE TABLE badge_definitions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   category TEXT NOT NULL,                  -- distance / streak / exploration / time / special / season
-  name TEXT NOT NULL,                      -- "5km 클럽"
-  description TEXT,                        -- "누적 5킬로미터를 걸었어요"
-  icon TEXT,                               -- 이모지 또는 아이콘 코드
-  condition_type TEXT NOT NULL,            -- cumulative_distance / consecutive_days / unique_places / cumulative_time / special_* / season_*
-  condition_value NUMERIC,                 -- 5000 (미터), 7 (일), 10 (곳) 등
-  condition_extra JSONB,                   -- 추가 조건 (예: {"hour_before": 6} 얼리버드)
+  name TEXT NOT NULL,
+  description TEXT,
+  icon TEXT,
+  condition_type TEXT NOT NULL,
+  condition_value NUMERIC,
+  condition_extra JSONB,
   difficulty TEXT NOT NULL,                -- beginner / easy / normal / hard / very_hard / legendary / mythic
-  season_start DATE,                       -- 시즌 뱃지 시작일 (NULL이면 상시)
-  season_end DATE,                         -- 시즌 뱃지 종료일
-  hint TEXT,                               -- 미발견 뱃지의 힌트 텍스트
+  season_start DATE,
+  season_end DATE,
+  hint TEXT,
   sort_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -196,11 +202,11 @@ CREATE TABLE user_badges (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   badge_id UUID NOT NULL REFERENCES badge_definitions(id),
   status TEXT NOT NULL DEFAULT 'locked',   -- locked / in_progress / earned
-  progress_value NUMERIC DEFAULT 0,        -- 현재 진행 수치 (예: 7200m)
-  progress_percent NUMERIC DEFAULT 0,      -- 진행률 % (예: 72.0)
-  earned_at TIMESTAMPTZ,                   -- 획득 시각
-  earned_walk_id UUID REFERENCES walks(id),-- 획득 시 산책 ID
-  pet_id UUID REFERENCES pets(id),         -- 어떤 반려동물과 달성했는지
+  progress_value NUMERIC DEFAULT 0,
+  progress_percent NUMERIC DEFAULT 0,
+  earned_at TIMESTAMPTZ,
+  earned_walk_id UUID REFERENCES walks(id),
+  pet_id UUID REFERENCES pets(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, badge_id)
@@ -225,9 +231,9 @@ CREATE TABLE rankings (
   total_duration_sec INTEGER DEFAULT 0,
   walk_count INTEGER DEFAULT 0,
   rank INTEGER,
-  prev_rank INTEGER,                       -- 이전 기간 순위 (변동 표시용)
-  region_sigungu TEXT,                     -- 구 단위 지역
-  region_dong TEXT,                        -- 동 단위 지역
+  prev_rank INTEGER,
+  region_sigungu TEXT,
+  region_dong TEXT,
   calculated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, period_type, period_key, region_sigungu)
 );
@@ -246,10 +252,10 @@ CREATE TABLE hall_of_fame (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id),
   pet_id UUID REFERENCES pets(id),
-  category TEXT NOT NULL,                  -- monthly_mvp / longest_streak / longest_walk / top_cumulative / season_champion
-  period_key TEXT,                         -- "2026-02", "2026-Q1" 등
-  record_value NUMERIC,                    -- 거리(m), 일수 등
-  message TEXT,                            -- "비가 와도 뽀삐랑 산책!" (사용자 한 줄 코멘트)
+  category TEXT NOT NULL,
+  period_key TEXT,
+  record_value NUMERIC,
+  message TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -297,7 +303,7 @@ CREATE TABLE comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   walk_id UUID NOT NULL REFERENCES walks(id) ON DELETE CASCADE,
-  content TEXT NOT NULL,                   -- 최대 200자
+  content TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   deleted_at TIMESTAMPTZ
@@ -315,12 +321,12 @@ CREATE TABLE invitations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   inviter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   invitee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  scheduled_at TIMESTAMPTZ NOT NULL,       -- 산책 예정 시간
-  location_name TEXT,                      -- "한강공원 뚝섬입구"
-  location_point GEOMETRY(Point, 4326),    -- 만남 장소 GPS
-  message TEXT,                            -- "오늘 날씨 좋은데 같이 가요~"
+  scheduled_at TIMESTAMPTZ NOT NULL,
+  location_name TEXT,
+  location_point GEOMETRY(Point, 4326),
+  message TEXT,
   status TEXT NOT NULL DEFAULT 'pending',  -- pending / accepted / declined / expired
-  expires_at TIMESTAMPTZ,                  -- 예정 시간 30분 전 만료
+  expires_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -335,13 +341,13 @@ CREATE INDEX idx_invitations_inviter ON invitations(inviter_id);
 CREATE TABLE meetups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,                     -- "성수동 골든리트리버 모임"
+  title TEXT NOT NULL,
   description TEXT,
-  location_name TEXT NOT NULL,             -- "서울숲 메타세쿼이아길"
+  location_name TEXT NOT NULL,
   location_point GEOMETRY(Point, 4326),
   scheduled_at TIMESTAMPTZ NOT NULL,
-  is_recurring BOOLEAN DEFAULT FALSE,      -- 정기 모임 여부
-  recurrence_rule TEXT,                    -- "weekly" 등
+  is_recurring BOOLEAN DEFAULT FALSE,
+  recurrence_rule TEXT,
   max_participants INTEGER DEFAULT 15,
   size_filter TEXT,                        -- small / medium / large / all
   status TEXT DEFAULT 'active',            -- active / cancelled / completed
@@ -370,7 +376,7 @@ CREATE TABLE push_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   platform TEXT NOT NULL,                  -- ios / android
-  token TEXT NOT NULL,                     -- FCM 또는 APNs 토큰
+  token TEXT NOT NULL,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -387,10 +393,10 @@ CREATE INDEX idx_push_tokens_user ON push_tokens(user_id) WHERE is_active = TRUE
 CREATE TABLE notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  type TEXT NOT NULL,                      -- badge_earned / badge_progress / ranking_change / walk_reminder / social / system / season_deadline
+  type TEXT NOT NULL,
   title TEXT NOT NULL,
   body TEXT NOT NULL,
-  data JSONB,                              -- 딥링크 등 추가 데이터
+  data JSONB,
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -409,9 +415,9 @@ CREATE TABLE subscriptions (
   plan_type TEXT NOT NULL,                 -- monthly / annual
   status TEXT NOT NULL DEFAULT 'active',   -- active / cancelled / expired / trial
   payment_provider TEXT NOT NULL,          -- toss / ios_iap / google_play
-  provider_subscription_id TEXT,           -- 외부 구독 ID
-  price_krw INTEGER,                       -- 결제 금액 (원)
-  trial_ends_at TIMESTAMPTZ,               -- 무료 체험 종료일
+  provider_subscription_id TEXT,
+  price_krw INTEGER,
+  trial_ends_at TIMESTAMPTZ,
   current_period_start TIMESTAMPTZ,
   current_period_end TIMESTAMPTZ,
   cancelled_at TIMESTAMPTZ,
@@ -450,7 +456,7 @@ CREATE TABLE reports (
   reporter_id UUID NOT NULL REFERENCES users(id),
   target_type TEXT NOT NULL,               -- user / walk / comment / meetup
   target_id UUID NOT NULL,
-  reason TEXT NOT NULL,                    -- inappropriate / spam / harassment / animal_abuse / privacy
+  reason TEXT NOT NULL,
   description TEXT,
   status TEXT DEFAULT 'pending',           -- pending / reviewed / resolved / dismissed
   reviewed_at TIMESTAMPTZ,
@@ -463,7 +469,7 @@ CREATE INDEX idx_reports_status ON reports(status) WHERE status = 'pending';
 
 ---
 
-## 3. 뱃지 시드 데이터 (47개)
+## 3. 뱃지 시드 데이터 (45개)
 
 ```sql
 INSERT INTO badge_definitions (category, name, description, icon, condition_type, condition_value, condition_extra, difficulty, hint, sort_order) VALUES
@@ -518,61 +524,63 @@ INSERT INTO badge_definitions (category, name, description, icon, condition_type
 ('season', '겨울왕국', '12~2월에 눈 오는 날 산책했어요', '⛄', 'season_winter', 1, '{"weather": "snow"}', 'normal', '겨울에 눈 내리는 날을 기다려보세요', 4);
 ```
 
-**총 45개** (기획서 47개 중 시즌 뱃지 세부 조건에 따라 조정 가능)
-
 ---
 
-## 4. Row Level Security (RLS) 정책
+## 4. 접근 제어 (Application-Level)
 
-```sql
--- 모든 테이블에 RLS 활성화
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE pets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE walks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_badges ENABLE ROW LEVEL SECURITY;
--- ... (모든 테이블)
+> Supabase RLS 대신 FastAPI 의존성 주입(Depends)으로 접근 제어를 구현한다.
 
--- users: 본인 데이터만 수정 가능, 다른 사용자 닉네임/지역 읽기 가능
-CREATE POLICY "users_select_all" ON users FOR SELECT USING (true);
-CREATE POLICY "users_update_own" ON users FOR UPDATE USING (auth.uid() = auth_id);
+```python
+# app/dependencies.py
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, JWTError
 
--- pets: 본인 반려동물만 CRUD, 다른 사용자 반려동물 읽기 가능
-CREATE POLICY "pets_select_all" ON pets FOR SELECT USING (true);
-CREATE POLICY "pets_insert_own" ON pets FOR INSERT WITH CHECK (
-  user_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
-CREATE POLICY "pets_update_own" ON pets FOR UPDATE USING (
-  user_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
-CREATE POLICY "pets_delete_own" ON pets FOR DELETE USING (
-  user_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
+security = HTTPBearer()
 
--- walks: 본인 산책 CRUD, 피드 공개된 산책은 모두 읽기 가능
-CREATE POLICY "walks_select_own" ON walks FOR SELECT USING (
-  user_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
-CREATE POLICY "walks_select_feed" ON walks FOR SELECT USING (
-  shared_to_feed = TRUE AND is_valid = TRUE
-);
-CREATE POLICY "walks_insert_own" ON walks FOR INSERT WITH CHECK (
-  user_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """JWT 토큰에서 현재 사용자를 추출하는 의존성"""
+    try:
+        payload = jwt.decode(
+            credentials.credentials,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
--- follows: 본인 팔로우 관계만 CRUD
-CREATE POLICY "follows_select_all" ON follows FOR SELECT USING (true);
-CREATE POLICY "follows_insert_own" ON follows FOR INSERT WITH CHECK (
-  follower_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
-CREATE POLICY "follows_delete_own" ON follows FOR DELETE USING (
-  follower_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
+    user = await db.get(User, user_id)
+    if user is None or user.deleted_at is not None:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
 
--- blocks: 차단한 사용자의 콘텐츠 필터링
-CREATE POLICY "blocks_select_own" ON blocks FOR SELECT USING (
-  blocker_id IN (SELECT id FROM users WHERE auth_id = auth.uid())
-);
+
+async def require_premium(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """프리미엄 사용자만 접근 가능한 엔드포인트용 의존성"""
+    if not current_user.is_premium:
+        raise HTTPException(status_code=403, detail="Premium required")
+    return current_user
 ```
+
+### 4.1 주요 접근 제어 규칙
+
+| 리소스 | 읽기 | 쓰기 | 삭제 |
+|--------|------|------|------|
+| users | 모두 (닉네임/지역) | 본인만 | 본인만 (소프트 삭제) |
+| pets | 모두 | 본인 반려동물만 | 본인만 |
+| walks | 본인 + 피드 공개 | 본인만 | 본인만 |
+| follows | 모두 | 본인 팔로우만 | 본인만 |
+| likes/comments | 모두 | 인증 사용자 | 본인만 |
+| notifications | 본인만 | 시스템만 | 본인만 |
+| blocks | 본인만 | 본인만 | 본인만 |
 
 ---
 
@@ -588,7 +596,6 @@ DECLARE
   check_date DATE := CURRENT_DATE;
   walk_exists BOOLEAN;
 BEGIN
-  -- 하루 기준: 오전 4시 ~ 다음날 오전 4시
   LOOP
     SELECT EXISTS(
       SELECT 1 FROM walks
@@ -618,10 +625,8 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION refresh_weekly_rankings(p_period_key TEXT)
 RETURNS VOID AS $$
 BEGIN
-  -- 기존 해당 기간 랭킹 삭제
   DELETE FROM rankings WHERE period_type = 'weekly' AND period_key = p_period_key;
 
-  -- 새 랭킹 삽입
   INSERT INTO rankings (user_id, pet_id, period_type, period_key, total_distance_m, total_duration_sec, walk_count, rank, region_sigungu, region_dong)
   SELECT
     w.user_id,
@@ -644,7 +649,24 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
+### 5.3 고유 장소 수 계산
+
+```sql
+CREATE OR REPLACE FUNCTION count_unique_places(p_user_id UUID)
+RETURNS INTEGER AS $$
+  SELECT COUNT(DISTINCT cluster_id)::INTEGER
+  FROM (
+    SELECT
+      ST_ClusterDBSCAN(start_point, eps := 500, minpoints := 1) OVER () AS cluster_id
+    FROM walks
+    WHERE user_id = p_user_id
+      AND is_valid = TRUE
+      AND start_point IS NOT NULL
+  ) clusters;
+$$ LANGUAGE sql;
+```
+
 ---
 
 *작성일: 2026-02-12*
-*버전: 1.0*
+*버전: 2.0 — 자체 PostgreSQL + FastAPI 접근 제어로 전환*

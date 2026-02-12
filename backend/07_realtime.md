@@ -1,194 +1,211 @@
 # 실시간 기능 - 멍이랑 (withbowwow)
 
 > 코어 파일: [00_overview.md](./00_overview.md)
+> 구현: FastAPI WebSocket
 
 ---
 
-## 1. Supabase Realtime 개요
+## 1. 실시간 기능 개요
 
-Supabase Realtime은 PostgreSQL의 WAL(Write-Ahead Logging)을 기반으로 테이블 변경 사항을 WebSocket으로 클라이언트에 실시간 브로드캐스트한다.
+FastAPI의 내장 WebSocket 지원을 사용하여 실시간 기능을 구현한다.
 
-### 1.1 사용할 기능
+### 1.1 실시간이 필요한 기능
 
-| 기능 | 용도 |
-|------|------|
-| **Postgres Changes** | 테이블 INSERT/UPDATE/DELETE 감지 |
-| **Broadcast** | 커스텀 이벤트 발행 (산책 중 위치 공유) |
-| **Presence** | 온라인 상태 추적 (향후) |
+| 기능 | 방식 | 설명 |
+|------|------|------|
+| **함께 산책 위치 공유** | WebSocket | 산책 중 상대방 위치 실시간 표시 |
+| **소셜 피드 새 글** | Polling (30초) | 피드 새로고침 |
+| **좋아요/댓글 카운트** | Polling (30초) | 피드 인터랙션 업데이트 |
+| **산책 초대** | Push Notification | 초대 수신 알림 |
+| **랭킹 변동** | Push Notification | 랭킹 변동 알림 |
 
----
-
-## 2. 실시간 구독 목록
-
-### 2.1 소셜 피드 (산책 기록 실시간 업데이트)
-
-```typescript
-// 팔로잉 중인 사용자의 새 산책 기록 감지
-const feedSubscription = supabase
-  .channel('walk-feed')
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'walks',
-      filter: `shared_to_feed=eq.true`,
-    },
-    (payload) => {
-      // 팔로잉 중인 사용자인지 클라이언트에서 필터
-      if (followingIds.includes(payload.new.user_id)) {
-        addToFeed(payload.new);
-      }
-    }
-  )
-  .subscribe();
-```
-
-### 2.2 좋아요/댓글 실시간 카운트
-
-```typescript
-// 특정 산책 기록의 좋아요/댓글 실시간 업데이트
-const interactionSubscription = supabase
-  .channel(`walk-${walkId}`)
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'likes',
-      filter: `walk_id=eq.${walkId}`,
-    },
-    (payload) => {
-      incrementLikeCount();
-    }
-  )
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'comments',
-      filter: `walk_id=eq.${walkId}`,
-    },
-    (payload) => {
-      addComment(payload.new);
-    }
-  )
-  .subscribe();
-```
-
-### 2.3 산책 초대 수신
-
-```typescript
-// 새 산책 초대 실시간 감지
-const invitationSubscription = supabase
-  .channel('invitations')
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'invitations',
-      filter: `invitee_id=eq.${currentUserId}`,
-    },
-    (payload) => {
-      showInvitationNotification(payload.new);
-    }
-  )
-  .subscribe();
-```
-
-### 2.4 랭킹 변동 실시간
-
-```typescript
-// 내 랭킹 변동 감지
-const rankingSubscription = supabase
-  .channel('my-ranking')
-  .on(
-    'postgres_changes',
-    {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'rankings',
-      filter: `user_id=eq.${currentUserId}`,
-    },
-    (payload) => {
-      updateMyRank(payload.new.rank, payload.old.rank);
-    }
-  )
-  .subscribe();
-```
-
-### 2.5 함께 산책 위치 공유 (Broadcast)
-
-```typescript
-// 함께 산책 시 실시간 위치 공유 (Broadcast 채널)
-const walkTogetherChannel = supabase
-  .channel(`walk-together-${invitationId}`)
-  .on('broadcast', { event: 'location' }, (payload) => {
-    updatePartnerLocation(payload.payload);
-  })
-  .subscribe();
-
-// 내 위치 브로드캐스트 (5초 간격)
-function broadcastMyLocation(lat: number, lng: number) {
-  walkTogetherChannel.send({
-    type: 'broadcast',
-    event: 'location',
-    payload: { lat, lng, timestamp: Date.now() },
-  });
-}
-```
+> WebSocket은 "함께 산책 위치 공유"에만 사용. 나머지는 Push + Polling으로 충분.
+> 사이드 프로젝트 단계에서 WebSocket 연결 수를 최소화하여 서버 부하를 줄인다.
 
 ---
 
-## 3. 구독 관리 전략
+## 2. 함께 산책 위치 공유 (WebSocket)
 
-### 3.1 구독 생명주기
+### 2.1 연결 플로우
 
 ```
-앱 포그라운드 진입 → 필요한 채널 구독
-앱 백그라운드 전환 → 산책 중이 아니면 구독 해제
-앱 종료 → 모든 구독 해제
-산책 중 → 백그라운드에서도 위치 공유 채널 유지
+산책 초대 수락 (invitations.status = 'accepted')
+  → 양쪽 클라이언트가 WebSocket 연결
+  → ws://api.withbowwow.com/ws/walk-together/{invitation_id}
+  → JWT 토큰으로 인증
+  → 5초 간격으로 위치 브로드캐스트
+  → 산책 종료 시 연결 해제
 ```
 
-### 3.2 화면별 구독
+### 2.2 WebSocket 핸들러
 
-| 화면 | 구독 채널 | 해제 시점 |
-|------|----------|----------|
-| 홈 | 랭킹 변동, 뱃지 진행률 | 다른 탭 이동 시 |
-| 소셜 | 피드 신규, 좋아요/댓글, 초대 | 다른 탭 이동 시 |
-| 산책 중 | 함께 산책 위치 (해당 시) | 산책 종료 시 |
-| 랭킹 | 랭킹 변동 | 다른 탭 이동 시 |
-| 마이페이지 | 뱃지 상태 변경 | 다른 탭 이동 시 |
+```python
+# app/websocket/walk_together.py
+from fastapi import WebSocket, WebSocketDisconnect
+from jose import jwt, JWTError
+import json
 
-### 3.3 네트워크 재연결
 
-```typescript
-// 네트워크 끊김 후 재연결 시 자동 복구
-supabase.realtime.setAuth(session.access_token);
+class WalkTogetherManager:
+    """함께 산책 WebSocket 연결 관리"""
 
-// 재연결 이벤트 처리
-channel.on('system', { event: 'reconnect' }, () => {
-  // 끊겼던 동안의 데이터 동기화
-  syncMissedData();
-});
+    def __init__(self):
+        # invitation_id → {user_id: WebSocket}
+        self.rooms: dict[str, dict[str, WebSocket]] = {}
+
+    async def connect(self, invitation_id: str, user_id: str, websocket: WebSocket):
+        await websocket.accept()
+        if invitation_id not in self.rooms:
+            self.rooms[invitation_id] = {}
+        self.rooms[invitation_id][user_id] = websocket
+
+    def disconnect(self, invitation_id: str, user_id: str):
+        if invitation_id in self.rooms:
+            self.rooms[invitation_id].pop(user_id, None)
+            if not self.rooms[invitation_id]:
+                del self.rooms[invitation_id]
+
+    async def broadcast_location(
+        self, invitation_id: str, sender_id: str, data: dict
+    ):
+        """상대방에게 위치 브로드캐스트"""
+        room = self.rooms.get(invitation_id, {})
+        for user_id, ws in room.items():
+            if user_id != sender_id:
+                try:
+                    await ws.send_json(data)
+                except Exception:
+                    pass
+
+
+manager = WalkTogetherManager()
+```
+
+### 2.3 WebSocket 라우트
+
+```python
+# app/main.py 또는 app/routers/websocket.py
+from app.websocket.walk_together import manager
+
+
+@app.websocket("/ws/walk-together/{invitation_id}")
+async def walk_together_ws(websocket: WebSocket, invitation_id: str):
+    # 1. JWT 인증 (query param으로 전달)
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=4001, reason="Missing token")
+        return
+
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        user_id = payload["sub"]
+    except JWTError:
+        await websocket.close(code=4001, reason="Invalid token")
+        return
+
+    # 2. 초대 유효성 검증
+    async with get_async_session() as db:
+        invitation = await db.get(Invitation, invitation_id)
+        if not invitation or invitation.status != "accepted":
+            await websocket.close(code=4002, reason="Invalid invitation")
+            return
+
+        # 초대 참여자인지 확인
+        if user_id not in [str(invitation.inviter_id), str(invitation.invitee_id)]:
+            await websocket.close(code=4003, reason="Not a participant")
+            return
+
+    # 3. 연결
+    await manager.connect(invitation_id, user_id, websocket)
+
+    try:
+        while True:
+            # 클라이언트로부터 위치 데이터 수신
+            data = await websocket.receive_json()
+
+            # 위치 데이터 형식: {"lat": 37.5, "lng": 127.0, "timestamp": 1707750000}
+            location_data = {
+                "user_id": user_id,
+                "lat": data["lat"],
+                "lng": data["lng"],
+                "timestamp": data.get("timestamp"),
+            }
+
+            # 상대방에게 브로드캐스트
+            await manager.broadcast_location(invitation_id, user_id, location_data)
+
+    except WebSocketDisconnect:
+        manager.disconnect(invitation_id, user_id)
 ```
 
 ---
 
-## 4. 성능 고려사항
+## 3. Polling 기반 실시간 (피드/랭킹)
+
+### 3.1 피드 Polling
+
+```
+클라이언트 (소셜 탭 진입 시):
+  → 30초마다 GET /feed?since={last_updated_at}
+  → 새 글이 있으면 피드 상단에 "새 글 N개" 배너 표시
+  → 사용자가 탭하면 피드 갱신
+```
+
+### 3.2 좋아요/댓글 Polling
+
+```
+특정 산책 기록 상세 화면:
+  → 30초마다 GET /walks/{id}/interactions
+  → 좋아요 수, 댓글 목록 갱신
+```
+
+### 3.3 Push 기반 실시간
+
+나머지 실시간 기능은 Push Notification으로 처리:
+
+| 이벤트 | 방식 |
+|--------|------|
+| 산책 초대 수신 | FCM Push → 앱 내 알림 화면 |
+| 랭킹 변동 | FCM Push → 앱 내 알림 화면 |
+| 뱃지 획득 | FCM Push → 앱 내 알림 화면 |
+| 팔로우/좋아요/댓글 | FCM Push → 앱 내 알림 화면 |
+
+---
+
+## 4. 구독 관리 전략
+
+### 4.1 WebSocket 생명주기
+
+```
+산책 초대 수락 → WebSocket 연결
+산책 진행 중 → 5초 간격 위치 공유
+산책 종료 → WebSocket 해제
+앱 백그라운드 → WebSocket 유지 (산책 중일 때만)
+앱 종료 → WebSocket 자동 해제
+```
+
+### 4.2 네트워크 재연결
+
+```python
+# 클라이언트 (React Native) 에서 처리
+# expo-web-socket 또는 기본 WebSocket에 reconnect 로직 구현
+# 서버는 상태 없이(stateless) 동작 → 재연결 시 새로 연결
+```
+
+---
+
+## 5. 성능 고려사항
 
 | 항목 | 값 | 설명 |
 |------|-----|------|
-| 동시 연결 수 (Free) | 200 | Supabase Free tier 제한 |
-| 동시 연결 수 (Pro) | 500 | Pro tier |
-| 메시지 크기 제한 | 1MB | Supabase Realtime 제한 |
+| 동시 WebSocket 수 | ~50 | Render Free tier 기준 (메모리 512MB) |
 | 위치 공유 간격 | 5초 | 배터리 + 네트워크 절약 |
-| 피드 구독 필터 | 서버 사이드 | 클라이언트 부하 최소화 |
+| Polling 간격 | 30초 | 피드/랭킹 (서버 부하 최소화) |
+| WebSocket 사용 범위 | 함께 산책만 | 전체 앱에 WebSocket 남용 방지 |
+
+> 사용자 규모가 커지면 Redis Pub/Sub 또는 별도 WebSocket 서버로 분리 고려
 
 ---
 
 *작성일: 2026-02-12*
-*버전: 1.0*
+*버전: 2.0 — FastAPI WebSocket으로 전환*

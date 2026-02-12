@@ -1,6 +1,7 @@
 # 결제 시스템 - 멍이랑 (withbowwow)
 
 > 코어 파일: [00_overview.md](./00_overview.md)
+> HTTP 클라이언트: httpx (Toss Payments API, Google Play API)
 
 ---
 
@@ -25,14 +26,12 @@
 | Android | Google Play Billing (필수) | 15~30% |
 | 웹/기타 | Toss Payments (카드, 카카오페이, 네이버페이) | 3.3% |
 
-> iOS/Android 앱 내 디지털 상품은 반드시 각 플랫폼 IAP를 사용해야 함 (App Store/Google Play 정책)
-
 ---
 
 ## 2. 프리미엄 기능 비교
 
 | 기능 | 무료 | 프리미엄 |
-|------|------|---------|
+|------|------|---------||
 | 기본 산책 기록 | O | O |
 | 주간 랭킹 | O | O |
 | 뱃지 획득 | O | O |
@@ -67,7 +66,7 @@
   → iOS IAP 결제 시트
   → Apple 결제 완료
   → App Store Server Notification (Webhook)
-  → Edge Function: process-payment
+  → FastAPI: POST /payments/webhook/apple
     → subscriptions 테이블 INSERT
     → users.is_premium = TRUE
     → users.premium_until = 결제 종료일
@@ -75,25 +74,55 @@
 
 ### 3.3 Server-to-Server Notification
 
-```typescript
-// App Store Server Notification v2 처리
-async function handleAppleNotification(payload: any) {
-  const { notificationType, data } = payload;
+```python
+# app/services/payment_service.py
+import httpx
+from datetime import datetime
 
-  switch (notificationType) {
-    case 'SUBSCRIBED':
-    case 'DID_RENEW':
-      await activateSubscription(data);
-      break;
-    case 'DID_FAIL_TO_RENEW':
-    case 'EXPIRED':
-      await deactivateSubscription(data);
-      break;
-    case 'REFUND':
-      await handleRefund(data);
-      break;
-  }
-}
+
+class PaymentService:
+
+    async def handle_apple_notification(self, db: AsyncSession, payload: dict):
+        """App Store Server Notification v2 처리"""
+        notification_type = payload.get("notificationType")
+        data = payload.get("data", {})
+
+        match notification_type:
+            case "SUBSCRIBED" | "DID_RENEW":
+                await self._activate_subscription(db, data, provider="ios_iap")
+            case "DID_FAIL_TO_RENEW" | "EXPIRED":
+                await self._deactivate_subscription(db, data)
+            case "REFUND":
+                await self._handle_refund(db, data)
+
+    async def _activate_subscription(self, db: AsyncSession, data: dict, provider: str):
+        user_id = data.get("user_id")
+        user = await db.get(User, user_id)
+        if not user:
+            return
+
+        user.is_premium = True
+        user.premium_until = datetime.fromisoformat(data["expires_date"])
+
+        # subscriptions 테이블 업데이트
+        subscription = Subscription(
+            user_id=user_id,
+            plan_type=data.get("plan_type", "monthly"),
+            status="active",
+            payment_provider=provider,
+            provider_subscription_id=data.get("subscription_id"),
+            current_period_start=datetime.fromisoformat(data["start_date"]),
+            current_period_end=datetime.fromisoformat(data["expires_date"]),
+        )
+        db.add(subscription)
+        await db.commit()
+
+    async def _deactivate_subscription(self, db: AsyncSession, data: dict):
+        user_id = data.get("user_id")
+        user = await db.get(User, user_id)
+        if user:
+            user.is_premium = False
+            await db.commit()
 ```
 
 ---
@@ -107,19 +136,21 @@ async function handleAppleNotification(payload: any) {
 
 ### 4.2 영수증 검증
 
-```typescript
-async function verifyGooglePurchase(purchaseToken: string, productId: string) {
-  const { google } = require('googleapis');
-  const androidPublisher = google.androidpublisher('v3');
+```python
+async def verify_google_purchase(self, purchase_token: str, product_id: str) -> dict:
+    """Google Play 구독 영수증 검증"""
+    # Google OAuth2로 액세스 토큰 발급
+    access_token = await self._get_google_access_token()
 
-  const result = await androidPublisher.purchases.subscriptions.get({
-    packageName: 'com.withbowwow',
-    subscriptionId: productId,
-    token: purchaseToken,
-  });
-
-  return result.data;
-}
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            f"https://androidpublisher.googleapis.com/androidpublisher/v3"
+            f"/applications/com.withbowwow/purchases/subscriptions"
+            f"/{product_id}/tokens/{purchase_token}",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        resp.raise_for_status()
+        return resp.json()
 ```
 
 ---
@@ -129,51 +160,73 @@ async function verifyGooglePurchase(purchaseToken: string, productId: string) {
 ### 5.1 결제 플로우
 
 ```
-결제 요청 → Toss Payments SDK → 결제 완료
+결제 요청 → Toss Payments SDK (프론트) → 결제 완료
   → 클라이언트에서 paymentKey, orderId, amount 수신
-  → Edge Function: process-payment 호출
-  → Toss Payments 결제 승인 API 호출 (서버 사이드)
+  → POST /payments/confirm 호출
+  → Toss Payments 결제 승인 API 호출 (서버)
   → 승인 성공 → subscriptions 테이블 업데이트
 ```
 
 ### 5.2 결제 승인 (서버)
 
-```typescript
-async function confirmTossPayment(paymentKey: string, orderId: string, amount: number) {
-  const response = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(TOSS_SECRET_KEY + ':')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ paymentKey, orderId, amount }),
-  });
+```python
+async def confirm_toss_payment(
+    self, payment_key: str, order_id: str, amount: int
+) -> dict:
+    """Toss Payments 결제 승인"""
+    import base64
 
-  return response.json();
-}
+    auth = base64.b64encode(
+        f"{settings.TOSS_SECRET_KEY}:".encode()
+    ).decode()
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            "https://api.tosspayments.com/v1/payments/confirm",
+            headers={
+                "Authorization": f"Basic {auth}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "paymentKey": payment_key,
+                "orderId": order_id,
+                "amount": amount,
+            },
+        )
+        resp.raise_for_status()
+        return resp.json()
 ```
 
 ### 5.3 정기결제 (빌링키)
 
-```typescript
-// 빌링키 발급 후 자동 결제
-async function chargeSubscription(billingKey: string, amount: number) {
-  const response = await fetch('https://api.tosspayments.com/v1/billing/' + billingKey, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(TOSS_SECRET_KEY + ':')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      customerKey: userId,
-      amount,
-      orderId: generateOrderId(),
-      orderName: '멍이랑 프리미엄 구독',
-    }),
-  });
+```python
+async def charge_subscription(
+    self, billing_key: str, user_id: str, amount: int
+) -> dict:
+    """빌링키로 자동 정기결제"""
+    import base64
+    import uuid
 
-  return response.json();
-}
+    auth = base64.b64encode(
+        f"{settings.TOSS_SECRET_KEY}:".encode()
+    ).decode()
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            f"https://api.tosspayments.com/v1/billing/{billing_key}",
+            headers={
+                "Authorization": f"Basic {auth}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "customerKey": user_id,
+                "amount": amount,
+                "orderId": str(uuid.uuid4()),
+                "orderName": "멍이랑 프리미엄 구독",
+            },
+        )
+        resp.raise_for_status()
+        return resp.json()
 ```
 
 ---
@@ -191,17 +244,35 @@ cancelled: 해지 요청 (현재 기간 종료까지 프리미엄 유지)
 expired:   구독 만료 (무료로 전환)
 ```
 
-### 6.2 구독 만료 Cron
+### 6.2 구독 만료 Cron (APScheduler)
 
-```sql
--- 매일 자정 실행: 만료된 구독 처리
-UPDATE users SET is_premium = FALSE
-WHERE premium_until < NOW()
-  AND is_premium = TRUE;
+```python
+# app/scheduler/tasks.py
 
-UPDATE subscriptions SET status = 'expired'
-WHERE current_period_end < NOW()
-  AND status IN ('active', 'cancelled');
+async def expire_subscriptions():
+    """매일 자정: 만료된 구독 처리"""
+    async with get_async_session() as db:
+        now = datetime.utcnow()
+
+        # 프리미엄 만료 처리
+        stmt = (
+            update(User)
+            .where(User.premium_until < now, User.is_premium == True)
+            .values(is_premium=False)
+        )
+        await db.execute(stmt)
+
+        # 구독 상태 업데이트
+        stmt = (
+            update(Subscription)
+            .where(
+                Subscription.current_period_end < now,
+                Subscription.status.in_(["active", "cancelled"]),
+            )
+            .values(status="expired")
+        )
+        await db.execute(stmt)
+        await db.commit()
 ```
 
 ### 6.3 무료 체험
@@ -217,4 +288,4 @@ WHERE current_period_end < NOW()
 ---
 
 *작성일: 2026-02-12*
-*버전: 1.0*
+*버전: 2.0 — httpx (Python)로 전환*

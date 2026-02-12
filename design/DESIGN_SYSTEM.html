@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멍이랑 디자인 시스템 가이드</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197, 217, 0, 0.10);
+            --lime-glow: rgba(197, 217, 0, 0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0, 153, 255, 0.08);
+            --azure-glow: rgba(0, 153, 255, 0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-heavy: rgba(255, 255, 255, 0.80);
+            --glass-border: rgba(197, 217, 0, 0.12);
+            --glass-blur: blur(20px);
+            --danger: #EF4444;
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: #F0F2F5;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === 네비게이션 === */
+        .guide-nav {
+            position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
+            background: white;
+            border-right: 1px solid #E5E7EB;
+            padding: 28px 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .guide-nav-title {
+            padding: 0 24px 20px;
+            font-size: 18px; font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 12px;
+        }
+        .guide-nav-title span { color: var(--lime-dark); }
+        .nav-link {
+            display: block; padding: 10px 24px;
+            font-size: 14px; font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--lime-light);
+            border-left-color: var(--lime);
+        }
+
+        /* === 메인 콘텐츠 === */
+        .guide-main {
+            margin-left: 260px;
+            padding: 40px 48px 80px;
+            max-width: 1100px;
+        }
+
+        /* === 섹션 === */
+        .section {
+            margin-bottom: 56px;
+        }
+        .section-header {
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--lime);
+        }
+        .section-number {
+            font-size: 13px; font-weight: 700;
+            color: var(--lime-dark);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .section-title {
+            font-size: 28px; font-weight: 700;
+            color: var(--text-primary);
+        }
+        .section-desc {
+            font-size: 15px; color: var(--text-secondary);
+            margin-top: 8px; line-height: 1.6;
+        }
+
+        .subsection-title {
+            font-size: 18px; font-weight: 700;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .subsection-title::before {
+            content: '';
+            width: 4px; height: 20px;
+            background: var(--lime);
+            border-radius: 2px;
+        }
+
+        /* === 컬러 팔레트 === */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .color-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .color-swatch {
+            height: 100px;
+            display: flex; align-items: flex-end;
+            padding: 12px 16px;
+        }
+        .color-swatch-hex {
+            font-size: 13px; font-weight: 600;
+            color: white;
+            background: rgba(0,0,0,0.25);
+            padding: 3px 10px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .color-swatch-hex.dark {
+            color: rgba(0,0,0,0.7);
+            background: rgba(255,255,255,0.5);
+        }
+        .color-info {
+            padding: 14px 16px;
+        }
+        .color-name {
+            font-size: 15px; font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .color-usage {
+            font-size: 12px; color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* === 타이포 === */
+        .typo-list {
+            display: flex; flex-direction: column; gap: 0;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .typo-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 120px;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+        .typo-row:last-child { border-bottom: none; }
+        .typo-label {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .typo-label-name {
+            font-size: 13px; font-weight: 700; color: var(--lime-dark);
+        }
+        .typo-label-spec {
+            font-size: 11px; color: var(--text-muted);
+        }
+        .typo-sample {
+            color: var(--text-primary);
+        }
+        .typo-usage {
+            font-size: 12px; color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* === 라운딩 === */
+        .radius-grid {
+            display: flex; gap: 24px; flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .radius-item {
+            text-align: center;
+        }
+        .radius-box {
+            background: var(--lime);
+            margin-bottom: 10px;
+        }
+        .radius-value {
+            font-size: 14px; font-weight: 700; color: var(--text-primary);
+        }
+        .radius-name {
+            font-size: 11px; color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* === 글래스 === */
+        .glass-demo-area {
+            background: linear-gradient(135deg, #A8E6CF, #88D8F7, #D4A5FF);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex; gap: 24px; flex-wrap: wrap;
+        }
+        .glass-demo-card {
+            padding: 24px;
+            border-radius: var(--radius-md);
+            min-width: 220px; flex: 1;
+        }
+        .glass-demo-card h4 {
+            font-size: 14px; font-weight: 700; margin-bottom: 6px;
+        }
+        .glass-demo-card p {
+            font-size: 12px; color: var(--text-secondary);
+        }
+
+        /* === 그림자 === */
+        .shadow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .shadow-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .shadow-name {
+            font-size: 13px; font-weight: 700; margin-top: 12px;
+        }
+        .shadow-desc {
+            font-size: 11px; color: var(--text-muted); margin-top: 4px;
+        }
+
+        /* === 아이콘 === */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+        .icon-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 8px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: all 0.2s;
+        }
+        .icon-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .icon-item .lucide {
+            width: 24px; height: 24px; stroke-width: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .icon-item span {
+            display: block;
+            font-size: 10px; color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        /* === 아이콘 크기 === */
+        .icon-size-row {
+            display: flex; align-items: flex-end; gap: 32px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-wrap: wrap;
+        }
+        .icon-size-item {
+            text-align: center;
+        }
+        .icon-size-item .lucide {
+            color: var(--azure);
+            margin-bottom: 8px;
+        }
+        .icon-size-item .size-label {
+            font-size: 11px; font-weight: 700; color: var(--text-primary);
+        }
+        .icon-size-item .size-desc {
+            font-size: 10px; color: var(--text-muted); margin-top: 2px;
+        }
+
+        /* === 컴포넌트 데모 === */
+        .comp-demo {
+            background: var(--bg-base);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid #E5E7EB;
+        }
+        .comp-label {
+            font-size: 11px; font-weight: 700; color: var(--lime-dark);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .comp-row {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .comp-row:last-child { margin-bottom: 0; }
+
+        /* 버튼 데모 */
+        .demo-btn-primary {
+            padding: 14px 28px;
+            border: 2px solid var(--lime);
+            background: transparent;
+            border-radius: var(--radius-lg);
+            font-size: 15px; font-weight: 600;
+            font-family: inherit;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .demo-btn-primary:hover {
+            background: var(--lime);
+            box-shadow: 0 8px 32px var(--lime-glow);
+        }
+        .demo-btn-go {
+            padding: 14px 28px;
+            border: none;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border-radius: var(--radius-md);
+            font-size: 15px; font-weight: 600;
+            font-family: inherit;
+            color: var(--text-primary);
+            cursor: pointer;
+            box-shadow: 0 6px 24px var(--lime-glow);
+        }
+        .demo-btn-azure {
+            padding: 14px 28px;
+            border: none;
+            background: var(--azure);
+            border-radius: var(--radius-md);
+            font-size: 15px; font-weight: 600;
+            font-family: inherit;
+            color: white;
+            cursor: pointer;
+        }
+        .demo-btn-danger {
+            width: 52px; height: 52px;
+            border: none;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+        }
+        .demo-btn-danger .lucide { width: 20px; height: 20px; }
+        .demo-btn-glass {
+            width: 44px; height: 44px;
+            border: 1.5px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .demo-btn-glass .lucide { width: 18px; height: 18px; }
+        .demo-btn-ghost {
+            padding: 12px 24px;
+            border: none;
+            background: rgba(0,0,0,0.04);
+            border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 600;
+            font-family: inherit;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        /* GPS 필 데모 */
+        .demo-gps {
+            display: flex; align-items: center; gap: 5px;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .demo-gps.off {
+            background: rgba(248,252,250,0.8);
+            color: var(--text-muted);
+        }
+        .demo-gps.on {
+            background: var(--lime-light);
+            color: var(--lime-dark);
+            border-color: rgba(197,217,0,0.2);
+        }
+        .demo-gps-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .demo-gps.off .demo-gps-dot { background: var(--text-muted); }
+        .demo-gps.on .demo-gps-dot { background: var(--lime); }
+
+        /* 뱃지 데모 */
+        .demo-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 6px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .demo-badge.azure { background: var(--azure-light); color: var(--azure-dark); }
+        .demo-badge.lime { background: var(--lime-light); color: var(--lime-dark); }
+
+        /* 탭 데모 */
+        .demo-tabs {
+            display: flex; gap: 24px;
+        }
+        .demo-tab {
+            padding: 6px 0; border: none; background: none;
+            font-size: 13px; font-weight: 500; font-family: inherit;
+            color: var(--text-muted);
+            cursor: pointer; position: relative;
+        }
+        .demo-tab.active {
+            color: var(--text-primary); font-weight: 600;
+        }
+        .demo-tab.active::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            background: var(--lime);
+            border-radius: 2px;
+        }
+
+        /* 프로그레스 데모 */
+        .demo-progress {
+            width: 100%; max-width: 400px;
+        }
+        .demo-progress-label {
+            display: flex; justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .demo-progress-label span { font-size: 12px; color: var(--text-muted); }
+        .demo-progress-label strong { font-size: 12px; color: var(--lime-dark); }
+        .demo-progress-track {
+            height: 4px; background: rgba(197,217,0,0.12);
+            border-radius: 4px; overflow: hidden;
+        }
+        .demo-progress-bar {
+            height: 100%; border-radius: 4px;
+            background: linear-gradient(90deg, var(--lime), var(--azure));
+        }
+
+        /* 토스트 데모 */
+        .demo-toast {
+            display: inline-block;
+            background: rgba(26,43,60,0.88);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-size: 13px; font-weight: 500;
+        }
+
+        /* 카드 데모 */
+        .demo-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .demo-glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+        }
+        .demo-glass-card h4 {
+            font-size: 14px; font-weight: 600; margin-bottom: 4px;
+        }
+        .demo-glass-card p {
+            font-size: 11px; color: var(--text-muted);
+        }
+
+        /* === 그라데이션 === */
+        .gradient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .gradient-card {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .gradient-swatch {
+            height: 80px;
+            display: flex; align-items: flex-end;
+            padding: 10px 16px;
+        }
+        .gradient-swatch span {
+            font-size: 12px; font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .gradient-info {
+            padding: 12px 16px;
+            background: white;
+        }
+        .gradient-info .g-name { font-size: 14px; font-weight: 700; }
+        .gradient-info .g-use { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* === 애니메이션 === */
+        .anim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .anim-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .anim-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .anim-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+        .anim-preview {
+            height: 60px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .anim-dot {
+            width: 16px; height: 16px;
+            background: var(--lime);
+            border-radius: 50%;
+        }
+        .anim-dot.float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .anim-dot.pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .anim-box {
+            width: 60px; height: 40px;
+            background: var(--azure-light);
+            border: 1px solid var(--azure);
+            border-radius: 8px;
+        }
+        .anim-box.fadein {
+            animation: fadeInUp 1.5s ease-out infinite;
+        }
+        .anim-box.slideup {
+            animation: slideUpDemo 2s ease-out infinite;
+        }
+        .anim-cloud {
+            width: 50px; height: 25px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            animation: cloudDrift 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(197,217,0,0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(197,217,0,0); }
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(14px); }
+            30% { opacity: 1; transform: translateY(0); }
+            70% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(14px); }
+        }
+        @keyframes slideUpDemo {
+            0% { transform: translateY(20px); opacity: 0; }
+            30% { transform: translateY(0); opacity: 1; }
+            70% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(20px); opacity: 0; }
+        }
+        @keyframes cloudDrift {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        /* === 디자인 원칙 === */
+        .principle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .principle-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-top: 4px solid var(--lime);
+        }
+        .principle-card .p-num {
+            font-size: 32px; font-weight: 800; color: var(--lime);
+            margin-bottom: 8px;
+        }
+        .principle-card h4 {
+            font-size: 16px; font-weight: 700; margin-bottom: 6px;
+        }
+        .principle-card p {
+            font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+        }
+
+        /* === 간격 === */
+        .spacing-list {
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .spacing-row {
+            display: flex; align-items: center; gap: 16px;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .spacing-bar {
+            background: var(--azure);
+            height: 20px;
+            border-radius: 4px;
+            min-width: 4px;
+        }
+        .spacing-info {
+            font-size: 13px;
+        }
+        .spacing-info strong { color: var(--text-primary); }
+        .spacing-info span { color: var(--text-muted); margin-left: 8px; font-size: 12px; }
+
+        /* 반응형 */
+        @media (max-width: 900px) {
+            .guide-nav { display: none; }
+            .guide-main { margin-left: 0; padding: 24px 20px 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 사이드 네비게이션 -->
+    <nav class="guide-nav">
+        <div class="guide-nav-title"><span>멍이랑</span> 디자인 시스템</div>
+        <a class="nav-link" href="#concept">컨셉 소개</a>
+        <a class="nav-link" href="#colors">컬러 팔레트</a>
+        <a class="nav-link" href="#typography">타이포그래피</a>
+        <a class="nav-link" href="#radius">라운딩 (둥글기)</a>
+        <a class="nav-link" href="#glass">글래스모피즘</a>
+        <a class="nav-link" href="#shadows">그림자 / 빛 효과</a>
+        <a class="nav-link" href="#icons">아이콘</a>
+        <a class="nav-link" href="#components">컴포넌트 모음</a>
+        <a class="nav-link" href="#gradients">그라데이션</a>
+        <a class="nav-link" href="#spacing">간격 체계</a>
+        <a class="nav-link" href="#animation">애니메이션</a>
+        <a class="nav-link" href="#principles">디자인 원칙</a>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="guide-main">
+
+        <!-- 컨셉 소개 -->
+        <section class="section" id="concept">
+            <div class="section-header">
+                <div class="section-number">CONCEPT</div>
+                <h2 class="section-title">시원하고 청량한 맑은날의 산책</h2>
+                <p class="section-desc">
+                    연두빛 라임과 하늘빛 아주르가 만나, 투명한 유리 위에 햇살이 번지는 느낌.<br>
+                    가볍고 맑은 공기 속에서 반려동물과 함께 걷는 상쾌한 순간을 담았습니다.
+                </p>
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <span class="demo-badge lime">#Refreshing</span>
+                <span class="demo-badge azure">#Vivid</span>
+                <span class="demo-badge lime">#Transparent</span>
+                <span class="demo-badge azure">#Airy</span>
+            </div>
+        </section>
+
+        <!-- 1. 컬러 팔레트 -->
+        <section class="section" id="colors">
+            <div class="section-header">
+                <div class="section-number">01</div>
+                <h2 class="section-title">컬러 팔레트</h2>
+                <p class="section-desc">앱 전체에서 사용하는 색상 체계입니다. 라임과 아주르 두 가지 브랜드 컬러를 중심으로 구성됩니다.</p>
+            </div>
+
+            <h3 class="subsection-title">브랜드 컬러</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#C5D900">
+                        <span class="color-swatch-hex dark">#C5D900</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Lime Punch</div>
+                        <div class="color-usage">주요 강조, 버튼, 활성 상태, 산책 경로</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#9FB300">
+                        <span class="color-swatch-hex">#9FB300</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Lime Dark</div>
+                        <div class="color-usage">텍스트 강조, 아이콘 활성, 네비 활성</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#0099FF">
+                        <span class="color-swatch-hex">#0099FF</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Azure</div>
+                        <div class="color-usage">보조 강조, 거리 표시, 알림, 섹션 아이콘</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#0077CC">
+                        <span class="color-swatch-hex">#0077CC</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Azure Dark</div>
+                        <div class="color-usage">날씨 온도, 프리미엄 배너</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">텍스트 컬러</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#1A2B3C">
+                        <span class="color-swatch-hex">#1A2B3C</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Text Primary</div>
+                        <div class="color-usage">제목, 본문, 중요한 수치</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#5C6F82">
+                        <span class="color-swatch-hex">#5C6F82</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Text Secondary</div>
+                        <div class="color-usage">부가 텍스트, 아이콘 기본색</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#94A3B8">
+                        <span class="color-swatch-hex">#94A3B8</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Text Muted</div>
+                        <div class="color-usage">힌트, 라벨, 비활성 텍스트, 단위</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">배경 컬러</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#F8FCFA; border-bottom: 1px solid #eee;">
+                        <span class="color-swatch-hex dark">#F8FCFA</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">BG Base</div>
+                        <div class="color-usage">앱 전체 배경 (약간 민트 톤)</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#FFFFFF; border-bottom: 1px solid #eee;">
+                        <span class="color-swatch-hex dark">#FFFFFF</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">White</div>
+                        <div class="color-usage">카드, 콘텐츠 영역</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">시맨틱 컬러 (상황별)</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#EF4444">
+                        <span class="color-swatch-hex">#EF4444</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Danger / Red</div>
+                        <div class="color-usage">정지 버튼, 에러, 연속 챌린지</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#F59E0B">
+                        <span class="color-swatch-hex dark">#F59E0B</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Warning / Amber</div>
+                        <div class="color-usage">일시정지, 카페 아이콘, 탐험 챌린지</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:#8B5CF6">
+                        <span class="color-swatch-hex">#8B5CF6</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Purple</div>
+                        <div class="color-usage">시간 관련 챌린지</div>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background:linear-gradient(135deg, #D4A017 33%, #8A9BAE 33% 66%, #C8763E 66%)">
+                        <span class="color-swatch-hex">랭킹</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Gold / Silver / Bronze</div>
+                        <div class="color-usage">#D4A017 / #8A9BAE / #C8763E</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 타이포그래피 -->
+        <section class="section" id="typography">
+            <div class="section-header">
+                <div class="section-number">02</div>
+                <h2 class="section-title">타이포그래피</h2>
+                <p class="section-desc">서체는 Pretendard Variable을 사용합니다. 크기와 굵기로 정보의 위계를 표현합니다.</p>
+            </div>
+
+            <div class="typo-list">
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Display</span>
+                        <span class="typo-label-spec">52px / Light (300)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:44px; font-weight:300; letter-spacing:3px;">00:12:34</div>
+                    <div class="typo-usage">산책 타이머</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Hero</span>
+                        <span class="typo-label-spec">36px / Thin (200)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:36px; font-weight:200; color:var(--azure-dark);">12°</div>
+                    <div class="typo-usage">날씨 온도</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Heading 1</span>
+                        <span class="typo-label-spec">26px / Bold (700)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:26px; font-weight:700;">12.5<span style="font-size:12px;color:var(--text-muted)">km</span></div>
+                    <div class="typo-usage">주간 통계 수치</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Heading 2</span>
+                        <span class="typo-label-spec">22px / Bold (700)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:22px; font-weight:700;">산책 완료!</div>
+                    <div class="typo-usage">결과 제목</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Logo</span>
+                        <span class="typo-label-spec">19px / Light+Bold</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:19px; font-weight:300;"><strong style="font-weight:700">멍이</strong>랑</div>
+                    <div class="typo-usage">앱 로고</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Title</span>
+                        <span class="typo-label-spec">16px / SemiBold (600)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:16px; font-weight:600;">산책 시작하기</div>
+                    <div class="typo-usage">섹션 제목, 버튼</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Subtitle</span>
+                        <span class="typo-label-spec">15px / SemiBold (600)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:15px; font-weight:600;">이번 주 산책</div>
+                    <div class="typo-usage">카드 헤더</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Body</span>
+                        <span class="typo-label-spec">14px / SemiBold (600)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:14px; font-weight:600;">보라매공원 반려동물 놀이터</div>
+                    <div class="typo-usage">카드 이름, 장소명</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Caption</span>
+                        <span class="typo-label-spec">12px / Regular (400)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:12px; font-weight:400; color:var(--text-muted);">주간 목표 20km</div>
+                    <div class="typo-usage">라벨, 부가정보</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Small</span>
+                        <span class="typo-label-spec">11px / Regular (400)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:11px; font-weight:400; color:var(--text-muted);">골든 리트리버 · 3살</div>
+                    <div class="typo-usage">품종, 상세정보</div>
+                </div>
+                <div class="typo-row">
+                    <div class="typo-label">
+                        <span class="typo-label-name">Tiny</span>
+                        <span class="typo-label-spec">10px / Medium (500)</span>
+                    </div>
+                    <div class="typo-sample" style="font-size:10px; font-weight:500; color:var(--text-muted);">홈 &nbsp; 소셜 &nbsp; 산책 &nbsp; 랭킹 &nbsp; MY</div>
+                    <div class="typo-usage">네비 라벨, 단위</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 라운딩 -->
+        <section class="section" id="radius">
+            <div class="section-header">
+                <div class="section-number">03</div>
+                <h2 class="section-title">라운딩 (둥글기)</h2>
+                <p class="section-desc">모서리의 둥근 정도입니다. 큰 카드는 더 둥글고, 작은 요소는 덜 둥급니다.</p>
+            </div>
+
+            <div class="radius-grid">
+                <div class="radius-item">
+                    <div class="radius-box" style="width:120px;height:80px;border-radius:28px;"></div>
+                    <div class="radius-value">28px</div>
+                    <div class="radius-name">XL - 모달, 패널</div>
+                </div>
+                <div class="radius-item">
+                    <div class="radius-box" style="width:110px;height:74px;border-radius:24px;"></div>
+                    <div class="radius-value">24px</div>
+                    <div class="radius-name">LG - 주요 카드</div>
+                </div>
+                <div class="radius-item">
+                    <div class="radius-box" style="width:100px;height:68px;border-radius:20px;"></div>
+                    <div class="radius-value">20px</div>
+                    <div class="radius-name">MD - 일반 카드</div>
+                </div>
+                <div class="radius-item">
+                    <div class="radius-box" style="width:90px;height:62px;border-radius:14px;"></div>
+                    <div class="radius-value">14px</div>
+                    <div class="radius-name">SM - 작은 카드</div>
+                </div>
+                <div class="radius-item">
+                    <div class="radius-box" style="width:80px;height:56px;border-radius:10px;"></div>
+                    <div class="radius-value">10px</div>
+                    <div class="radius-name">XS - 아이콘 박스</div>
+                </div>
+                <div class="radius-item">
+                    <div class="radius-box" style="width:56px;height:56px;border-radius:50%;"></div>
+                    <div class="radius-value">50%</div>
+                    <div class="radius-name">원형 - 아바타</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 글래스모피즘 -->
+        <section class="section" id="glass">
+            <div class="section-header">
+                <div class="section-number">04</div>
+                <h2 class="section-title">글래스모피즘</h2>
+                <p class="section-desc">반투명 유리 효과. 배경이 흐릿하게 비치면서 투명한 느낌을 줍니다. 이 앱의 핵심 디자인 언어입니다.</p>
+            </div>
+
+            <div class="glass-demo-area">
+                <div class="glass-demo-card" style="background:rgba(255,255,255,0.65); backdrop-filter:blur(20px); border:1px solid rgba(197,217,0,0.12);">
+                    <h4>Glass (기본)</h4>
+                    <p>투명도 65%, 블러 20px<br>일반 카드, 펫카드, 챌린지 카드</p>
+                </div>
+                <div class="glass-demo-card" style="background:rgba(255,255,255,0.80); backdrop-filter:blur(20px); border:1px solid rgba(197,217,0,0.12);">
+                    <h4>Glass Heavy (강한)</h4>
+                    <p>투명도 80%, 블러 20px<br>헤더, 하단 네비, 산책 패널</p>
+                </div>
+                <div class="glass-demo-card" style="background:rgba(255,255,255,0.70); backdrop-filter:blur(24px); border-bottom:1px solid rgba(197,217,0,0.08);">
+                    <h4>Header Glass</h4>
+                    <p>투명도 70%, 블러 24px<br>상단 헤더 전용</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 그림자 / 빛 효과 -->
+        <section class="section" id="shadows">
+            <div class="section-header">
+                <div class="section-number">05</div>
+                <h2 class="section-title">그림자 / 빛 효과</h2>
+                <p class="section-desc">일반적인 어두운 그림자 대신, 브랜드 컬러의 은은한 빛(Glow)으로 깊이감을 표현합니다.</p>
+            </div>
+
+            <div class="shadow-grid">
+                <div class="shadow-card" style="box-shadow: 0 8px 32px rgba(197,217,0,0.25);">
+                    <div style="width:60px;height:60px;background:var(--lime);border-radius:50%;margin:0 auto;"></div>
+                    <div class="shadow-name">Lime Glow</div>
+                    <div class="shadow-desc">CTA 버튼, 산책 시작</div>
+                </div>
+                <div class="shadow-card" style="box-shadow: 0 4px 20px rgba(0,153,255,0.20);">
+                    <div style="width:60px;height:60px;background:var(--azure);border-radius:50%;margin:0 auto;"></div>
+                    <div class="shadow-name">Azure Glow</div>
+                    <div class="shadow-desc">펫카드 호버</div>
+                </div>
+                <div class="shadow-card" style="box-shadow: 0 4px 20px rgba(239,68,68,0.30);">
+                    <div style="width:60px;height:60px;background:#EF4444;border-radius:50%;margin:0 auto;"></div>
+                    <div class="shadow-name">Danger Glow</div>
+                    <div class="shadow-desc">정지 버튼</div>
+                </div>
+                <div class="shadow-card" style="box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+                    <div style="width:60px;height:60px;background:#E5E7EB;border-radius:12px;margin:0 auto;"></div>
+                    <div class="shadow-name">Soft Shadow</div>
+                    <div class="shadow-desc">카드 호버 시 미세한 그림자</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 아이콘 -->
+        <section class="section" id="icons">
+            <div class="section-header">
+                <div class="section-number">06</div>
+                <h2 class="section-title">아이콘</h2>
+                <p class="section-desc">Lucide Icons 라이브러리를 사용합니다. 선(stroke) 기반의 깔끔한 아이콘입니다.</p>
+            </div>
+
+            <h3 class="subsection-title">크기 체계</h3>
+            <div class="icon-size-row">
+                <div class="icon-size-item">
+                    <i data-lucide="heart" style="width:16px;height:16px;stroke-width:1.8;"></i>
+                    <div class="size-label">16px</div>
+                    <div class="size-desc">아주 작은</div>
+                </div>
+                <div class="icon-size-item">
+                    <i data-lucide="heart" style="width:20px;height:20px;stroke-width:1.8;"></i>
+                    <div class="size-label">20px</div>
+                    <div class="size-desc">기본</div>
+                </div>
+                <div class="icon-size-item">
+                    <i data-lucide="heart" style="width:24px;height:24px;stroke-width:1.6;"></i>
+                    <div class="size-label">24px</div>
+                    <div class="size-desc">네비, 큰 버튼</div>
+                </div>
+                <div class="icon-size-item">
+                    <i data-lucide="heart" style="width:28px;height:28px;stroke-width:1.5;"></i>
+                    <div class="size-label">28px</div>
+                    <div class="size-desc">강조</div>
+                </div>
+                <div class="icon-size-item">
+                    <i data-lucide="heart" style="width:32px;height:32px;stroke-width:1.4;"></i>
+                    <div class="size-label">32px</div>
+                    <div class="size-desc">히어로 (날씨)</div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">앱에서 사용하는 아이콘 목록</h3>
+            <div class="icon-grid">
+                <div class="icon-item"><i data-lucide="home"></i><span>홈</span></div>
+                <div class="icon-item"><i data-lucide="users"></i><span>소셜</span></div>
+                <div class="icon-item"><i data-lucide="trophy"></i><span>랭킹</span></div>
+                <div class="icon-item"><i data-lucide="user"></i><span>MY</span></div>
+                <div class="icon-item"><i data-lucide="bell"></i><span>알림</span></div>
+                <div class="icon-item"><i data-lucide="heart"></i><span>반려동물</span></div>
+                <div class="icon-item"><i data-lucide="sun"></i><span>날씨(맑음)</span></div>
+                <div class="icon-item"><i data-lucide="bar-chart-2"></i><span>통계</span></div>
+                <div class="icon-item"><i data-lucide="arrow-right"></i><span>시작</span></div>
+                <div class="icon-item"><i data-lucide="play"></i><span>재생</span></div>
+                <div class="icon-item"><i data-lucide="pause"></i><span>일시정지</span></div>
+                <div class="icon-item"><i data-lucide="square"></i><span>중지</span></div>
+                <div class="icon-item"><i data-lucide="camera"></i><span>카메라</span></div>
+                <div class="icon-item"><i data-lucide="x"></i><span>닫기</span></div>
+                <div class="icon-item"><i data-lucide="target"></i><span>챌린지</span></div>
+                <div class="icon-item"><i data-lucide="map-pin"></i><span>위치</span></div>
+                <div class="icon-item"><i data-lucide="map"></i><span>지도/거리</span></div>
+                <div class="icon-item"><i data-lucide="clock"></i><span>시간</span></div>
+                <div class="icon-item"><i data-lucide="flame"></i><span>칼로리</span></div>
+                <div class="icon-item"><i data-lucide="compass"></i><span>탐험</span></div>
+                <div class="icon-item"><i data-lucide="trees"></i><span>공원</span></div>
+                <div class="icon-item"><i data-lucide="coffee"></i><span>카페</span></div>
+                <div class="icon-item"><i data-lucide="heart-pulse"></i><span>병원</span></div>
+                <div class="icon-item"><i data-lucide="crown"></i><span>프리미엄</span></div>
+                <div class="icon-item"><i data-lucide="award"></i><span>뱃지</span></div>
+                <div class="icon-item"><i data-lucide="plus"></i><span>추가</span></div>
+                <div class="icon-item"><i data-lucide="locate"></i><span>내 위치</span></div>
+                <div class="icon-item"><i data-lucide="crosshair"></i><span>따라가기</span></div>
+                <div class="icon-item"><i data-lucide="chevron-right"></i><span>더보기</span></div>
+                <div class="icon-item"><i data-lucide="timer"></i><span>타이머</span></div>
+            </div>
+        </section>
+
+        <!-- 7. 컴포넌트 모음 -->
+        <section class="section" id="components">
+            <div class="section-header">
+                <div class="section-number">07</div>
+                <h2 class="section-title">컴포넌트 모음</h2>
+                <p class="section-desc">앱에서 반복적으로 사용되는 UI 요소들입니다.</p>
+            </div>
+
+            <h3 class="subsection-title">버튼</h3>
+            <div class="comp-demo">
+                <div class="comp-label">주요 버튼 (CTA)</div>
+                <div class="comp-row">
+                    <button class="demo-btn-primary">산책 시작하기</button>
+                    <button class="demo-btn-go">GPS 산책 시작!</button>
+                    <button class="demo-btn-azure">저장하기</button>
+                </div>
+                <div class="comp-label">원형 버튼</div>
+                <div class="comp-row">
+                    <button class="demo-btn-danger"><i data-lucide="square"></i></button>
+                    <button class="demo-btn-glass"><i data-lucide="pause"></i></button>
+                    <button class="demo-btn-glass"><i data-lucide="camera"></i></button>
+                </div>
+                <div class="comp-label">보조 버튼</div>
+                <div class="comp-row">
+                    <button class="demo-btn-ghost">닫기</button>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">GPS 상태 표시</h3>
+            <div class="comp-demo">
+                <div class="comp-row">
+                    <div class="demo-gps off">
+                        <span class="demo-gps-dot"></span>
+                        GPS 대기
+                    </div>
+                    <span style="font-size:13px;color:var(--text-muted);">→</span>
+                    <div class="demo-gps on">
+                        <span class="demo-gps-dot"></span>
+                        GPS 활성
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">뱃지 / 칩</h3>
+            <div class="comp-demo">
+                <div class="comp-row">
+                    <span class="demo-badge azure">1km 달성</span>
+                    <span class="demo-badge azure">3km 달성</span>
+                    <span class="demo-badge azure">30분 산책</span>
+                    <span class="demo-badge lime">#Refreshing</span>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">탭</h3>
+            <div class="comp-demo">
+                <div class="comp-row">
+                    <div class="demo-tabs">
+                        <button class="demo-tab active">주간</button>
+                        <button class="demo-tab">월간</button>
+                        <button class="demo-tab">전체</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">프로그레스 바</h3>
+            <div class="comp-demo">
+                <div class="demo-progress">
+                    <div class="demo-progress-label">
+                        <span>주간 목표 20km</span>
+                        <strong>62%</strong>
+                    </div>
+                    <div class="demo-progress-track">
+                        <div class="demo-progress-bar" style="width:62%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">토스트 알림</h3>
+            <div class="comp-demo">
+                <div class="comp-row">
+                    <div class="demo-toast">현재 위치를 찾았습니다</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. 그라데이션 -->
+        <section class="section" id="gradients">
+            <div class="section-header">
+                <div class="section-number">08</div>
+                <h2 class="section-title">그라데이션</h2>
+                <p class="section-desc">두 가지 이상의 색이 자연스럽게 섞이는 효과입니다.</p>
+            </div>
+
+            <div class="gradient-grid">
+                <div class="gradient-card">
+                    <div class="gradient-swatch" style="background:linear-gradient(135deg, #C5D900, #9FB300);">
+                        <span>Lime CTA</span>
+                    </div>
+                    <div class="gradient-info">
+                        <div class="g-name">라임 CTA</div>
+                        <div class="g-use">산책 시작 버튼, 네비 중앙 버튼</div>
+                    </div>
+                </div>
+                <div class="gradient-card">
+                    <div class="gradient-swatch" style="background:linear-gradient(135deg, #0077CC, #0099FF 60%, #33BBFF);">
+                        <span>Azure Premium</span>
+                    </div>
+                    <div class="gradient-info">
+                        <div class="g-name">아주르 프리미엄</div>
+                        <div class="g-use">프리미엄 배너</div>
+                    </div>
+                </div>
+                <div class="gradient-card">
+                    <div class="gradient-swatch" style="background:linear-gradient(135deg, #EF4444, #DC2626);">
+                        <span>Danger</span>
+                    </div>
+                    <div class="gradient-info">
+                        <div class="g-name">위험 / 정지</div>
+                        <div class="g-use">산책 정지 버튼</div>
+                    </div>
+                </div>
+                <div class="gradient-card">
+                    <div class="gradient-swatch" style="background:linear-gradient(135deg, rgba(0,153,255,0.15), rgba(0,153,255,0.25) 40%, rgba(197,217,0,0.15));">
+                        <span style="color:var(--text-primary)">Sky Weather</span>
+                    </div>
+                    <div class="gradient-info">
+                        <div class="g-name">하늘 날씨</div>
+                        <div class="g-use">날씨 카드 배경</div>
+                    </div>
+                </div>
+                <div class="gradient-card">
+                    <div class="gradient-swatch" style="background:linear-gradient(90deg, #C5D900, #0099FF);">
+                        <span>Progress</span>
+                    </div>
+                    <div class="gradient-info">
+                        <div class="g-name">프로그레스</div>
+                        <div class="g-use">진행률 바</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. 간격 체계 -->
+        <section class="section" id="spacing">
+            <div class="section-header">
+                <div class="section-number">09</div>
+                <h2 class="section-title">간격 체계</h2>
+                <p class="section-desc">요소들 사이의 여백 규칙입니다. 일관된 간격으로 깔끔한 화면을 유지합니다.</p>
+            </div>
+
+            <div class="spacing-list">
+                <div class="spacing-row">
+                    <div class="spacing-bar" style="width:4px;"></div>
+                    <div class="spacing-info"><strong>2~4px</strong> <span>XS - 텍스트 사이 미세 간격</span></div>
+                </div>
+                <div class="spacing-row">
+                    <div class="spacing-bar" style="width:12px;"></div>
+                    <div class="spacing-info"><strong>6~8px</strong> <span>SM - 아이콘과 텍스트 사이</span></div>
+                </div>
+                <div class="spacing-row">
+                    <div class="spacing-bar" style="width:28px;"></div>
+                    <div class="spacing-info"><strong>10~14px</strong> <span>MD - 카드 사이, 리스트 아이템 패딩</span></div>
+                </div>
+                <div class="spacing-row">
+                    <div class="spacing-bar" style="width:48px;"></div>
+                    <div class="spacing-info"><strong>16~18px</strong> <span>LG - 섹션 좌우 여백, 카드 안쪽 여백</span></div>
+                </div>
+                <div class="spacing-row">
+                    <div class="spacing-bar" style="width:68px;"></div>
+                    <div class="spacing-info"><strong>20~24px</strong> <span>XL - 큰 카드 안쪽 여백</span></div>
+                </div>
+                <div class="spacing-row">
+                    <div class="spacing-bar" style="width:88px;"></div>
+                    <div class="spacing-info"><strong>28px</strong> <span>2XL - 섹션 제목 위 여백</span></div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">앱 프레임</h3>
+            <div class="comp-demo" style="text-align:center;">
+                <div style="display:inline-block; width:200px; border:2px dashed var(--azure); border-radius:20px; padding:16px; position:relative;">
+                    <div style="font-size:11px; color:var(--azure); font-weight:700; margin-bottom:8px;">최대 너비 480px</div>
+                    <div style="background:var(--bg-base); border-radius:12px; padding:12px; font-size:11px; color:var(--text-muted);">
+                        <div style="text-align:left;">좌우 여백 16px</div>
+                        <div style="text-align:left; margin-top:4px;">헤더 높이 58px</div>
+                        <div style="text-align:left; margin-top:4px;">하단 네비 76px</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. 애니메이션 -->
+        <section class="section" id="animation">
+            <div class="section-header">
+                <div class="section-number">10</div>
+                <h2 class="section-title">애니메이션</h2>
+                <p class="section-desc">화면에 생동감을 주는 움직임 효과들입니다.</p>
+            </div>
+
+            <div class="anim-grid">
+                <div class="anim-card">
+                    <h4>Float (부유)</h4>
+                    <p>위아래로 살짝 떠다니는 효과<br>산책 시작 버튼, 네비 중앙 버튼</p>
+                    <div class="anim-preview">
+                        <div class="anim-dot float"></div>
+                    </div>
+                </div>
+                <div class="anim-card">
+                    <h4>Pulse (맥박)</h4>
+                    <p>빛이 퍼져나가는 효과<br>GPS 활성 인디케이터</p>
+                    <div class="anim-preview">
+                        <div class="anim-dot pulse"></div>
+                    </div>
+                </div>
+                <div class="anim-card">
+                    <h4>Fade In Up (등장)</h4>
+                    <p>아래에서 위로 올라오며 나타남<br>페이지 첫 로딩 시 카드들</p>
+                    <div class="anim-preview">
+                        <div class="anim-box fadein"></div>
+                    </div>
+                </div>
+                <div class="anim-card">
+                    <h4>Slide Up (올라옴)</h4>
+                    <p>아래에서 올라오는 시트<br>산책 결과 모달</p>
+                    <div class="anim-preview">
+                        <div class="anim-box slideup"></div>
+                    </div>
+                </div>
+                <div class="anim-card">
+                    <h4>Cloud Drift (구름)</h4>
+                    <p>좌우로 느리게 흘러가는 효과<br>날씨 카드 배경 구름</p>
+                    <div class="anim-preview">
+                        <div class="anim-cloud"></div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">터치 반응</h3>
+            <div class="comp-demo">
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:12px;">
+                    <div style="background:white; padding:16px; border-radius:12px; text-align:center;">
+                        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Hover - 카드</div>
+                        <div style="font-size:11px; color:var(--text-muted);">위로 3px 올라감 + 미세 그림자</div>
+                    </div>
+                    <div style="background:white; padding:16px; border-radius:12px; text-align:center;">
+                        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Hover - 버튼</div>
+                        <div style="font-size:11px; color:var(--text-muted);">위로 2px + 빛 효과 강화</div>
+                    </div>
+                    <div style="background:white; padding:16px; border-radius:12px; text-align:center;">
+                        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Active - 누를 때</div>
+                        <div style="font-size:11px; color:var(--text-muted);">98% 또는 92%로 살짝 줄어듦</div>
+                    </div>
+                    <div style="background:white; padding:16px; border-radius:12px; text-align:center;">
+                        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Hover - 리스트</div>
+                        <div style="font-size:11px; color:var(--text-muted);">왼쪽으로 8px 밀려남</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. 디자인 원칙 -->
+        <section class="section" id="principles">
+            <div class="section-header">
+                <div class="section-number">11</div>
+                <h2 class="section-title">디자인 원칙</h2>
+                <p class="section-desc">멍이랑 앱 디자인의 5가지 핵심 원칙입니다.</p>
+            </div>
+
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="p-num">01</div>
+                    <h4>투명감</h4>
+                    <p>반투명 유리(글래스모피즘)로 레이어 사이에 깊이감을 만듭니다. 배경이 살짝 비치는 느낌.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="p-num">02</div>
+                    <h4>청량감</h4>
+                    <p>라임 + 아주르 조합, 밝은 배경, 가벼운 그림자. 맑은 날 산책의 상쾌함을 색으로 전달합니다.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="p-num">03</div>
+                    <h4>가벼움</h4>
+                    <p>얇은 글씨체(Light/Thin), 최소한의 테두리, 넉넉한 여백. 무겁지 않고 시원한 화면.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="p-num">04</div>
+                    <h4>생동감</h4>
+                    <p>떠다니기, 맥박, 구름 흘러가기 등 자연스러운 움직임으로 화면에 활력을 줍니다.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="p-num">05</div>
+                    <h4>일관성</h4>
+                    <p>같은 색, 같은 둥글기, 같은 간격을 반복 사용. 어디를 봐도 '멍이랑'다운 느낌.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>

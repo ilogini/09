@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>소셜 - 멍이랑 withbowwow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --nav-height: 72px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-logo { display: flex; align-items: center; gap: 8px; }
+        .header-logo .paw-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .header-title { font-size: 20px; font-weight: 800; color: var(--text); }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s; text-decoration: none; }
+        .header-btn:hover { background: var(--border); }
+        .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
+
+        /* ===== Content ===== */
+        .content { padding-bottom: calc(var(--nav-height) + 20px); }
+
+        /* ===== Section Title ===== */
+        .section-title { padding: 24px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .section-title .more { font-size: 13px; color: var(--text-light); text-decoration: none; cursor: pointer; }
+        .section-title .more:hover { color: var(--primary); }
+
+        /* ===== Search Bar ===== */
+        .search-bar {
+            margin: 12px 16px 0;
+            display: flex; align-items: center; gap: 10px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            transition: border-color 0.2s;
+        }
+        .search-bar:focus-within { border-color: var(--primary); }
+        .search-bar .search-icon { font-size: 16px; color: var(--text-light); }
+        .search-bar input {
+            flex: 1; border: none; outline: none; font-family: inherit;
+            font-size: 14px; color: var(--text); background: transparent;
+        }
+        .search-bar input::placeholder { color: var(--text-light); }
+
+        /* ===== Friend Recommend (Horizontal Scroll) ===== */
+        .friend-scroll {
+            padding: 0 16px;
+            display: flex; gap: 12px;
+            overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .friend-scroll::-webkit-scrollbar { display: none; }
+        .friend-card {
+            min-width: 150px; flex-shrink: 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 20px 16px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            scroll-snap-align: start;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+        .friend-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+        .friend-avatar {
+            width: 64px; height: 64px; border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px;
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            position: relative;
+        }
+        .friend-avatar .online-dot {
+            position: absolute; bottom: 2px; right: 2px;
+            width: 12px; height: 12px; background: var(--primary);
+            border-radius: 50%; border: 2px solid var(--white);
+        }
+        .friend-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .friend-card .breed { font-size: 11px; color: var(--text-light); margin-bottom: 12px; }
+        .friend-add-btn {
+            width: 100%; padding: 8px;
+            background: var(--primary-light); color: var(--primary-dark);
+            border: none; border-radius: var(--radius-xs);
+            font-size: 12px; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .friend-add-btn:hover { background: var(--primary); color: var(--white); }
+
+        /* ===== Walk Invite Banner ===== */
+        .invite-banner {
+            margin: 16px 16px 0;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            display: flex; align-items: center; gap: 14px;
+            cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+        }
+        .invite-banner:hover { transform: translateY(-2px); }
+        .invite-icon {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+        }
+        .invite-text h4 { font-size: 15px; font-weight: 700; color: white; }
+        .invite-text p { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+        .invite-arrow { margin-left: auto; font-size: 20px; color: rgba(255,255,255,0.7); }
+
+        /* ===== Feed ===== */
+        .feed-list { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+        .feed-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+        .feed-card:hover { box-shadow: var(--shadow); }
+        .feed-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px 0;
+        }
+        .feed-user-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary-light), #A7F3D0);
+        }
+        .feed-user-info { flex: 1; }
+        .feed-username { font-size: 14px; font-weight: 600; }
+        .feed-time { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+        .feed-more-btn {
+            width: 28px; height: 28px; border: none; background: none;
+            font-size: 16px; color: var(--text-light); cursor: pointer;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .feed-more-btn:hover { background: var(--bg); }
+        .feed-map-preview {
+            margin: 12px 16px;
+            height: 160px;
+            background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .feed-map-preview .map-placeholder {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            color: var(--primary-dark); font-size: 13px; font-weight: 500;
+        }
+        .feed-map-preview .map-placeholder .icon { font-size: 32px; }
+        .feed-route-line {
+            position: absolute; inset: 0;
+        }
+        .feed-route-line svg { width: 100%; height: 100%; }
+        .feed-stats {
+            display: flex; gap: 0; padding: 0 16px; margin-bottom: 10px;
+        }
+        .feed-stat {
+            flex: 1; text-align: center;
+            padding: 10px 0;
+            border-right: 1px solid var(--border);
+        }
+        .feed-stat:last-child { border-right: none; }
+        .feed-stat .value { font-size: 15px; font-weight: 700; color: var(--text); }
+        .feed-stat .value .unit { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+        .feed-stat .label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+        .feed-actions {
+            display: flex; align-items: center;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+        }
+        .feed-action-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border: none; background: none;
+            font-size: 13px; font-weight: 500; color: var(--text-secondary);
+            font-family: inherit; cursor: pointer; border-radius: var(--radius-xs);
+            transition: all 0.2s;
+        }
+        .feed-action-btn:hover { background: var(--bg); color: var(--primary); }
+        .feed-action-btn .icon { font-size: 18px; }
+        .feed-action-btn.liked { color: var(--danger); }
+
+        /* ===== Meeting Board ===== */
+        .meeting-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+        .meeting-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+        .meeting-item:hover { box-shadow: var(--shadow); transform: translateX(4px); }
+        .meeting-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+            background: var(--primary-light);
+        }
+        .meeting-info { flex: 1; min-width: 0; }
+        .meeting-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .meeting-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+        .meeting-tag {
+            font-size: 11px; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 3px;
+        }
+        .meeting-members {
+            font-size: 13px; font-weight: 600; color: var(--primary-dark);
+            white-space: nowrap;
+        }
+
+        /* ===== Bottom Nav ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 8px 12px; border: none; background: none;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            position: relative; min-width: 52px;
+            text-decoration: none; color: inherit;
+        }
+        .nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
+        .nav-item:hover .nav-icon { transform: translateY(-2px); }
+        .nav-item.center-btn { position: relative; top: -14px; }
+        .nav-item.center-btn .nav-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.4);
+            color: white;
+        }
+        .nav-item.center-btn:hover .nav-icon { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(16,185,129,0.5); }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+
+        /* ===== Toast ===== */
+        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <div class="paw-icon">🐾</div>
+            </div>
+            <span class="header-title">소셜</span>
+        </div>
+        <div class="header-actions">
+            <a href="뱃지.html" class="header-btn" aria-label="알림">
+                🔔<span class="notification-dot"></span>
+            </a>
+            <button class="header-btn" aria-label="검색" onclick="toggleSearch()">🔍</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- Search Bar (hidden by default) -->
+        <div class="search-bar" id="searchBar" style="display: none;">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="닉네임, 견종으로 검색..." />
+        </div>
+
+        <!-- Walk Invite Banner -->
+        <div class="invite-banner animate-in" onclick="toast('초대 링크가 복사되었습니다!')">
+            <div class="invite-icon">🤝</div>
+            <div class="invite-text">
+                <h4>함께 산책해요!</h4>
+                <p>근처 산책 친구에게 초대를 보내보세요</p>
+            </div>
+            <span class="invite-arrow">→</span>
+        </div>
+
+        <!-- Friend Recommend -->
+        <div class="section-title"><h3>🐕 동네 산책 친구 추천</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="friend-scroll">
+            <div class="friend-card animate-in">
+                <div class="friend-avatar">
+                    🐕
+                    <span class="online-dot"></span>
+                </div>
+                <h4>초코</h4>
+                <p class="breed">골든 리트리버</p>
+                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
+            </div>
+            <div class="friend-card animate-in">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">
+                    🐩
+                </div>
+                <h4>뽀삐</h4>
+                <p class="breed">토이 푸들</p>
+                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
+            </div>
+            <div class="friend-card animate-in">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #DBEAFE, #93C5FD);">
+                    🐕‍🦺
+                </div>
+                <h4>바둑이</h4>
+                <p class="breed">진돗개</p>
+                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
+            </div>
+            <div class="friend-card animate-in">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #EDE9FE, #C4B5FD);">
+                    🦮
+                </div>
+                <h4>모카</h4>
+                <p class="breed">시바 이누</p>
+                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
+            </div>
+            <div class="friend-card animate-in">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #FEE2E2, #FCA5A5);">
+                    🐶
+                </div>
+                <h4>콩이</h4>
+                <p class="breed">비숑 프리제</p>
+                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
+            </div>
+        </div>
+
+        <!-- Walk Feed -->
+        <div class="section-title"><h3>📸 산책 피드</h3><a class="more" href="#">새로고침 →</a></div>
+        <div class="feed-list">
+            <!-- Feed 1 -->
+            <article class="feed-card animate-in">
+                <div class="feed-header">
+                    <div class="feed-user-avatar">🐕</div>
+                    <div class="feed-user-info">
+                        <div class="feed-username">초코아빠</div>
+                        <div class="feed-time">30분 전 · 보라매공원</div>
+                    </div>
+                    <button class="feed-more-btn">···</button>
+                </div>
+                <div class="feed-map-preview">
+                    <div class="feed-route-line">
+                        <svg viewBox="0 0 300 160" fill="none">
+                            <path d="M30 130 Q80 40 150 80 Q220 120 270 30" stroke="#10B981" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
+                            <circle cx="30" cy="130" r="6" fill="#10B981"/>
+                            <circle cx="270" cy="30" r="6" fill="#059669"/>
+                        </svg>
+                    </div>
+                    <div class="map-placeholder">
+                        <span class="icon">🗺️</span>
+                        산책 경로
+                    </div>
+                </div>
+                <div class="feed-stats">
+                    <div class="feed-stat"><div class="value">4.2 <span class="unit">km</span></div><div class="label">거리</div></div>
+                    <div class="feed-stat"><div class="value">52 <span class="unit">분</span></div><div class="label">시간</div></div>
+                    <div class="feed-stat"><div class="value">210 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                </div>
+                <div class="feed-actions">
+                    <button class="feed-action-btn liked" onclick="toggleLike(this)"><span class="icon">❤️</span> 24</button>
+                    <button class="feed-action-btn" onclick="toast('댓글 기능 준비 중!')"><span class="icon">💬</span> 8</button>
+                    <button class="feed-action-btn" style="margin-left:auto" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
+                </div>
+            </article>
+
+            <!-- Feed 2 -->
+            <article class="feed-card animate-in">
+                <div class="feed-header">
+                    <div class="feed-user-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">🐩</div>
+                    <div class="feed-user-info">
+                        <div class="feed-username">달이맘</div>
+                        <div class="feed-time">1시간 전 · 한강공원</div>
+                    </div>
+                    <button class="feed-more-btn">···</button>
+                </div>
+                <div class="feed-map-preview">
+                    <div class="feed-route-line">
+                        <svg viewBox="0 0 300 160" fill="none">
+                            <path d="M20 80 Q100 20 150 90 Q200 150 280 60" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
+                            <circle cx="20" cy="80" r="6" fill="#3B82F6"/>
+                            <circle cx="280" cy="60" r="6" fill="#1D4ED8"/>
+                        </svg>
+                    </div>
+                    <div class="map-placeholder">
+                        <span class="icon">🗺️</span>
+                        산책 경로
+                    </div>
+                </div>
+                <div class="feed-stats">
+                    <div class="feed-stat"><div class="value">6.8 <span class="unit">km</span></div><div class="label">거리</div></div>
+                    <div class="feed-stat"><div class="value">1:15</div><div class="label">시간</div></div>
+                    <div class="feed-stat"><div class="value">340 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                </div>
+                <div class="feed-actions">
+                    <button class="feed-action-btn" onclick="toggleLike(this)"><span class="icon">🤍</span> 18</button>
+                    <button class="feed-action-btn" onclick="toast('댓글 기능 준비 중!')"><span class="icon">💬</span> 5</button>
+                    <button class="feed-action-btn" style="margin-left:auto" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
+                </div>
+            </article>
+
+            <!-- Feed 3 -->
+            <article class="feed-card animate-in">
+                <div class="feed-header">
+                    <div class="feed-user-avatar" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐶</div>
+                    <div class="feed-user-info">
+                        <div class="feed-username">콩이엄마</div>
+                        <div class="feed-time">3시간 전 · 올림픽공원</div>
+                    </div>
+                    <button class="feed-more-btn">···</button>
+                </div>
+                <div class="feed-map-preview">
+                    <div class="feed-route-line">
+                        <svg viewBox="0 0 300 160" fill="none">
+                            <path d="M40 100 L100 40 L180 120 L260 50" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+                            <circle cx="40" cy="100" r="6" fill="#F59E0B"/>
+                            <circle cx="260" cy="50" r="6" fill="#D97706"/>
+                        </svg>
+                    </div>
+                    <div class="map-placeholder">
+                        <span class="icon">🗺️</span>
+                        산책 경로
+                    </div>
+                </div>
+                <div class="feed-stats">
+                    <div class="feed-stat"><div class="value">3.5 <span class="unit">km</span></div><div class="label">거리</div></div>
+                    <div class="feed-stat"><div class="value">40 <span class="unit">분</span></div><div class="label">시간</div></div>
+                    <div class="feed-stat"><div class="value">175 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                </div>
+                <div class="feed-actions">
+                    <button class="feed-action-btn" onclick="toggleLike(this)"><span class="icon">🤍</span> 12</button>
+                    <button class="feed-action-btn" onclick="toast('댓글 기능 준비 중!')"><span class="icon">💬</span> 3</button>
+                    <button class="feed-action-btn" style="margin-left:auto" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
+                </div>
+            </article>
+        </div>
+
+        <!-- Walk Meeting Board -->
+        <div class="section-title"><h3>📋 산책 모임 게시판</h3><a class="more" href="#">글쓰기 →</a></div>
+        <div class="meeting-list">
+            <div class="meeting-item animate-in">
+                <div class="meeting-icon">🌅</div>
+                <div class="meeting-info">
+                    <div class="meeting-title">주말 아침 한강 산책 같이해요!</div>
+                    <div class="meeting-meta">
+                        <span class="meeting-tag">📍 여의도 한강공원</span>
+                        <span class="meeting-tag">📅 2/15 (토) 오전 8시</span>
+                    </div>
+                </div>
+                <span class="meeting-members">4/8</span>
+            </div>
+            <div class="meeting-item animate-in">
+                <div class="meeting-icon" style="background: var(--accent-light);">🐕</div>
+                <div class="meeting-info">
+                    <div class="meeting-title">대형견 산책 모임 (골든, 래브라도)</div>
+                    <div class="meeting-meta">
+                        <span class="meeting-tag">📍 보라매공원</span>
+                        <span class="meeting-tag">📅 2/13 (목) 오후 5시</span>
+                    </div>
+                </div>
+                <span class="meeting-members">6/10</span>
+            </div>
+            <div class="meeting-item animate-in">
+                <div class="meeting-icon" style="background: #EDE9FE;">🌙</div>
+                <div class="meeting-info">
+                    <div class="meeting-title">퇴근 후 야간 산책 번개</div>
+                    <div class="meeting-meta">
+                        <span class="meeting-tag">📍 서초구 반포천</span>
+                        <span class="meeting-tag">📅 매주 수요일 저녁 8시</span>
+                    </div>
+                </div>
+                <span class="meeting-members">3/6</span>
+            </div>
+            <div class="meeting-item animate-in">
+                <div class="meeting-icon" style="background: #FEE2E2;">🐾</div>
+                <div class="meeting-info">
+                    <div class="meeting-title">소형견 플레이데이트 모집</div>
+                    <div class="meeting-meta">
+                        <span class="meeting-tag">📍 마포구 상암 월드컵공원</span>
+                        <span class="meeting-tag">📅 2/16 (일) 오후 2시</span>
+                    </div>
+                </div>
+                <span class="meeting-members">5/8</span>
+            </div>
+        </div>
+
+        <div style="height: 24px;"></div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="../멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
+        <a href="소셜.html" class="nav-item active"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
+        <a href="../멍이랑_메인페이지_시안.html" class="nav-item center-btn"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></a>
+        <a href="랭킹.html" class="nav-item"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></a>
+        <a href="마이페이지.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    // Toggle search bar
+    function toggleSearch() {
+        const sb = document.getElementById('searchBar');
+        if (sb.style.display === 'none') {
+            sb.style.display = 'flex';
+            sb.querySelector('input').focus();
+        } else {
+            sb.style.display = 'none';
+        }
+    }
+
+    // Toggle like
+    function toggleLike(btn) {
+        const isLiked = btn.classList.contains('liked');
+        const numMatch = btn.textContent.match(/\d+/);
+        let count = numMatch ? parseInt(numMatch[0]) : 0;
+        if (isLiked) {
+            btn.classList.remove('liked');
+            count--;
+            btn.innerHTML = `<span class="icon">🤍</span> ${count}`;
+        } else {
+            btn.classList.add('liked');
+            count++;
+            btn.innerHTML = `<span class="icon">❤️</span> ${count}`;
+        }
+    }
+
+    // Toast
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+    </script>
+</body>
+</html>

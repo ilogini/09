@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>멍이랑 withbowwow - 반려동물 산책 앱 (컨셉1: 햇살 가득)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E85D26;
+            --primary-light: #FFF0E8;
+            --secondary: #FFD100;
+            --secondary-dark: #E6BC00;
+            --accent: #FF8C42;
+            --accent-light: #FFF5E6;
+            --text: #2D1B0E;
+            --text-secondary: #7A6555;
+            --text-light: #A89585;
+            --bg: #FFFAF5;
+            --white: #FFFFFF;
+            --border: #F3E8DE;
+            --danger: #EF4444;
+            --card-bg: #FFFFFF;
+            --shadow-warm: 0 4px 20px rgba(255,107,53,0.08);
+            --shadow-warm-lg: 0 8px 32px rgba(255,107,53,0.12);
+            --shadow-warm-xl: 0 16px 48px rgba(255,107,53,0.16);
+            --shadow-soft: 0 2px 12px rgba(45,27,14,0.06);
+            --radius: 20px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --nav-height: 80px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Floating Pill Header ===== */
+        .header {
+            position: sticky; top: 8px; z-index: 100;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            margin: 8px 16px 0;
+            padding: 10px 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-radius: 50px;
+            box-shadow: 0 4px 24px rgba(255,107,53,0.10), 0 1px 4px rgba(45,27,14,0.04);
+            border: 1px solid rgba(255,107,53,0.08);
+        }
+        .header-logo { display: flex; align-items: center; gap: 10px; }
+        .header-logo .paw-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(255,107,53,0.3);
+        }
+        .header-logo .paw-icon svg { width: 20px; height: 20px; }
+        .header-logo span { font-size: 19px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+        .header-logo span em { font-style: normal; color: var(--primary); }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .header-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: var(--primary-light); font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transition: all 0.2s; color: var(--primary);
+        }
+        .header-btn:hover { background: #FFE4D0; transform: scale(1.05); }
+        .notification-dot {
+            position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
+            background: var(--danger); border-radius: 50%; border: 2px solid var(--white);
+        }
+
+        /* ===== GPS Badge ===== */
+        .gps-badge {
+            display: flex; align-items: center; gap: 5px;
+            padding: 5px 12px; border-radius: 50px;
+            font-size: 11px; font-weight: 600;
+            background: #F5EDE6; color: var(--text-light);
+            transition: all 0.3s;
+        }
+        .gps-badge.on { background: #FFF0E8; color: var(--primary); }
+        .gps-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-light); transition: background 0.3s; }
+        .gps-badge.on .gps-dot { background: var(--primary); animation: gpsPulse 1.5s infinite; }
+        @keyframes gpsPulse {
+            0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,107,53,0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(255,107,53,0); }
+        }
+
+        /* ===== Main Content ===== */
+        .content { padding: 8px 0 calc(var(--nav-height) + 24px) 0; }
+
+        /* ===== Weather Blob ===== */
+        .weather-bar {
+            background: linear-gradient(135deg, #FFF5EB 0%, #FFE8D0 40%, #FFF0D0 100%);
+            margin: 12px 16px 0;
+            padding: 16px 20px;
+            border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid rgba(255,107,53,0.08);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+        }
+        .weather-bar::before {
+            content: '';
+            position: absolute; right: -10px; top: -10px;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, rgba(255,209,0,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .weather-sun-illustration {
+            position: absolute; right: 70px; top: -8px;
+            width: 50px; height: 50px;
+        }
+        .sun-core {
+            width: 24px; height: 24px;
+            background: radial-gradient(circle, #FFD100, #FFAA00);
+            border-radius: 50%;
+            position: absolute; top: 13px; left: 13px;
+            box-shadow: 0 0 16px rgba(255,209,0,0.5);
+        }
+        .sun-ray {
+            position: absolute;
+            width: 3px; height: 8px;
+            background: #FFD100;
+            border-radius: 3px;
+            opacity: 0.6;
+        }
+        .sun-ray:nth-child(2) { top: 0; left: 23.5px; }
+        .sun-ray:nth-child(3) { top: 5px; left: 38px; transform: rotate(45deg); }
+        .sun-ray:nth-child(4) { top: 21px; left: 42px; transform: rotate(90deg); }
+        .sun-ray:nth-child(5) { top: 35px; left: 38px; transform: rotate(135deg); }
+        .sun-ray:nth-child(6) { bottom: 0; left: 23.5px; }
+        .sun-ray:nth-child(7) { top: 35px; left: 9px; transform: rotate(-135deg); }
+        .sun-ray:nth-child(8) { top: 21px; left: 4px; transform: rotate(-90deg); }
+        .sun-ray:nth-child(9) { top: 5px; left: 9px; transform: rotate(-45deg); }
+
+        .weather-info { display: flex; align-items: center; gap: 12px; z-index: 1; }
+        .weather-icon-wrap {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .weather-icon-wrap i { font-size: 24px; color: #E6A000; }
+        .weather-text h4 { font-size: 14px; font-weight: 700; color: #92400E; }
+        .weather-text p { font-size: 12px; color: #B45309; margin-top: 2px; font-weight: 500; }
+        .weather-temp { font-size: 28px; font-weight: 800; color: var(--primary); z-index: 1; }
+
+        /* ===== Weekly Card with Circular Progress ===== */
+        .weekly-card {
+            margin: 16px;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-warm);
+            border: 1px solid rgba(255,107,53,0.05);
+        }
+        .weekly-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px;
+        }
+        .weekly-header h3 {
+            font-size: 17px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .weekly-header h3 i { font-size: 20px; color: var(--primary); }
+        .weekly-header .period {
+            font-size: 11px; font-weight: 600; color: var(--text-light);
+            background: var(--primary-light); padding: 5px 12px; border-radius: 50px;
+        }
+        .weekly-content {
+            display: flex; align-items: center; gap: 24px;
+        }
+        .progress-ring-wrap {
+            position: relative; flex-shrink: 0;
+        }
+        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring-bg { fill: none; stroke: #FFF0E8; stroke-width: 8; }
+        .progress-ring-fill {
+            fill: none; stroke: url(#warmGrad); stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s ease;
+        }
+        .progress-ring-text {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .progress-ring-text .pct { font-size: 24px; font-weight: 800; color: var(--primary); }
+        .progress-ring-text .pct-label { font-size: 10px; color: var(--text-light); font-weight: 600; margin-top: -2px; }
+
+        .weekly-stats-bubbles {
+            display: flex; flex-direction: column; gap: 10px; flex: 1;
+        }
+        .stat-bubble {
+            display: flex; align-items: center; gap: 12px;
+            background: #FFFAF5; border-radius: 16px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(255,107,53,0.04);
+        }
+        .stat-bubble-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .stat-bubble-icon.dist { background: #FFF0E8; color: var(--primary); }
+        .stat-bubble-icon.count { background: #FEF3C7; color: #D97706; }
+        .stat-bubble-icon.time { background: #FCE7F3; color: #DB2777; }
+        .stat-bubble-text .value { font-size: 18px; font-weight: 800; color: var(--text); }
+        .stat-bubble-text .value .unit { font-size: 12px; font-weight: 600; color: var(--text-light); }
+        .stat-bubble-text .label { font-size: 11px; color: var(--text-light); font-weight: 500; }
+        .weekly-subtext {
+            margin-top: 16px; text-align: center;
+            font-size: 13px; color: var(--text-light); font-weight: 400;
+        }
+
+        /* ===== Walk Start Button ===== */
+        .walk-start-section { margin: 0 16px; }
+        .walk-start-btn {
+            width: 100%; padding: 20px 24px;
+            background: linear-gradient(135deg, #FF6B35, #FF8C42, #FFD100);
+            color: white; border: none; border-radius: 50px;
+            font-size: 18px; font-weight: 700; font-family: inherit;
+            cursor: pointer; display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 8px 28px rgba(255,107,53,0.35);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; overflow: hidden;
+        }
+        .walk-start-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 14px 40px rgba(255,107,53,0.45);
+        }
+        .walk-start-btn:active { transform: translateY(0) scale(0.98); }
+        .walk-start-btn .btn-icon {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.25); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+            animation: pawBounce 2s ease infinite;
+        }
+        @keyframes pawBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(-5deg); }
+        }
+        .walk-start-btn .btn-icon i { color: white; }
+        .walk-start-btn .btn-text { text-align: left; flex: 1; }
+        .walk-start-btn .btn-text .main-text { font-size: 17px; font-weight: 700; }
+        .walk-start-btn .btn-text .sub { font-size: 12px; font-weight: 500; opacity: 0.85; margin-top: 3px; }
+        .walk-start-btn .btn-arrow { font-size: 22px; opacity: 0.7; color: white; }
+
+        /* ===== Section Title ===== */
+        .section-title {
+            padding: 28px 20px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .section-title h3 {
+            font-size: 18px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title h3 i { font-size: 22px; color: var(--primary); }
+        .section-title .more {
+            font-size: 13px; color: var(--text-light); text-decoration: none;
+            cursor: pointer; font-weight: 500; transition: color 0.2s;
+        }
+        .section-title .more:hover { color: var(--primary); }
+
+        /* ===== Pet Cards ===== */
+        .pets-scroll {
+            padding: 0 20px; display: flex; gap: 14px;
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .pets-scroll::-webkit-scrollbar { display: none; }
+        .pet-card {
+            min-width: 150px; background: var(--white);
+            border-radius: var(--radius-lg); padding: 20px 16px 16px;
+            text-align: center; box-shadow: var(--shadow-soft);
+            border: 2.5px solid transparent; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0; position: relative; overflow: visible;
+        }
+        .pet-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-warm); }
+        .pet-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(255,107,53,0.18);
+        }
+        .pet-card.selected::after {
+            content: '';
+            position: absolute; top: 8px; right: 8px;
+            width: 22px; height: 22px;
+            background: var(--primary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            /* heart check */
+        }
+        .pet-card.selected::after {
+            content: '\2665'; /* heart */
+            font-size: 12px; color: white;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .pet-avatar {
+            width: 72px; height: 72px; border-radius: 50%;
+            margin: -36px auto 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 34px;
+            border: 3px solid var(--white);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .pet-avatar.dog { background: linear-gradient(135deg, #FFECD2, #FCB69F); }
+        .pet-avatar.cat { background: linear-gradient(135deg, #FECDD3, #FDA4AF); }
+        .pet-avatar.add {
+            background: var(--primary-light); border: 2.5px dashed var(--border);
+            box-shadow: none;
+        }
+        .pet-avatar.add i { font-size: 28px; color: var(--text-light); }
+        .pet-card h4 { font-size: 15px; font-weight: 700; margin-top: 4px; }
+        .pet-card p { font-size: 11px; color: var(--text-light); margin-top: 3px; font-weight: 500; }
+        .pet-card .pet-stat {
+            margin-top: 10px; font-size: 12px; font-weight: 700;
+            color: var(--primary); background: var(--primary-light);
+            padding: 4px 10px; border-radius: 50px; display: inline-block;
+        }
+
+        /* ===== Ranking ===== */
+        .ranking-card {
+            margin: 0 16px; background: var(--white);
+            border-radius: var(--radius-lg); overflow: hidden;
+            box-shadow: var(--shadow-warm);
+            border: 1px solid rgba(255,107,53,0.05);
+        }
+        /* Pill toggle switch */
+        .ranking-toggle-wrap {
+            padding: 16px 18px 12px;
+            display: flex; justify-content: center;
+        }
+        .ranking-toggle {
+            display: flex; background: #FFF0E8; border-radius: 50px;
+            padding: 3px; gap: 2px;
+        }
+        .ranking-toggle-btn {
+            padding: 8px 20px; border-radius: 50px;
+            font-size: 13px; font-weight: 600;
+            color: var(--text-light); border: none;
+            background: transparent; cursor: pointer;
+            font-family: inherit; transition: all 0.25s;
+        }
+        .ranking-toggle-btn.active {
+            background: var(--primary); color: white;
+            box-shadow: 0 2px 8px rgba(255,107,53,0.3);
+        }
+        .ranking-list { padding: 4px 0 8px; }
+        .ranking-item {
+            display: flex; align-items: center; padding: 12px 18px; gap: 14px;
+            transition: background 0.2s; border-radius: 16px; margin: 0 8px;
+        }
+        .ranking-item:hover { background: #FFFAF5; }
+        .ranking-item.me {
+            background: linear-gradient(135deg, #FFF5EB, #FFF0E8);
+            border: 1.5px solid rgba(255,107,53,0.15);
+            position: relative;
+        }
+        .ranking-item.me::before {
+            content: '';
+            position: absolute; inset: -2px; border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,209,0,0.15));
+            z-index: -1; filter: blur(4px);
+        }
+        .rank-num {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            color: var(--text-secondary); background: #F5EDE6;
+            flex-shrink: 0;
+        }
+        .rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white; box-shadow: 0 2px 8px rgba(255,215,0,0.4);
+        }
+        .rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+            color: white; box-shadow: 0 2px 8px rgba(192,192,192,0.3);
+        }
+        .rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #B8690E);
+            color: white; box-shadow: 0 2px 8px rgba(205,127,50,0.3);
+        }
+        .rank-avatar {
+            width: 46px; height: 46px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFF0E8, #FFE4D0);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+            border: 2px solid var(--white);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .rank-info { flex: 1; min-width: 0; }
+        .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rank-pet { font-size: 11px; color: var(--text-light); margin-top: 2px; font-weight: 500; }
+        .rank-distance { font-size: 16px; font-weight: 800; color: var(--primary); white-space: nowrap; }
+        .rank-distance .unit { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+        .me-sparkle {
+            font-size: 14px; margin-left: 4px;
+        }
+
+        /* ===== Challenges ===== */
+        .challenges-list {
+            padding: 0 16px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .challenge-item {
+            background: var(--white); border-radius: var(--radius-lg);
+            padding: 0; box-shadow: var(--shadow-soft);
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid rgba(255,107,53,0.05);
+            overflow: hidden;
+        }
+        .challenge-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-warm); }
+        .challenge-top-stripe { height: 4px; border-radius: 4px 4px 0 0; }
+        .challenge-top-stripe.orange { background: linear-gradient(90deg, #FF6B35, #FFD100); }
+        .challenge-top-stripe.red { background: linear-gradient(90deg, #EF4444, #FF6B6B); }
+        .challenge-top-stripe.amber { background: linear-gradient(90deg, #F59E0B, #FFD100); }
+        .challenge-top-stripe.purple { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+        .challenge-body {
+            padding: 18px 20px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .challenge-badge {
+            width: 52px; height: 52px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+        }
+        .challenge-badge i { font-size: 26px; }
+        .challenge-badge.distance { background: #FFF0E8; color: var(--primary); }
+        .challenge-badge.streak { background: #FEE2E2; color: #EF4444; }
+        .challenge-badge.explore { background: #FFF5E6; color: #D97706; }
+        .challenge-badge.special { background: #EDE9FE; color: #8B5CF6; }
+        .challenge-content { flex: 1; min-width: 0; }
+        .challenge-content h4 { font-size: 15px; font-weight: 700; }
+        .challenge-content p { font-size: 12px; color: var(--text-secondary); margin-top: 3px; font-weight: 500; }
+        .challenge-progress { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .challenge-progress .bar { flex: 1; height: 8px; background: #F5EDE6; border-radius: 50px; overflow: hidden; }
+        .challenge-progress .bar-fill { height: 100%; border-radius: 50px; transition: width 1s ease; }
+        .bar-fill.orange-grad { background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .bar-fill.red-grad { background: linear-gradient(90deg, #EF4444, #FF6B6B); }
+        .bar-fill.amber-grad { background: linear-gradient(90deg, #F59E0B, #FFD100); }
+        .bar-fill.purple-grad { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+        .challenge-progress span { font-size: 12px; font-weight: 700; color: var(--text-secondary); white-space: nowrap; }
+
+        /* ===== Nearby ===== */
+        .nearby-map-box {
+            margin: 0 16px; height: 180px;
+            border-radius: var(--radius-lg); overflow: hidden;
+            border: 2px solid rgba(255,107,53,0.08);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+        }
+        .nearby-map-box::after {
+            content: '';
+            position: absolute; inset: 0; z-index: 1;
+            border-radius: var(--radius-lg);
+            box-shadow: inset 0 0 20px rgba(255,160,100,0.08);
+            pointer-events: none;
+        }
+        .nearby-map-box .leaflet-control-attribution { font-size: 8px !important; opacity: 0.5; }
+        .nearby-list { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+        .nearby-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px; background: var(--white);
+            border-radius: var(--radius); box-shadow: var(--shadow-soft);
+            cursor: pointer; transition: all 0.3s;
+            border: 1px solid rgba(255,107,53,0.04);
+        }
+        .nearby-item:hover {
+            box-shadow: 0 4px 16px rgba(255,107,53,0.12);
+            transform: translateX(4px);
+        }
+        .nearby-icon {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .nearby-icon i { font-size: 24px; }
+        .nearby-icon.park { background: #FFF0E8; color: var(--primary); }
+        .nearby-icon.cafe { background: #FEF3C7; color: #D97706; }
+        .nearby-icon.hospital { background: #DBEAFE; color: #3B82F6; }
+        .nearby-info { flex: 1; min-width: 0; }
+        .nearby-name { font-size: 14px; font-weight: 600; }
+        .nearby-detail { font-size: 12px; color: var(--text-light); margin-top: 3px; font-weight: 500; }
+        .nearby-dist {
+            font-size: 13px; font-weight: 700; color: var(--primary);
+            white-space: nowrap; background: var(--primary-light);
+            padding: 4px 10px; border-radius: 50px;
+        }
+
+        /* ===== Ad / Premium ===== */
+        .ad-banner {
+            margin: 20px 16px 0; padding: 16px 20px;
+            background: linear-gradient(135deg, #FFFAF5, #FFE8D0, #FFF5E6);
+            border-radius: var(--radius); display: flex; align-items: center;
+            gap: 14px; cursor: pointer; position: relative;
+            border: 1px solid rgba(255,107,53,0.08);
+            box-shadow: var(--shadow-soft);
+        }
+        .ad-badge {
+            font-size: 9px; font-weight: 700; color: var(--text-light);
+            background: rgba(0,0,0,0.06); padding: 2px 8px;
+            border-radius: 4px; position: absolute; top: 8px; right: 10px;
+            letter-spacing: 0.5px;
+        }
+        .ad-banner .ad-icon-wrap {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: var(--primary-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .ad-banner .ad-icon-wrap i { font-size: 24px; color: var(--primary); }
+        .ad-banner .ad-text h4 { font-size: 14px; font-weight: 700; color: #92400E; }
+        .ad-banner .ad-text p { font-size: 12px; color: #A16207; margin-top: 2px; font-weight: 500; }
+
+        /* Recent Walks */
+        .recent-walks { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+        .walk-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 18px; background: var(--white);
+            border-radius: var(--radius); box-shadow: var(--shadow-soft);
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid rgba(255,107,53,0.04);
+        }
+        .walk-item:hover { box-shadow: var(--shadow-warm); transform: translateY(-2px); }
+        .walk-route-mini {
+            width: 54px; height: 54px; border-radius: 16px;
+            background: var(--primary-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .walk-route-mini svg { width: 34px; height: 34px; }
+        .walk-info { flex: 1; min-width: 0; }
+        .walk-date { font-size: 12px; color: var(--text-light); font-weight: 500; }
+        .walk-title { font-size: 14px; font-weight: 700; margin-top: 3px; }
+        .walk-meta { display: flex; gap: 14px; margin-top: 6px; }
+        .walk-meta span { font-size: 12px; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 4px; }
+        .walk-meta span i { font-size: 14px; color: var(--primary); }
+        .walk-meta span strong { color: var(--text); font-weight: 700; }
+
+        /* Premium */
+        .premium-banner {
+            margin: 20px 16px 0; padding: 20px 20px;
+            background: linear-gradient(135deg, #3D1F00, #6B3A0A, #92570F);
+            border-radius: var(--radius-lg);
+            display: flex; align-items: center; gap: 16px;
+            cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .premium-banner::before {
+            content: '';
+            position: absolute; right: 30px; top: -20px;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, rgba(255,209,0,0.15), transparent);
+            border-radius: 50%;
+        }
+        .premium-banner::after {
+            content: '';
+            position: absolute; right: 80px; bottom: -10px;
+            width: 50px; height: 50px;
+            background: radial-gradient(circle, rgba(255,107,53,0.1), transparent);
+            border-radius: 50%;
+        }
+        .premium-banner:hover { transform: translateY(-2px); }
+        .premium-badge {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .premium-badge i { font-size: 24px; color: white; }
+        .premium-text { flex: 1; z-index: 1; }
+        .premium-text h4 { font-size: 15px; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px; }
+        .premium-text p { font-size: 12px; color: #FDBA74; margin-top: 3px; font-weight: 500; }
+        .premium-price { text-align: right; z-index: 1; }
+        .premium-price .price { font-size: 18px; font-weight: 800; color: var(--secondary); }
+        .premium-price .period { font-size: 11px; color: #FDBA74; font-weight: 500; }
+
+        /* ===== Floating Bottom Nav ===== */
+        .bottom-nav {
+            position: fixed; bottom: 12px;
+            left: 50%; transform: translateX(-50%);
+            width: calc(100% - 32px); max-width: 448px;
+            height: 68px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255,107,53,0.08);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 8px;
+            z-index: 200;
+            box-shadow: 0 8px 32px rgba(45,27,14,0.12), 0 2px 8px rgba(255,107,53,0.06);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px 12px; border: none; background: none;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s; position: relative; min-width: 52px;
+        }
+        .nav-item .nav-icon { font-size: 24px; color: var(--text-light); transition: all 0.2s; }
+        .nav-item .nav-icon i { font-size: 24px; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+        .nav-item.active .nav-icon { color: var(--primary); }
+        .nav-item.active .nav-icon i { color: var(--primary); }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 700; }
+        .nav-item.active::after {
+            content: '';
+            position: absolute; bottom: 2px;
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--primary);
+        }
+        .nav-item:hover .nav-icon { transform: translateY(-2px); }
+
+        .nav-item.center-btn { position: relative; top: -16px; }
+        .nav-item.center-btn .nav-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--primary), #FF8C42, var(--secondary));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+            color: white; font-size: 28px;
+            animation: centerBtnFloat 3s ease-in-out infinite;
+        }
+        .nav-item.center-btn .nav-icon i { font-size: 28px; color: white; }
+        .nav-item.center-btn:hover .nav-icon {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 10px 28px rgba(255,107,53,0.5);
+        }
+        .nav-item.center-btn .nav-label { color: var(--primary); font-weight: 700; margin-top: 4px; }
+        .nav-item.center-btn::after { display: none; }
+        @keyframes centerBtnFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* ===== Walk Screen ===== */
+        .walk-screen {
+            display: none;
+            position: fixed; inset: 0; z-index: 300;
+            background: var(--bg);
+            max-width: 480px; margin: 0 auto;
+            flex-direction: column;
+        }
+        .walk-screen.active { display: flex; }
+
+        .walk-screen-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0; z-index: 10;
+        }
+        .walk-screen-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .walk-screen-header h3 i { font-size: 18px; color: var(--primary); }
+        .walk-close-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: var(--primary-light); font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); transition: all 0.2s;
+        }
+        .walk-close-btn:hover { background: #FFE4D0; }
+
+        .walk-map-area { flex: 1; position: relative; min-height: 0; }
+        #walkMap { width: 100%; height: 100%; z-index: 1; }
+        .leaflet-control-zoom { display: none !important; }
+
+        .walk-map-controls {
+            position: absolute; top: 12px; right: 12px; z-index: 10;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .wmap-btn {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+            border: none; border-radius: 14px; box-shadow: var(--shadow-warm);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; color: var(--text-secondary);
+        }
+        .wmap-btn i { font-size: 20px; }
+        .wmap-btn:active { transform: scale(0.92); }
+        .wmap-btn.on { background: var(--primary); color: white; }
+
+        .walk-dist-chip {
+            position: absolute; bottom: 14px; left: 14px; z-index: 10;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+            border-radius: 50px; padding: 12px 18px;
+            box-shadow: var(--shadow-warm);
+        }
+        .walk-dist-chip .live-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary); animation: gpsPulse 1s infinite;
+        }
+        .walk-dist-chip .dist-num { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--primary); }
+        .walk-dist-chip .dist-unit { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+
+        /* Walk Stats Panel */
+        .walk-stats-panel {
+            background: var(--white);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 20px 24px 32px;
+            box-shadow: 0 -6px 24px rgba(255,107,53,0.08);
+            flex-shrink: 0; z-index: 10;
+        }
+        .walk-pet-label { text-align: center; font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+        .walk-pause-label { text-align: center; font-size: 13px; font-weight: 600; color: var(--secondary-dark); margin-bottom: 4px; display: none; }
+        .walk-pause-label.on { display: block; }
+        .walk-pause-label i { margin-right: 4px; }
+
+        .walk-timer {
+            text-align: center; font-size: 52px; font-weight: 800;
+            color: var(--text); letter-spacing: 2px;
+            margin-bottom: 16px; font-variant-numeric: tabular-nums;
+        }
+        .walk-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .walk-stat {
+            text-align: center; background: #FFFAF5;
+            border-radius: var(--radius); padding: 14px 8px;
+            border: 1px solid rgba(255,107,53,0.06);
+        }
+        .walk-stat .stat-icon { font-size: 18px; color: var(--primary); margin-bottom: 4px; }
+        .walk-stat .value { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+        .walk-stat .value .unit { font-size: 11px; font-weight: 600; color: var(--text-light); }
+        .walk-stat .label { font-size: 11px; color: var(--text-light); margin-top: 4px; font-weight: 500; }
+
+        .walk-controls { display: flex; align-items: center; justify-content: center; gap: 24px; }
+        .walk-ctrl-btn {
+            border: none; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .walk-ctrl-btn:active { transform: scale(0.92); }
+        .walk-ctrl-btn.pause {
+            width: 54px; height: 54px; background: var(--primary-light);
+            font-size: 22px; color: var(--primary);
+        }
+        .walk-ctrl-btn.pause i { font-size: 22px; }
+        .walk-ctrl-btn.stop {
+            width: 70px; height: 70px;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white; font-size: 26px;
+            box-shadow: 0 6px 20px rgba(239,68,68,0.4);
+        }
+        .walk-ctrl-btn.stop i { font-size: 26px; color: white; }
+        .walk-ctrl-btn.camera {
+            width: 54px; height: 54px; background: var(--primary-light);
+            font-size: 22px; color: var(--primary);
+        }
+        .walk-ctrl-btn.camera i { font-size: 22px; }
+
+        /* Walk Screen Start Button (in panel) */
+        .walk-panel-start-btn {
+            width: 100%; padding: 18px;
+            background: linear-gradient(135deg, #FF6B35, #FF8C42, #FFD100);
+            color: white; border: none; border-radius: 50px;
+            font-size: 17px; font-weight: 700; font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255,107,53,0.35);
+            transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .walk-panel-start-btn:hover { transform: translateY(-2px); }
+        .walk-panel-start-btn i { font-size: 22px; }
+
+        /* ===== Result Modal ===== */
+        .result-modal {
+            display: none; position: fixed; inset: 0; z-index: 400;
+            background: rgba(45,27,14,0.5);
+            backdrop-filter: blur(4px);
+            align-items: flex-end; justify-content: center;
+            max-width: 480px; margin: 0 auto;
+        }
+        .result-modal.active { display: flex; }
+        .result-content {
+            background: var(--white); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            width: 100%; max-height: 92vh; overflow-y: auto;
+            padding: 32px 24px 40px;
+            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* Celebration area */
+        .result-celebration {
+            position: relative; text-align: center; padding: 20px 0;
+            margin-bottom: 20px; overflow: hidden;
+        }
+        .confetti-dot {
+            position: absolute; width: 6px; height: 6px; border-radius: 50%;
+            animation: confettiFall 2s ease-in-out infinite;
+            opacity: 0;
+        }
+        @keyframes confettiFall {
+            0% { opacity: 0; transform: translateY(-20px) rotate(0deg) scale(0); }
+            20% { opacity: 1; transform: translateY(0) rotate(90deg) scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(40px) rotate(360deg) scale(0.5); }
+        }
+        .result-header { text-align: center; margin-bottom: 24px; }
+        .result-header .result-emoji { font-size: 56px; margin-bottom: 8px; display: block; }
+        .result-header h2 { font-size: 24px; font-weight: 800; }
+        .result-header p { font-size: 14px; color: var(--text-secondary); margin-top: 6px; font-weight: 500; }
+
+        .result-map-preview {
+            width: 100%; height: 160px;
+            border-radius: var(--radius); overflow: hidden;
+            margin-bottom: 20px; background: var(--primary-light);
+            box-shadow: var(--shadow-soft);
+        }
+        .result-stats { display: flex; gap: 10px; margin-bottom: 24px; }
+        .result-stat {
+            flex: 1; background: #FFFAF5;
+            border-radius: var(--radius); padding: 16px 10px;
+            text-align: center;
+            border: 1px solid rgba(255,107,53,0.06);
+        }
+        .result-stat .stat-icon-circle {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--primary-light); margin: 0 auto 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .result-stat .stat-icon-circle i { font-size: 18px; color: var(--primary); }
+        .result-stat .value { font-size: 20px; font-weight: 800; color: var(--text); }
+        .result-stat .label { font-size: 11px; color: var(--text-light); margin-top: 4px; font-weight: 500; }
+
+        .result-badges { margin-bottom: 20px; }
+        .result-badges h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .result-badges h4 i { font-size: 18px; color: var(--secondary); }
+        .badge-list { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge-item {
+            display: flex; align-items: center; gap: 5px;
+            padding: 8px 14px; border-radius: 50px;
+            background: linear-gradient(135deg, #FFF5E6, #FFF0E8);
+            font-size: 13px; font-weight: 600; color: #92400E;
+            border: 1px solid rgba(255,107,53,0.1);
+        }
+        .result-actions { display: flex; gap: 12px; }
+        .result-btn {
+            flex: 1; padding: 16px; border-radius: 50px;
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; border: none; transition: all 0.2s;
+        }
+        .result-btn.share { background: #F5EDE6; color: var(--text); }
+        .result-btn.save {
+            background: linear-gradient(135deg, var(--primary), #FF8C42, var(--secondary));
+            color: white;
+            box-shadow: 0 4px 16px rgba(255,107,53,0.3);
+        }
+        .result-btn:hover { transform: translateY(-2px); }
+
+        /* ===== Toast ===== */
+        .toast-el {
+            position: fixed; bottom: 100px;
+            left: 50%; transform: translateX(-50%) translateY(12px);
+            background: rgba(61,31,0,0.9);
+            backdrop-filter: blur(8px); color: white;
+            padding: 12px 24px; border-radius: 50px;
+            font-size: 13px; font-weight: 600;
+            z-index: 500; opacity: 0; transition: all 0.3s;
+            pointer-events: none; white-space: nowrap; max-width: 90%;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+
+        @media (max-width: 360px) {
+            .walk-timer { font-size: 42px; }
+            .bottom-nav { width: calc(100% - 24px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header (Floating Pill) -->
+    <header class="header">
+        <div class="header-logo">
+            <div class="paw-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 18c-2.5 0-4.5-1.5-5.5-3.5C5.5 12.5 6 10 8 9s4 0 4 0 2-1 4 0 2.5 3.5 1.5 5.5S14.5 18 12 18z" fill="white" opacity="0.9"/>
+                    <circle cx="8" cy="7" r="2" fill="white" opacity="0.8"/>
+                    <circle cx="16" cy="7" r="2" fill="white" opacity="0.8"/>
+                    <circle cx="5.5" cy="11" r="1.8" fill="white" opacity="0.7"/>
+                    <circle cx="18.5" cy="11" r="1.8" fill="white" opacity="0.7"/>
+                </svg>
+            </div>
+            <span>멍이<em>랑</em></span>
+        </div>
+        <div class="header-actions">
+            <div class="gps-badge" id="gpsBadge">
+                <span class="gps-dot"></span>
+                <span id="gpsLabel">GPS 대기</span>
+            </div>
+            <button class="header-btn" aria-label="알림">
+                <i class="ph-duotone ph-bell"></i>
+                <span class="notification-dot"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Weather Blob -->
+        <div class="weather-bar animate-in">
+            <div class="weather-info">
+                <div class="weather-icon-wrap">
+                    <i class="ph-duotone ph-sun"></i>
+                </div>
+                <div class="weather-text">
+                    <h4>산책하기 좋은 날이에요!</h4>
+                    <p>미세먼지 좋음 · 습도 45%</p>
+                </div>
+            </div>
+            <div class="weather-sun-illustration">
+                <div class="sun-core"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+            </div>
+            <div class="weather-temp">12°</div>
+        </div>
+
+        <!-- Weekly Summary with Circular Progress Ring -->
+        <div class="weekly-card animate-in">
+            <div class="weekly-header">
+                <h3><i class="ph-duotone ph-chart-bar"></i> 이번 주 산책</h3>
+                <span class="period">2.3 ~ 2.9</span>
+            </div>
+            <div class="weekly-content">
+                <div class="progress-ring-wrap">
+                    <svg class="progress-ring" width="110" height="110" viewBox="0 0 110 110">
+                        <defs>
+                            <linearGradient id="warmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF6B35"/>
+                                <stop offset="100%" style="stop-color:#FFD100"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="progress-ring-bg" cx="55" cy="55" r="46"/>
+                        <circle class="progress-ring-fill" cx="55" cy="55" r="46"
+                            stroke-dasharray="289.03"
+                            stroke-dashoffset="109.83"/>
+                    </svg>
+                    <div class="progress-ring-text">
+                        <span class="pct">62%</span>
+                        <span class="pct-label">달성률</span>
+                    </div>
+                </div>
+                <div class="weekly-stats-bubbles">
+                    <div class="stat-bubble">
+                        <div class="stat-bubble-icon dist"><i class="ph-duotone ph-path"></i></div>
+                        <div class="stat-bubble-text">
+                            <div class="value">12.5 <span class="unit">km</span></div>
+                            <div class="label">총 거리</div>
+                        </div>
+                    </div>
+                    <div class="stat-bubble">
+                        <div class="stat-bubble-icon count"><i class="ph-duotone ph-paw-print"></i></div>
+                        <div class="stat-bubble-text">
+                            <div class="value">5 <span class="unit">회</span></div>
+                            <div class="label">산책 횟수</div>
+                        </div>
+                    </div>
+                    <div class="stat-bubble">
+                        <div class="stat-bubble-icon time"><i class="ph-duotone ph-timer"></i></div>
+                        <div class="stat-bubble-text">
+                            <div class="value">2:15</div>
+                            <div class="label">총 시간</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="weekly-subtext">주간 목표 20km 중 12.5km를 걸었어요</div>
+        </div>
+
+        <!-- Walk Start Button (Bouncy Pill) -->
+        <div class="walk-start-section animate-in">
+            <button class="walk-start-btn" onclick="openWalkScreen()">
+                <span class="btn-icon"><i class="ph-duotone ph-paw-print"></i></span>
+                <div class="btn-text">
+                    <div class="main-text">산책 시작하기</div>
+                    <div class="sub">초코와 함께 걸어볼까요?</div>
+                </div>
+                <span class="btn-arrow"><i class="ph-duotone ph-caret-right"></i></span>
+            </button>
+        </div>
+
+        <!-- My Pets (Rounded cards with overlapping avatar) -->
+        <div class="section-title"><h3><i class="ph-duotone ph-paw-print"></i> 내 반려동물</h3><a class="more" href="#">관리 <i class="ph-duotone ph-caret-right"></i></a></div>
+        <div class="pets-scroll">
+            <div class="pet-card selected" onclick="selectPet(this,'초코')" style="margin-top:36px">
+                <div class="pet-avatar dog">🐕</div>
+                <h4>초코</h4>
+                <p>골든 리트리버 · 3살</p>
+                <div class="pet-stat"><i class="ph-duotone ph-path" style="font-size:12px;margin-right:2px"></i> 142.5km</div>
+            </div>
+            <div class="pet-card" onclick="selectPet(this,'나비')" style="margin-top:36px">
+                <div class="pet-avatar cat">🐈</div>
+                <h4>나비</h4>
+                <p>코리안 숏헤어 · 2살</p>
+                <div class="pet-stat"><i class="ph-duotone ph-path" style="font-size:12px;margin-right:2px"></i> 28.3km</div>
+            </div>
+            <div class="pet-card" style="margin-top:36px">
+                <div class="pet-avatar add"><i class="ph-duotone ph-plus-circle"></i></div>
+                <h4>추가하기</h4>
+                <p>반려동물 등록</p>
+            </div>
+        </div>
+
+        <!-- Ranking (Pill Toggle) -->
+        <div class="section-title"><h3><i class="ph-duotone ph-trophy"></i> 동네 랭킹</h3><a class="more" href="#">전체보기 <i class="ph-duotone ph-caret-right"></i></a></div>
+        <div class="ranking-card">
+            <div class="ranking-toggle-wrap">
+                <div class="ranking-toggle">
+                    <button class="ranking-toggle-btn active" data-period="weekly">주간</button>
+                    <button class="ranking-toggle-btn" data-period="monthly">월간</button>
+                    <button class="ranking-toggle-btn" data-period="total">전체</button>
+                </div>
+            </div>
+            <div class="ranking-list">
+                <div class="ranking-item">
+                    <span class="rank-num rank-1">1</span>
+                    <div class="rank-avatar">🐕</div>
+                    <div class="rank-info">
+                        <div class="rank-name">초코아빠</div>
+                        <div class="rank-pet">골든 리트리버 · 4살</div>
+                    </div>
+                    <div class="rank-distance">45.2 <span class="unit">km</span></div>
+                </div>
+                <div class="ranking-item me">
+                    <span class="rank-num rank-2">2</span>
+                    <div class="rank-avatar">🐕</div>
+                    <div class="rank-info">
+                        <div class="rank-name">나 <span class="me-sparkle"><i class="ph-duotone ph-star"></i></span></div>
+                        <div class="rank-pet">골든 리트리버 · 3살</div>
+                    </div>
+                    <div class="rank-distance">38.1 <span class="unit">km</span></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num rank-3">3</span>
+                    <div class="rank-avatar">🐩</div>
+                    <div class="rank-info">
+                        <div class="rank-name">달이맘</div>
+                        <div class="rank-pet">푸들 · 2살</div>
+                    </div>
+                    <div class="rank-distance">32.7 <span class="unit">km</span></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">4</span>
+                    <div class="rank-avatar">🐕</div>
+                    <div class="rank-info">
+                        <div class="rank-name">바둑이집사</div>
+                        <div class="rank-pet">진돗개 · 5살</div>
+                    </div>
+                    <div class="rank-distance">28.4 <span class="unit">km</span></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">5</span>
+                    <div class="rank-avatar">🐈</div>
+                    <div class="rank-info">
+                        <div class="rank-name">콩이엄마</div>
+                        <div class="rank-pet">러시안블루 · 3살</div>
+                    </div>
+                    <div class="rank-distance">21.9 <span class="unit">km</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenges (Vertical stacked cards with warm gradient stripe) -->
+        <div class="section-title"><h3><i class="ph-duotone ph-target"></i> 진행 중인 챌린지</h3><a class="more" href="#">전체보기 <i class="ph-duotone ph-caret-right"></i></a></div>
+        <div class="challenges-list">
+            <div class="challenge-item">
+                <div class="challenge-top-stripe orange"></div>
+                <div class="challenge-body">
+                    <div class="challenge-badge distance"><i class="ph-duotone ph-path"></i></div>
+                    <div class="challenge-content">
+                        <h4>주간 50km 달성</h4>
+                        <p>이번 주 총 50km 걷기</p>
+                        <div class="challenge-progress">
+                            <div class="bar"><div class="bar-fill orange-grad" style="width:76%"></div></div>
+                            <span>38/50km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-top-stripe red"></div>
+                <div class="challenge-body">
+                    <div class="challenge-badge streak"><i class="ph-duotone ph-fire"></i></div>
+                    <div class="challenge-content">
+                        <h4>7일 연속 산책</h4>
+                        <p>매일 1회 이상 산책</p>
+                        <div class="challenge-progress">
+                            <div class="bar"><div class="bar-fill red-grad" style="width:71%"></div></div>
+                            <span>5/7일</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-top-stripe amber"></div>
+                <div class="challenge-body">
+                    <div class="challenge-badge explore"><i class="ph-duotone ph-compass"></i></div>
+                    <div class="challenge-content">
+                        <h4>공원 탐험가</h4>
+                        <p>다른 공원 5곳 방문</p>
+                        <div class="challenge-progress">
+                            <div class="bar"><div class="bar-fill amber-grad" style="width:40%"></div></div>
+                            <span>2/5곳</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-top-stripe purple"></div>
+                <div class="challenge-body">
+                    <div class="challenge-badge special"><i class="ph-duotone ph-star"></i></div>
+                    <div class="challenge-content">
+                        <h4>10km 마스터</h4>
+                        <p>한 번의 산책으로 10km 달성</p>
+                        <div class="challenge-progress">
+                            <div class="bar"><div class="bar-fill purple-grad" style="width:65%"></div></div>
+                            <span>6.5/10km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nearby (Real Map) -->
+        <div class="section-title"><h3><i class="ph-duotone ph-map-pin"></i> 내 주변</h3><a class="more" href="#">지도보기 <i class="ph-duotone ph-caret-right"></i></a></div>
+        <div class="nearby-map-box" id="nearbyMap"></div>
+        <div class="nearby-list">
+            <div class="nearby-item">
+                <div class="nearby-icon park"><i class="ph-duotone ph-tree"></i></div>
+                <div class="nearby-info">
+                    <div class="nearby-name">보라매공원 반려동물 놀이터</div>
+                    <div class="nearby-detail">반려동물 전용 · 무료 입장</div>
+                </div>
+                <div class="nearby-dist">450m</div>
+            </div>
+            <div class="nearby-item">
+                <div class="nearby-icon cafe"><i class="ph-duotone ph-coffee"></i></div>
+                <div class="nearby-info">
+                    <div class="nearby-name">멍멍카페</div>
+                    <div class="nearby-detail">반려동물 동반 카페 · 대형견 OK</div>
+                </div>
+                <div class="nearby-dist">800m</div>
+            </div>
+            <div class="nearby-item">
+                <div class="nearby-icon hospital"><i class="ph-duotone ph-first-aid-kit"></i></div>
+                <div class="nearby-info">
+                    <div class="nearby-name">해피 동물병원</div>
+                    <div class="nearby-detail">24시 진료 · 평점 4.8</div>
+                </div>
+                <div class="nearby-dist">1.2km</div>
+            </div>
+        </div>
+
+        <!-- Ad -->
+        <div class="ad-banner">
+            <span class="ad-badge">AD</span>
+            <div class="ad-icon-wrap"><i class="ph-duotone ph-bone"></i></div>
+            <div class="ad-text">
+                <h4>프리미엄 강아지 간식 20% 할인!</h4>
+                <p>산책 후 맛있는 간식 어때요?</p>
+            </div>
+        </div>
+
+        <!-- Recent Walks -->
+        <div class="section-title"><h3><i class="ph-duotone ph-clock"></i> 최근 산책</h3><a class="more" href="#">전체보기 <i class="ph-duotone ph-caret-right"></i></a></div>
+        <div class="recent-walks">
+            <div class="walk-item">
+                <div class="walk-route-mini">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M6 26 L10 14 L18 18 L26 6" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="26" r="3" fill="#FF6B35"/>
+                        <circle cx="26" cy="6" r="3" fill="#E85D26"/>
+                    </svg>
+                </div>
+                <div class="walk-info">
+                    <div class="walk-date">오늘 오전 7:30</div>
+                    <div class="walk-title">보라매공원 코스 · 초코</div>
+                    <div class="walk-meta">
+                        <span><i class="ph-duotone ph-path"></i> <strong>3.2km</strong></span>
+                        <span><i class="ph-duotone ph-timer"></i> <strong>42분</strong></span>
+                        <span><i class="ph-duotone ph-flame"></i> <strong>165kcal</strong></span>
+                    </div>
+                </div>
+            </div>
+            <div class="walk-item">
+                <div class="walk-route-mini">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M8 24 L16 8 L24 20" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8" cy="24" r="3" fill="#FF6B35"/>
+                        <circle cx="24" cy="20" r="3" fill="#E85D26"/>
+                    </svg>
+                </div>
+                <div class="walk-info">
+                    <div class="walk-date">어제 오후 6:15</div>
+                    <div class="walk-title">한강 산책로 · 초코</div>
+                    <div class="walk-meta">
+                        <span><i class="ph-duotone ph-path"></i> <strong>4.7km</strong></span>
+                        <span><i class="ph-duotone ph-timer"></i> <strong>58분</strong></span>
+                        <span><i class="ph-duotone ph-flame"></i> <strong>231kcal</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Banner -->
+        <div class="premium-banner">
+            <div class="premium-badge"><i class="ph-duotone ph-crown"></i></div>
+            <div class="premium-text">
+                <h4>멍이랑 프리미엄</h4>
+                <p>광고 제거 + 상세 통계 + 무제한 챌린지</p>
+            </div>
+            <div class="premium-price">
+                <div class="price">₩3,900</div>
+                <div class="period">/월</div>
+            </div>
+        </div>
+        <div style="height:24px"></div>
+    </main>
+
+    <!-- Floating Bottom Nav -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab(this)">
+            <span class="nav-icon"><i class="ph-duotone ph-house"></i></span>
+            <span class="nav-label">홈</span>
+        </button>
+        <button class="nav-item" onclick="switchTab(this)">
+            <span class="nav-icon"><i class="ph-duotone ph-users-three"></i></span>
+            <span class="nav-label">소셜</span>
+        </button>
+        <button class="nav-item center-btn" onclick="openWalkScreen()">
+            <span class="nav-icon"><i class="ph-duotone ph-paw-print"></i></span>
+            <span class="nav-label">산책</span>
+        </button>
+        <button class="nav-item" onclick="switchTab(this)">
+            <span class="nav-icon"><i class="ph-duotone ph-trophy"></i></span>
+            <span class="nav-label">랭킹</span>
+        </button>
+        <button class="nav-item" onclick="switchTab(this)">
+            <span class="nav-icon"><i class="ph-duotone ph-user-circle"></i></span>
+            <span class="nav-label">MY</span>
+        </button>
+    </nav>
+
+    <!-- ===== Walk Screen (Full-screen with REAL MAP) ===== -->
+    <div class="walk-screen" id="walkScreen">
+        <div class="walk-screen-header">
+            <div class="gps-badge" id="walkGpsBadge">
+                <span class="gps-dot"></span>
+                <span id="walkGpsLabel">GPS</span>
+            </div>
+            <h3 id="walkScreenTitle"><i class="ph-duotone ph-paw-print"></i> 산책 준비</h3>
+            <button class="walk-close-btn" onclick="closeWalk()"><i class="ph-duotone ph-x"></i></button>
+        </div>
+
+        <div class="walk-map-area">
+            <div id="walkMap"></div>
+            <div class="walk-map-controls">
+                <button class="wmap-btn" onclick="centerMe()" title="내 위치"><i class="ph-duotone ph-crosshair"></i></button>
+                <button class="wmap-btn on" id="followBtn" onclick="toggleFollow()" title="따라가기"><i class="ph-duotone ph-compass"></i></button>
+                <button class="wmap-btn" onclick="wMap&&wMap.zoomIn()">+</button>
+                <button class="wmap-btn" onclick="wMap&&wMap.zoomOut()">&minus;</button>
+            </div>
+            <div class="walk-dist-chip" id="walkDistChip" style="display:none">
+                <span class="live-dot"></span>
+                <span class="dist-num" id="mapDistNum">0.00</span>
+                <span class="dist-unit">km</span>
+            </div>
+        </div>
+
+        <div class="walk-stats-panel">
+            <div class="walk-pet-label" id="walkPetLabel"><i class="ph-duotone ph-paw-print"></i> 초코와 산책</div>
+            <div class="walk-pause-label" id="walkPauseLabel"><i class="ph-duotone ph-pause"></i> 일시정지</div>
+            <div class="walk-timer" id="walkTimer">00:00:00</div>
+            <div class="walk-stats-grid">
+                <div class="walk-stat">
+                    <div class="stat-icon"><i class="ph-duotone ph-path"></i></div>
+                    <div class="value"><span id="wDist">0.00</span> <span class="unit">km</span></div>
+                    <div class="label">거리</div>
+                </div>
+                <div class="walk-stat">
+                    <div class="stat-icon"><i class="ph-duotone ph-flame"></i></div>
+                    <div class="value"><span id="wCal">0</span> <span class="unit">kcal</span></div>
+                    <div class="label">칼로리</div>
+                </div>
+            </div>
+            <div class="walk-controls" id="preStartControls">
+                <button class="walk-panel-start-btn" onclick="beginTracking()">
+                    <i class="ph-duotone ph-paw-print"></i> GPS 산책 시작!
+                </button>
+            </div>
+            <div class="walk-controls" id="walkingControls" style="display:none">
+                <button class="walk-ctrl-btn pause" id="pauseBtn" onclick="togglePause()"><i class="ph-duotone ph-pause"></i></button>
+                <button class="walk-ctrl-btn stop" onclick="stopWalk()"><i class="ph-duotone ph-stop"></i></button>
+                <button class="walk-ctrl-btn camera" onclick="toast('사진 촬영 기능은 준비 중입니다')"><i class="ph-duotone ph-camera"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <!-- Celebration confetti dots -->
+            <div class="result-celebration" id="resultCelebration"></div>
+            <div class="result-header">
+                <span class="result-emoji" id="resultEmoji"></span>
+                <h2>산책 완료!</h2>
+                <p id="resultPetMsg">초코와 즐거운 산책이었어요</p>
+            </div>
+            <div class="result-map-preview" id="resultMapEl"></div>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <div class="stat-icon-circle"><i class="ph-duotone ph-path"></i></div>
+                    <div class="value" id="rDist">0 km</div>
+                    <div class="label">거리</div>
+                </div>
+                <div class="result-stat">
+                    <div class="stat-icon-circle"><i class="ph-duotone ph-timer"></i></div>
+                    <div class="value" id="rTime">0:00</div>
+                    <div class="label">시간</div>
+                </div>
+                <div class="result-stat">
+                    <div class="stat-icon-circle"><i class="ph-duotone ph-flame"></i></div>
+                    <div class="value" id="rCal">0 kcal</div>
+                    <div class="label">칼로리</div>
+                </div>
+            </div>
+            <div class="result-badges" id="resBadges" style="display:none">
+                <h4><i class="ph-duotone ph-medal"></i> 획득한 배지</h4>
+                <div class="badge-list" id="badgeList"></div>
+            </div>
+            <div class="result-actions">
+                <button class="result-btn share" onclick="closeResult()">닫기</button>
+                <button class="result-btn save" onclick="saveAndClose()"><i class="ph-duotone ph-check-circle" style="margin-right:4px"></i> 저장하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    // ============================================================
+    //  멍이랑 (withbowwow) - 컨셉1: 햇살 가득, 활짝 피어나는 설렘
+    //  OpenStreetMap + Leaflet.js (NO API key needed)
+    //  Phosphor Icons Duotone
+    // ============================================================
+
+    // --- State ---
+    let curPos = null;
+    let curAcc = null;
+    let selectedPet = '초코';
+    let nearbyMapObj = null;
+    let nearbyMarker = null;
+    let wMap = null;
+    let wMarker = null;
+    let wAccCircle = null;
+    let wPolyline = null;
+    let wStartMarker = null;
+    let resMapObj = null;
+
+    let follow = true;
+    let walking = false;
+    let paused = false;
+    let secs = 0;
+    let dist = 0;
+    let route = [];
+    let tickId = null;
+    let gpsWatchId = null;
+
+    // --- Haversine formula ---
+    function hav(lat1, lon1, lat2, lon2) {
+        const R = 6371000, toR = d => d * Math.PI / 180;
+        const dLat = toR(lat2 - lat1), dLon = toR(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toR(lat1)) * Math.cos(toR(lat2)) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // --- Leaflet marker icon ---
+    function makeDot(color, size) {
+        return L.divIcon({
+            html: `<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,0.25)"></div>`,
+            iconSize: [size, size], iconAnchor: [size / 2, size / 2], className: ''
+        });
+    }
+
+    // --- Init nearby mini-map on home ---
+    function initNearbyMap(lat, lng) {
+        if (nearbyMapObj) return;
+        nearbyMapObj = L.map('nearbyMap', { zoomControl: false, attributionControl: true, dragging: true }).setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OSM' }).addTo(nearbyMapObj);
+        nearbyMarker = L.marker([lat, lng], { icon: makeDot('#FF6B35', 16) }).addTo(nearbyMapObj);
+    }
+
+    // --- Init walk map (fullscreen) ---
+    function initWalkMap(lat, lng) {
+        if (wMap) {
+            wMap.setView([lat, lng], 17);
+            wMarker.setLatLng([lat, lng]);
+            wAccCircle.setLatLng([lat, lng]);
+            return;
+        }
+        wMap = L.map('walkMap', { zoomControl: false, attributionControl: false }).setView([lat, lng], 17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(wMap);
+
+        wMarker = L.marker([lat, lng], { icon: makeDot('#FF6B35', 20) }).addTo(wMap);
+        wAccCircle = L.circle([lat, lng], {
+            radius: 30, color: '#FF6B35', fillColor: '#FF6B35',
+            fillOpacity: 0.08, weight: 1, opacity: 0.3
+        }).addTo(wMap);
+        wPolyline = L.polyline([], {
+            color: '#FF6B35', weight: 5, opacity: 0.85,
+            lineJoin: 'round', lineCap: 'round'
+        }).addTo(wMap);
+    }
+
+    // --- GPS ---
+    function initGPS() {
+        if (!navigator.geolocation) { toast('GPS를 지원하지 않는 브라우저입니다'); return; }
+
+        navigator.geolocation.getCurrentPosition(
+            p => {
+                const { latitude: lat, longitude: lng, accuracy } = p.coords;
+                curPos = { lat, lng }; curAcc = accuracy;
+                setGPS(true);
+                initNearbyMap(lat, lng);
+                toast('현재 위치를 찾았습니다');
+            },
+            e => {
+                setGPS(false);
+                initNearbyMap(37.5665, 126.978);
+                toast('GPS: ' + e.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+        );
+
+        gpsWatchId = navigator.geolocation.watchPosition(
+            p => {
+                const { latitude: lat, longitude: lng, accuracy } = p.coords;
+                const newPos = { lat, lng };
+
+                if (walking && !paused && curPos) {
+                    const d = hav(curPos.lat, curPos.lng, lat, lng);
+                    if (d >= 2 && accuracy < 50) {
+                        dist += d;
+                        route.push({ lat, lng, t: Date.now() });
+                        if (wPolyline) wPolyline.addLatLng([lat, lng]);
+                    }
+                }
+
+                curPos = newPos; curAcc = accuracy;
+                setGPS(true);
+
+                if (nearbyMarker) nearbyMarker.setLatLng([lat, lng]);
+                if (wMarker) {
+                    wMarker.setLatLng([lat, lng]);
+                    wAccCircle.setLatLng([lat, lng]).setRadius(accuracy);
+                    if (follow && wMap) wMap.panTo([lat, lng]);
+                }
+            },
+            e => { setGPS(false); },
+            { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+        );
+    }
+
+    function setGPS(on) {
+        ['gpsBadge', 'walkGpsBadge'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('on', on);
+        });
+        document.getElementById('gpsLabel').textContent = on ? 'GPS 활성' : 'GPS 오류';
+        const wl = document.getElementById('walkGpsLabel');
+        if (wl) wl.textContent = on ? (curAcc ? `\u00B1${Math.round(curAcc)}m` : 'GPS') : 'GPS 오류';
+    }
+
+    // --- Walk Screen ---
+    function openWalkScreen() {
+        const ws = document.getElementById('walkScreen');
+        ws.classList.add('active');
+
+        // Reset UI
+        document.getElementById('preStartControls').style.display = 'flex';
+        document.getElementById('walkingControls').style.display = 'none';
+        document.getElementById('walkDistChip').style.display = 'none';
+        document.getElementById('walkPauseLabel').classList.remove('on');
+        document.getElementById('walkTimer').textContent = '00:00:00';
+        document.getElementById('wDist').textContent = '0.00';
+        document.getElementById('wCal').textContent = '0';
+        document.getElementById('walkScreenTitle').innerHTML = '<i class="ph-duotone ph-paw-print"></i> 산책 준비';
+
+        const petEmoji = selectedPet === '나비' ? '🐈' : '🐕';
+        document.getElementById('walkPetLabel').innerHTML =
+            `<i class="ph-duotone ph-paw-print"></i> ${selectedPet}와 산책`;
+
+        setTimeout(() => {
+            const lat = curPos ? curPos.lat : 37.5665;
+            const lng = curPos ? curPos.lng : 126.978;
+            initWalkMap(lat, lng);
+            setTimeout(() => { if (wMap) wMap.invalidateSize(); }, 100);
+        }, 50);
+    }
+
+    function beginTracking() {
+        if (!curPos) { toast('GPS 위치를 먼저 확인해주세요'); return; }
+
+        walking = true; paused = false; secs = 0; dist = 0;
+        route = [{ lat: curPos.lat, lng: curPos.lng, t: Date.now() }];
+
+        if (wPolyline) wPolyline.setLatLngs([[curPos.lat, curPos.lng]]);
+        if (wStartMarker) wMap.removeLayer(wStartMarker);
+        wStartMarker = L.circleMarker([curPos.lat, curPos.lng], {
+            radius: 8, color: '#fff', fillColor: '#FF6B35', fillOpacity: 1, weight: 3
+        }).addTo(wMap);
+
+        document.getElementById('preStartControls').style.display = 'none';
+        document.getElementById('walkingControls').style.display = 'flex';
+        document.getElementById('walkDistChip').style.display = 'flex';
+        document.getElementById('walkScreenTitle').innerHTML =
+            `<i class="ph-duotone ph-paw-print"></i> ${selectedPet}와 산책 중`;
+
+        wMap.setZoom(18);
+
+        tickId = setInterval(() => {
+            if (!paused) {
+                secs++;
+                updateWalkUI();
+            }
+        }, 1000);
+
+        toast(`${selectedPet}와(과) 산책을 시작합니다!`);
+    }
+
+    function togglePause() {
+        paused = !paused;
+        const btn = document.getElementById('pauseBtn');
+        btn.innerHTML = paused ? '<i class="ph-duotone ph-play"></i>' : '<i class="ph-duotone ph-pause"></i>';
+        document.getElementById('walkPauseLabel').classList.toggle('on', paused);
+        toast(paused ? '일시정지' : '산책 재개');
+    }
+
+    function stopWalk() {
+        if (secs < 3) { toast('조금만 더 걸어보세요!'); return; }
+        if (!confirm('산책을 종료하시겠습니까?')) return;
+
+        walking = false; paused = false;
+        clearInterval(tickId);
+
+        const km = dist / 1000;
+        const cal = Math.round(km * 55);
+        const mm = Math.floor(secs / 60), ss = secs % 60;
+
+        document.getElementById('rDist').textContent = km.toFixed(2) + ' km';
+        document.getElementById('rTime').textContent = `${mm}분 ${ss}초`;
+        document.getElementById('rCal').textContent = cal + ' kcal';
+        document.getElementById('resultPetMsg').textContent = `${selectedPet}와(과) 즐거운 산책이었어요`;
+
+        // Badges (no speed badge)
+        const badges = [];
+        if (km >= 1) badges.push('<i class="ph-duotone ph-path"></i> 1km 달성');
+        if (km >= 3) badges.push('<i class="ph-duotone ph-medal"></i> 3km 달성');
+        if (km >= 5) badges.push('<i class="ph-duotone ph-diamond"></i> 5km 달성');
+        if (km >= 10) badges.push('<i class="ph-duotone ph-lightning"></i> 10km 달성');
+        if (mm >= 30) badges.push('<i class="ph-duotone ph-timer"></i> 30분 산책');
+        if (mm >= 60) badges.push('<i class="ph-duotone ph-fire"></i> 1시간 산책');
+
+        const bd = document.getElementById('resBadges'), bl = document.getElementById('badgeList');
+        if (badges.length > 0) {
+            bd.style.display = 'block';
+            bl.innerHTML = badges.map(b => `<span class="badge-item">${b}</span>`).join('');
+        } else { bd.style.display = 'none'; }
+
+        // Generate confetti
+        generateConfetti();
+
+        document.getElementById('walkScreen').classList.remove('active');
+        document.getElementById('resultModal').classList.add('active');
+        setTimeout(() => buildResultMap(), 300);
+
+        // Save to localStorage (no speed field)
+        const h = JSON.parse(localStorage.getItem('withbowwow_walks') || '[]');
+        h.unshift({
+            pet: selectedPet,
+            distance: km,
+            duration: secs,
+            calories: cal,
+            route,
+            date: new Date().toISOString()
+        });
+        if (h.length > 50) h.pop();
+        localStorage.setItem('withbowwow_walks', JSON.stringify(h));
+    }
+
+    function generateConfetti() {
+        const container = document.getElementById('resultCelebration');
+        container.innerHTML = '';
+        const colors = ['#FF6B35', '#FFD100', '#FF8C42', '#EF4444', '#8B5CF6', '#10B981', '#F59E0B'];
+        for (let i = 0; i < 20; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'confetti-dot';
+            dot.style.left = Math.random() * 100 + '%';
+            dot.style.top = Math.random() * 60 + '%';
+            dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+            dot.style.animationDelay = Math.random() * 2 + 's';
+            dot.style.animationDuration = (1.5 + Math.random()) + 's';
+            dot.style.width = (4 + Math.random() * 6) + 'px';
+            dot.style.height = dot.style.width;
+            container.appendChild(dot);
+        }
+    }
+
+    function closeWalk() {
+        if (walking) {
+            if (confirm('산책을 종료하시겠습니까?')) stopWalk();
+        } else {
+            document.getElementById('walkScreen').classList.remove('active');
+        }
+    }
+
+    function updateWalkUI() {
+        const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+        const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+        const s = String(secs % 60).padStart(2, '0');
+        document.getElementById('walkTimer').textContent = `${h}:${m}:${s}`;
+
+        const km = dist / 1000;
+        const cal = Math.round(km * 55);
+        document.getElementById('wDist').textContent = km.toFixed(2);
+        document.getElementById('wCal').textContent = cal;
+        document.getElementById('mapDistNum').textContent = km.toFixed(2);
+    }
+
+    // --- Result Map ---
+    function buildResultMap() {
+        if (route.length < 2) return;
+        const el = document.getElementById('resultMapEl');
+        if (resMapObj) { resMapObj.remove(); resMapObj = null; }
+        resMapObj = L.map(el, { zoomControl: false, attributionControl: false, dragging: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(resMapObj);
+        const pts = route.map(r => [r.lat, r.lng]);
+        L.polyline(pts, { color: '#FF6B35', weight: 4 }).addTo(resMapObj);
+        L.circleMarker(pts[0], { radius: 7, color: '#fff', fillColor: '#FF6B35', fillOpacity: 1, weight: 3 }).addTo(resMapObj);
+        L.circleMarker(pts[pts.length - 1], { radius: 7, color: '#fff', fillColor: '#EF4444', fillOpacity: 1, weight: 3 }).addTo(resMapObj);
+        resMapObj.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
+    }
+
+    // --- Map helpers ---
+    function centerMe() {
+        if (curPos && wMap) { wMap.setView([curPos.lat, curPos.lng], 17); toast('내 위치로 이동'); }
+    }
+    function toggleFollow() {
+        follow = !follow;
+        document.getElementById('followBtn').classList.toggle('on', follow);
+        toast(follow ? '따라가기 ON' : '따라가기 OFF');
+    }
+
+    // --- UI helpers ---
+    function selectPet(el, name) {
+        document.querySelectorAll('.pet-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedPet = name;
+
+        // Update walk start button subtitle
+        const subEl = document.querySelector('.walk-start-btn .sub');
+        if (subEl) subEl.textContent = `${name}와 함께 걸어볼까요?`;
+    }
+
+    function switchTab(el) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function closeResult() {
+        document.getElementById('resultModal').classList.remove('active');
+        if (resMapObj) { resMapObj.remove(); resMapObj = null; }
+    }
+
+    function saveAndClose() {
+        toast('산책 기록이 저장되었습니다');
+        closeResult();
+    }
+
+    // Ranking toggle tabs
+    document.querySelectorAll('.ranking-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.ranking-toggle-btn').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // Toast
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    // --- Init ---
+    initGPS();
+    </script>
+</body>
+</html>

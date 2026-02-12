@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>내 주변 - 멍이랑</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 0 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            background: var(--bg); font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; text-decoration: none; color: var(--text);
+        }
+        .back-btn:hover { background: var(--border); }
+        .header-title { font-size: 17px; font-weight: 700; }
+        .header-location {
+            font-size: 12px; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        /* ===== Map Area ===== */
+        .map-area {
+            width: 100%;
+            height: 50vh;
+            background: #E5E7EB;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-placeholder {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 50%, #E5E7EB 100%);
+            position: relative;
+        }
+        .map-placeholder .map-icon { font-size: 48px; opacity: 0.3; margin-bottom: 8px; }
+        .map-placeholder .map-text { font-size: 14px; color: var(--text-light); font-weight: 500; }
+
+        /* Map grid lines */
+        .map-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(156,163,175,0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(156,163,175,0.15) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Map markers */
+        .map-marker {
+            position: absolute;
+            width: 36px; height: 36px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        .map-marker span { transform: rotate(45deg); font-size: 16px; }
+        .marker-park { background: var(--primary); }
+        .marker-cafe { background: var(--accent); }
+        .marker-hospital { background: var(--secondary); }
+        .marker-pharmacy { background: #8B5CF6; }
+
+        /* My location */
+        .my-location {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+        .my-dot {
+            width: 18px; height: 18px;
+            background: var(--primary);
+            border: 3px solid var(--white);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+            position: relative;
+        }
+        .my-dot::before {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px; height: 48px;
+            background: rgba(16,185,129,0.12);
+            border-radius: 50%;
+            animation: locationPulse 2s infinite;
+        }
+        @keyframes locationPulse {
+            0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.8; }
+            100% { transform: translate(-50%,-50%) scale(1.5); opacity: 0; }
+        }
+
+        /* Map control buttons */
+        .map-controls {
+            position: absolute; top: 12px; right: 12px; z-index: 10;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .map-ctrl-btn {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            border: none; border-radius: 10px;
+            box-shadow: var(--shadow);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .map-ctrl-btn:hover { background: var(--white); box-shadow: var(--shadow-lg); }
+
+        /* ===== Filter Bar ===== */
+        .filter-bar {
+            display: flex; gap: 8px; padding: 14px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-btn {
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            border-radius: 24px;
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .filter-btn:hover { border-color: var(--primary); }
+        .filter-count {
+            background: var(--bg);
+            color: var(--text-light);
+            font-size: 11px;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+        .filter-btn.active .filter-count {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== Bottom Sheet ===== */
+        .bottom-sheet {
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            margin-top: -16px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            min-height: 40vh;
+        }
+        .sheet-handle {
+            width: 40px; height: 4px;
+            background: var(--border);
+            border-radius: 4px;
+            margin: 0 auto;
+            padding-top: 0;
+            position: relative;
+            top: 10px;
+        }
+        .sheet-header {
+            padding: 20px 16px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sheet-header h3 { font-size: 17px; font-weight: 700; }
+        .sheet-header .result-count { font-size: 13px; color: var(--text-light); }
+
+        /* ===== Place List ===== */
+        .place-list { padding: 0 16px 32px; display: flex; flex-direction: column; gap: 12px; }
+        .place-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .place-item:hover { background: var(--primary-light); transform: translateX(4px); }
+        .place-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+        }
+        .place-icon.park { background: #D1FAE5; }
+        .place-icon.cafe { background: #FEF3C7; }
+        .place-icon.hospital { background: #DBEAFE; }
+        .place-icon.pharmacy { background: #EDE9FE; }
+        .place-info { flex: 1; min-width: 0; }
+        .place-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .place-meta {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .place-tag {
+            font-size: 11px; font-weight: 500;
+            padding: 2px 8px; border-radius: 6px;
+        }
+        .place-tag.park { background: #D1FAE5; color: #065F46; }
+        .place-tag.cafe { background: #FEF3C7; color: #92400E; }
+        .place-tag.hospital { background: #DBEAFE; color: #1E40AF; }
+        .place-tag.pharmacy { background: #EDE9FE; color: #5B21B6; }
+        .place-detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .place-right { text-align: right; flex-shrink: 0; }
+        .place-distance { font-size: 14px; font-weight: 700; color: var(--secondary); }
+        .place-rating {
+            display: flex; align-items: center; gap: 3px;
+            font-size: 12px; color: var(--accent); margin-top: 4px; justify-content: flex-end;
+        }
+
+        /* ===== Animation ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="../멍이랑_메인페이지_시안.html" class="back-btn" aria-label="뒤로가기">←</a>
+            <span class="header-title">📍 내 주변</span>
+        </div>
+        <div class="header-location">📌 서울 동작구 보라매동</div>
+    </header>
+
+    <!-- Map Area -->
+    <div class="map-area">
+        <div class="map-placeholder">
+            <div class="map-grid"></div>
+
+            <!-- Map Markers -->
+            <div class="map-marker marker-park" style="top: 25%; left: 30%;">
+                <span>🌳</span>
+            </div>
+            <div class="map-marker marker-park" style="top: 60%; left: 20%;">
+                <span>🌳</span>
+            </div>
+            <div class="map-marker marker-cafe" style="top: 35%; left: 65%;">
+                <span>☕</span>
+            </div>
+            <div class="map-marker marker-cafe" style="top: 70%; left: 55%;">
+                <span>☕</span>
+            </div>
+            <div class="map-marker marker-hospital" style="top: 20%; left: 75%;">
+                <span>🏥</span>
+            </div>
+            <div class="map-marker marker-pharmacy" style="top: 55%; left: 80%;">
+                <span>💊</span>
+            </div>
+
+            <!-- My Location -->
+            <div class="my-location">
+                <div class="my-dot"></div>
+            </div>
+
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="map-ctrl-btn" title="내 위치">📍</button>
+                <button class="map-ctrl-btn" title="확대">＋</button>
+                <button class="map-ctrl-btn" title="축소">－</button>
+            </div>
+
+            <span class="map-icon" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); font-size:14px; opacity:0.3;">지도 영역 (Placeholder)</span>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            🌳 공원 <span class="filter-count">2</span>
+        </button>
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            ☕ 카페 <span class="filter-count">2</span>
+        </button>
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            🏥 병원 <span class="filter-count">1</span>
+        </button>
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            💊 약국 <span class="filter-count">1</span>
+        </button>
+    </div>
+
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <h3>주변 장소</h3>
+            <span class="result-count">6개 장소</span>
+        </div>
+
+        <div class="place-list">
+            <!-- Place 1 -->
+            <div class="place-item animate-in">
+                <div class="place-icon park">🌳</div>
+                <div class="place-info">
+                    <div class="place-name">보라매공원 반려동물 놀이터</div>
+                    <div class="place-meta">
+                        <span class="place-tag park">공원</span>
+                    </div>
+                    <div class="place-detail">반려동물 전용 · 무료 · 06:00~22:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">450m</div>
+                    <div class="place-rating">⭐ 4.7</div>
+                </div>
+            </div>
+
+            <!-- Place 2 -->
+            <div class="place-item animate-in">
+                <div class="place-icon cafe">☕</div>
+                <div class="place-info">
+                    <div class="place-name">멍멍카페</div>
+                    <div class="place-meta">
+                        <span class="place-tag cafe">카페</span>
+                    </div>
+                    <div class="place-detail">반려동물 동반 · 대형견 OK · 10:00~22:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">800m</div>
+                    <div class="place-rating">⭐ 4.5</div>
+                </div>
+            </div>
+
+            <!-- Place 3 -->
+            <div class="place-item animate-in">
+                <div class="place-icon hospital">🏥</div>
+                <div class="place-info">
+                    <div class="place-name">해피 동물병원</div>
+                    <div class="place-meta">
+                        <span class="place-tag hospital">동물병원</span>
+                    </div>
+                    <div class="place-detail">24시 진료 · 응급실 운영</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">1.2km</div>
+                    <div class="place-rating">⭐ 4.8</div>
+                </div>
+            </div>
+
+            <!-- Place 4 -->
+            <div class="place-item animate-in">
+                <div class="place-icon park">🌳</div>
+                <div class="place-info">
+                    <div class="place-name">신림 근린공원</div>
+                    <div class="place-meta">
+                        <span class="place-tag park">공원</span>
+                    </div>
+                    <div class="place-detail">산책로 · 운동시설 · 24시간</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">1.5km</div>
+                    <div class="place-rating">⭐ 4.3</div>
+                </div>
+            </div>
+
+            <!-- Place 5 -->
+            <div class="place-item animate-in">
+                <div class="place-icon cafe">☕</div>
+                <div class="place-info">
+                    <div class="place-name">펫프렌즈 카페</div>
+                    <div class="place-meta">
+                        <span class="place-tag cafe">카페</span>
+                    </div>
+                    <div class="place-detail">소형견 전용 · 야외 테라스 · 09:00~21:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">1.8km</div>
+                    <div class="place-rating">⭐ 4.6</div>
+                </div>
+            </div>
+
+            <!-- Place 6 -->
+            <div class="place-item animate-in">
+                <div class="place-icon pharmacy">💊</div>
+                <div class="place-info">
+                    <div class="place-name">보라매 동물약국</div>
+                    <div class="place-meta">
+                        <span class="place-tag pharmacy" style="background:#EDE9FE;color:#5B21B6;">약국</span>
+                    </div>
+                    <div class="place-detail">처방약 · 건강식품 · 09:00~19:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">2.1km</div>
+                    <div class="place-rating">⭐ 4.4</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function toggleFilter(btn) {
+        btn.classList.toggle('active');
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>알림 - 멍이랑</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 0 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            background: var(--bg); font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; text-decoration: none; color: var(--text);
+        }
+        .back-btn:hover { background: var(--border); }
+        .header-title { font-size: 17px; font-weight: 700; }
+        .mark-read-btn {
+            font-size: 13px; font-weight: 600; color: var(--primary);
+            background: none; border: none; cursor: pointer;
+            font-family: inherit; padding: 6px 12px;
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .mark-read-btn:hover { background: var(--primary-light); }
+
+        /* ===== Content ===== */
+        .content { padding: 0 0 32px; }
+
+        /* ===== Group Header ===== */
+        .group-header {
+            padding: 20px 16px 8px;
+            font-size: 13px; font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== Notification Item ===== */
+        .notif-list { display: flex; flex-direction: column; }
+        .notif-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+        .notif-item:hover { background: var(--bg); }
+        .notif-item.unread { background: #F0FDF4; }
+        .notif-item.unread::before {
+            content: '';
+            position: absolute; left: 8px; top: 50%;
+            transform: translateY(-50%);
+            width: 6px; height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        .notif-icon {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .notif-icon.badge-type { background: var(--accent-light); }
+        .notif-icon.ranking-type { background: #EDE9FE; }
+        .notif-icon.social-type { background: #DBEAFE; }
+        .notif-icon.reminder-type { background: var(--primary-light); }
+        .notif-icon.season-type { background: #FCE7F3; }
+        .notif-icon.system-type { background: #F3F4F6; }
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-message {
+            font-size: 14px; font-weight: 500;
+            line-height: 1.5;
+            color: var(--text);
+        }
+        .notif-item.unread .notif-message { font-weight: 600; }
+        .notif-time {
+            font-size: 12px; color: var(--text-light);
+            margin-top: 4px;
+        }
+        .notif-action-tag {
+            display: inline-block;
+            font-size: 11px; font-weight: 600;
+            padding: 2px 8px; border-radius: 6px;
+            margin-top: 6px;
+        }
+        .tag-badge { background: var(--accent-light); color: #92400E; }
+        .tag-ranking { background: #EDE9FE; color: #5B21B6; }
+        .tag-social { background: #DBEAFE; color: #1E40AF; }
+
+        /* ===== Empty State ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+        .empty-state .icon { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+
+        /* ===== Animation ===== */
+        .animate-in { animation: fadeInUp 0.3s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .notif-item:nth-child(1) { animation-delay: 0.02s; }
+        .notif-item:nth-child(2) { animation-delay: 0.04s; }
+        .notif-item:nth-child(3) { animation-delay: 0.06s; }
+        .notif-item:nth-child(4) { animation-delay: 0.08s; }
+        .notif-item:nth-child(5) { animation-delay: 0.10s; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="../멍이랑_메인페이지_시안.html" class="back-btn" aria-label="뒤로가기">←</a>
+            <span class="header-title">🔔 알림</span>
+        </div>
+        <button class="mark-read-btn" onclick="markAllRead()">모두 읽음</button>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+        <!-- Today -->
+        <div class="group-header">오늘</div>
+        <div class="notif-list">
+            <a href="뱃지.html" class="notif-item unread animate-in">
+                <div class="notif-icon badge-type">🏅</div>
+                <div class="notif-content">
+                    <div class="notif-message">50km 마라토너 뱃지까지 <strong>12km</strong> 남았어요!</div>
+                    <div class="notif-time">오전 10:30</div>
+                    <span class="notif-action-tag tag-badge">뱃지 진행</span>
+                </div>
+            </a>
+            <div class="notif-item unread animate-in">
+                <div class="notif-icon ranking-type">🏆</div>
+                <div class="notif-content">
+                    <div class="notif-message">동네 랭킹 <strong>2위</strong>로 올라갔어요!</div>
+                    <div class="notif-time">오전 9:15</div>
+                    <span class="notif-action-tag tag-ranking">랭킹</span>
+                </div>
+            </div>
+            <div class="notif-item unread animate-in">
+                <div class="notif-icon social-type">👥</div>
+                <div class="notif-content">
+                    <div class="notif-message"><strong>초코아빠</strong>님이 나를 팔로우했어요</div>
+                    <div class="notif-time">오전 8:42</div>
+                    <span class="notif-action-tag tag-social">소셜</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yesterday -->
+        <div class="group-header">어제</div>
+        <div class="notif-list">
+            <a href="뱃지.html" class="notif-item animate-in">
+                <div class="notif-icon badge-type">🏅</div>
+                <div class="notif-content">
+                    <div class="notif-message">축하해요! '<strong>5km 워커</strong>' 뱃지를 획득했어요! 🎉</div>
+                    <div class="notif-time">오후 6:30</div>
+                    <span class="notif-action-tag tag-badge">뱃지 획득</span>
+                </div>
+            </a>
+            <div class="notif-item animate-in">
+                <div class="notif-icon reminder-type">🐾</div>
+                <div class="notif-content">
+                    <div class="notif-message">산책 시간이에요! 초코가 기다리고 있어요 🐕</div>
+                    <div class="notif-time">오후 5:00</div>
+                </div>
+            </div>
+            <a href="뱃지.html" class="notif-item animate-in">
+                <div class="notif-icon season-type">🌟</div>
+                <div class="notif-content">
+                    <div class="notif-message"><strong>겨울왕국 시즌 뱃지</strong> 이벤트가 진행 중이에요</div>
+                    <div class="notif-time">오전 10:00</div>
+                    <span class="notif-action-tag tag-badge">시즌 이벤트</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- This Week -->
+        <div class="group-header">이번 주</div>
+        <div class="notif-list">
+            <a href="뱃지.html" class="notif-item animate-in">
+                <div class="notif-icon badge-type">🔥</div>
+                <div class="notif-content">
+                    <div class="notif-message"><strong>3일 연속 산책</strong> 뱃지를 획득했어요!</div>
+                    <div class="notif-time">2월 8일</div>
+                    <span class="notif-action-tag tag-badge">뱃지 획득</span>
+                </div>
+            </a>
+            <div class="notif-item animate-in">
+                <div class="notif-icon system-type">📢</div>
+                <div class="notif-content">
+                    <div class="notif-message">멍이랑 v1.2 업데이트 안내</div>
+                    <div class="notif-time">2월 7일</div>
+                </div>
+            </div>
+            <div class="notif-item animate-in">
+                <div class="notif-icon ranking-type">🏆</div>
+                <div class="notif-content">
+                    <div class="notif-message">이번 주 산책 랭킹 <strong>3위</strong>에 올랐어요!</div>
+                    <div class="notif-time">2월 6일</div>
+                    <span class="notif-action-tag tag-ranking">랭킹</span>
+                </div>
+            </div>
+            <div class="notif-item animate-in">
+                <div class="notif-icon reminder-type">🐾</div>
+                <div class="notif-content">
+                    <div class="notif-message">초코의 산책 기록이 갱신되었어요! 이번 주 총 <strong>12.5km</strong></div>
+                    <div class="notif-time">2월 5일</div>
+                </div>
+            </div>
+            <div class="notif-item animate-in">
+                <div class="notif-icon social-type">👥</div>
+                <div class="notif-content">
+                    <div class="notif-message"><strong>달이맘</strong>님이 산책 기록에 좋아요를 눌렀어요 ❤️</div>
+                    <div class="notif-time">2월 5일</div>
+                    <span class="notif-action-tag tag-social">소셜</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="height: 32px;"></div>
+    </main>
+
+    <script>
+    function markAllRead() {
+        document.querySelectorAll('.notif-item.unread').forEach(item => {
+            item.classList.remove('unread');
+        });
+    }
+    </script>
+</body>
+</html>

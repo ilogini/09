@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>펫런 PetRun - 반려동물 산책 경쟁 웹앱</title>
+    <title>멍이랑 withbowwow - 반려동물 산책 앱</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Leaflet.js (무료, API 키 불필요) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -142,7 +142,7 @@
         /* ===== Challenge ===== */
         .challenge-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .challenge-scroll::-webkit-scrollbar { display: none; }
-        .challenge-item { min-width: 200px; background: var(--white); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow); scroll-snap-align: start; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; }
+        .challenge-item { min-width: 200px; background: var(--white); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow); scroll-snap-align: start; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; text-decoration: none; color: inherit; display: block; }
         .challenge-item:hover { transform: translateY(-2px); }
         .challenge-badge { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; }
         .challenge-badge.distance { background: #DBEAFE; }
@@ -220,6 +220,7 @@
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: var(--nav-height); background: var(--white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 200; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; border: none; background: none; cursor: pointer; font-family: inherit; transition: all 0.2s; position: relative; min-width: 52px; }
         .nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+        .nav-item { text-decoration: none; }
         .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
         .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
         .nav-item:hover .nav-icon { transform: translateY(-2px); }
@@ -295,7 +296,7 @@
             color: var(--text); letter-spacing: 2px;
             margin-bottom: 12px; font-variant-numeric: tabular-nums;
         }
-        .walk-stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+        .walk-stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
         .walk-stat { text-align: center; background: var(--bg); border-radius: var(--radius-sm); padding: 12px 6px; }
         .walk-stat .value { font-size: 20px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
         .walk-stat .value .unit { font-size: 10px; font-weight: 500; color: var(--text-secondary); }
@@ -318,7 +319,7 @@
         .result-header h2 { font-size: 22px; font-weight: 800; }
         .result-header p { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
         .result-map-preview { width: 100%; height: 160px; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 18px; background: var(--bg); }
-        .result-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
+        .result-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
         .result-stat { background: var(--bg); border-radius: var(--radius-xs); padding: 14px; text-align: center; }
         .result-stat .icon { font-size: 18px; margin-bottom: 4px; }
         .result-stat .value { font-size: 20px; font-weight: 700; color: var(--text); }
@@ -356,16 +357,16 @@
     <header class="header">
         <div class="header-logo">
             <div class="paw-icon">🐾</div>
-            <span>Pet<em>Run</em></span>
+            <span>멍이<em>랑</em></span>
         </div>
         <div class="header-actions">
             <div class="gps-badge" id="gpsBadge">
                 <span class="gps-dot"></span>
                 <span id="gpsLabel">GPS 대기</span>
             </div>
-            <button class="header-btn" aria-label="알림">
+            <a class="header-btn" href="subpages/알림.html" aria-label="알림">
                 🔔<span class="notification-dot"></span>
-            </button>
+            </a>
         </div>
     </header>
 
@@ -413,7 +414,7 @@
         </div>
 
         <!-- My Pets -->
-        <div class="section-title"><h3>🐾 내 반려동물</h3><a class="more" href="#">관리 →</a></div>
+        <div class="section-title"><h3>🐾 내 반려동물</h3><a class="more" href="subpages/마이페이지.html">관리 →</a></div>
         <div class="pets-scroll">
             <div class="pet-card selected" onclick="selectPet(this,'초코')">
                 <div class="pet-avatar dog">🐕</div><h4>초코</h4><p>골든 리트리버 · 3살</p><div class="pet-stat">총 142.5km</div>
@@ -427,7 +428,7 @@
         </div>
 
         <!-- Ranking -->
-        <div class="section-title"><h3>🏆 동네 랭킹</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="section-title"><h3>🏆 동네 랭킹</h3><a class="more" href="subpages/랭킹.html">전체보기 →</a></div>
         <div class="ranking-card">
             <div class="ranking-tabs">
                 <button class="ranking-tab active">주간</button>
@@ -435,25 +436,25 @@
                 <button class="ranking-tab">전체</button>
             </div>
             <div class="ranking-list">
-                <div class="ranking-item"><span class="rank-num rank-1">1</span><div class="rank-avatar">🧑</div><div class="rank-info"><div class="rank-name">초코아빠</div><div class="rank-pet">🐕 골든 리트리버</div></div><div class="rank-distance">45.2 <span class="unit">km</span></div></div>
-                <div class="ranking-item me"><span class="rank-num rank-2">2</span><div class="rank-avatar">👤</div><div class="rank-info"><div class="rank-name">나 ⭐</div><div class="rank-pet">🐕 초코</div></div><div class="rank-distance">38.1 <span class="unit">km</span></div></div>
-                <div class="ranking-item"><span class="rank-num rank-3">3</span><div class="rank-avatar">👩</div><div class="rank-info"><div class="rank-name">달이맘</div><div class="rank-pet">🐩 푸들</div></div><div class="rank-distance">32.7 <span class="unit">km</span></div></div>
-                <div class="ranking-item"><span class="rank-num">4</span><div class="rank-avatar">🧑</div><div class="rank-info"><div class="rank-name">바둑이집사</div><div class="rank-pet">🐕 진돗개</div></div><div class="rank-distance">28.4 <span class="unit">km</span></div></div>
-                <div class="ranking-item"><span class="rank-num">5</span><div class="rank-avatar">👩</div><div class="rank-info"><div class="rank-name">콩이엄마</div><div class="rank-pet">🐈 러시안블루</div></div><div class="rank-distance">21.9 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num rank-1">1</span><div class="rank-avatar">🐕</div><div class="rank-info"><div class="rank-name">초코아빠</div><div class="rank-pet">골든 리트리버 · 4살</div></div><div class="rank-distance">45.2 <span class="unit">km</span></div></div>
+                <div class="ranking-item me"><span class="rank-num rank-2">2</span><div class="rank-avatar">🐕</div><div class="rank-info"><div class="rank-name">나 ⭐</div><div class="rank-pet">골든 리트리버 · 3살</div></div><div class="rank-distance">38.1 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num rank-3">3</span><div class="rank-avatar">🐩</div><div class="rank-info"><div class="rank-name">달이맘</div><div class="rank-pet">푸들 · 2살</div></div><div class="rank-distance">32.7 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num">4</span><div class="rank-avatar">🐕</div><div class="rank-info"><div class="rank-name">바둑이집사</div><div class="rank-pet">진돗개 · 5살</div></div><div class="rank-distance">28.4 <span class="unit">km</span></div></div>
+                <div class="ranking-item"><span class="rank-num">5</span><div class="rank-avatar">🐈</div><div class="rank-info"><div class="rank-name">콩이엄마</div><div class="rank-pet">러시안블루 · 3살</div></div><div class="rank-distance">21.9 <span class="unit">km</span></div></div>
             </div>
         </div>
 
         <!-- Challenges -->
-        <div class="section-title"><h3>🎯 진행 중인 챌린지</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="section-title"><h3>🏅 진행 중인 뱃지</h3><a class="more" href="subpages/뱃지.html">전체보기 →</a></div>
         <div class="challenge-scroll">
-            <div class="challenge-item"><div class="challenge-badge distance">🏃</div><h4>주간 50km 달성</h4><p>이번 주 총 50km 걷기</p><div class="challenge-progress"><div class="bar"><div class="bar-fill green" style="width:76%"></div></div><span>38/50km</span></div></div>
-            <div class="challenge-item"><div class="challenge-badge streak">🔥</div><h4>7일 연속 산책</h4><p>매일 1회 이상 산책</p><div class="challenge-progress"><div class="bar"><div class="bar-fill red" style="width:71%"></div></div><span>5/7일</span></div></div>
-            <div class="challenge-item"><div class="challenge-badge explore">🧭</div><h4>공원 탐험가</h4><p>다른 공원 5곳 방문</p><div class="challenge-progress"><div class="bar"><div class="bar-fill amber" style="width:40%"></div></div><span>2/5곳</span></div></div>
-            <div class="challenge-item"><div class="challenge-badge speed">⚡</div><h4>스피드 워커</h4><p>평균 속도 5km/h 이상</p><div class="challenge-progress"><div class="bar"><div class="bar-fill purple" style="width:90%"></div></div><span>9/10회</span></div></div>
+            <a class="challenge-item" href="subpages/뱃지.html"><div class="challenge-badge distance">🏃</div><h4>50km 마라토너</h4><p>누적 50km 걷기</p><div class="challenge-progress"><div class="bar"><div class="bar-fill green" style="width:76%"></div></div><span>38/50km</span></div></a>
+            <a class="challenge-item" href="subpages/뱃지.html"><div class="challenge-badge streak">🔥</div><h4>7일 연속 뱃지</h4><p>7일 연속 산책 달성</p><div class="challenge-progress"><div class="bar"><div class="bar-fill red" style="width:71%"></div></div><span>5/7일</span></div></a>
+            <a class="challenge-item" href="subpages/뱃지.html"><div class="challenge-badge explore">🧭</div><h4>동네 탐험가</h4><p>다른 장소 5곳 방문</p><div class="challenge-progress"><div class="bar"><div class="bar-fill amber" style="width:40%"></div></div><span>2/5곳</span></div></a>
+            <a class="challenge-item" href="subpages/뱃지.html"><div class="challenge-badge speed">⏱</div><h4>10시간 마니아</h4><p>누적 산책 10시간</p><div class="challenge-progress"><div class="bar"><div class="bar-fill purple" style="width:90%"></div></div><span>9/10시간</span></div></a>
         </div>
 
         <!-- Nearby (Real Map) -->
-        <div class="section-title"><h3>📍 내 주변</h3><a class="more" href="#">지도보기 →</a></div>
+        <div class="section-title"><h3>📍 내 주변</h3><a class="more" href="subpages/지도.html">지도보기 →</a></div>
         <div class="nearby-map-box" id="nearbyMap"></div>
         <div class="nearby-list">
             <div class="nearby-item"><div class="nearby-icon park">🌳</div><div class="nearby-info"><div class="nearby-name">보라매공원 반려동물 놀이터</div><div class="nearby-detail">반려동물 전용 · 무료 입장</div></div><div class="nearby-dist">450m</div></div>
@@ -465,24 +466,24 @@
         <div class="ad-banner"><span class="ad-badge">AD</span><span class="ad-icon">🦴</span><div class="ad-text"><h4>프리미엄 강아지 간식 20% 할인!</h4><p>산책 후 맛있는 간식 어때요?</p></div></div>
 
         <!-- Recent Walks -->
-        <div class="section-title"><h3>🕐 최근 산책</h3><a class="more" href="#">전체보기 →</a></div>
+        <div class="section-title"><h3>🕐 최근 산책</h3><a class="more" href="subpages/마이페이지.html">전체보기 →</a></div>
         <div class="recent-walks">
-            <div class="walk-item"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 L10 14 L18 18 L26 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="26" r="3" fill="#10B981"/><circle cx="26" cy="6" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">오늘 오전 7:30</div><div class="walk-title">보라매공원 코스 🐕 초코</div><div class="walk-meta"><span>📏 <strong>3.2km</strong></span><span>⏱ <strong>42분</strong></span><span>🔥 <strong>165kcal</strong></span></div></div></div>
-            <div class="walk-item"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M8 24 L16 8 L24 20" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="24" r="3" fill="#10B981"/><circle cx="24" cy="20" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">어제 오후 6:15</div><div class="walk-title">한강 산책로 🐕 초코</div><div class="walk-meta"><span>📏 <strong>4.7km</strong></span><span>⏱ <strong>58분</strong></span><span>🔥 <strong>231kcal</strong></span></div></div></div>
+            <a class="walk-item" href="subpages/산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 L10 14 L18 18 L26 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="26" r="3" fill="#10B981"/><circle cx="26" cy="6" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">오늘 오전 7:30</div><div class="walk-title">보라매공원 코스 🐕 초코</div><div class="walk-meta"><span>📏 <strong>3.2km</strong></span><span>⏱ <strong>42분</strong></span><span>🔥 <strong>165kcal</strong></span></div></div></a>
+            <a class="walk-item" href="subpages/산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M8 24 L16 8 L24 20" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="24" r="3" fill="#10B981"/><circle cx="24" cy="20" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">어제 오후 6:15</div><div class="walk-title">한강 산책로 🐕 초코</div><div class="walk-meta"><span>📏 <strong>4.7km</strong></span><span>⏱ <strong>58분</strong></span><span>🔥 <strong>231kcal</strong></span></div></div></a>
         </div>
 
         <!-- Premium -->
-        <div class="premium-banner"><div class="premium-badge">👑</div><div class="premium-text"><h4>PetRun 프리미엄</h4><p>광고 제거 + 상세 통계 + 무제한 챌린지</p></div><div class="premium-price"><div class="price">₩3,900</div><div class="period">/월</div></div></div>
+        <a class="premium-banner" href="subpages/프리미엄.html" style="text-decoration:none"><div class="premium-badge">👑</div><div class="premium-text"><h4>멍이랑 프리미엄</h4><p>광고 제거 + 상세 통계 + 프리미엄 뱃지</p></div><div class="premium-price"><div class="price">₩3,900</div><div class="period">/월</div></div></a>
         <div style="height:24px"></div>
     </main>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab(this)"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></button>
-        <button class="nav-item" onclick="switchTab(this)"><span class="nav-icon">🗺️</span><span class="nav-label">지도</span></button>
+        <a class="nav-item active" href="#"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
+        <a class="nav-item" href="subpages/소셜.html"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
         <button class="nav-item center-btn" onclick="openWalkScreen()"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></button>
-        <button class="nav-item" onclick="switchTab(this)"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></button>
-        <button class="nav-item" onclick="switchTab(this)"><span class="nav-icon">👤</span><span class="nav-label">MY</span></button>
+        <a class="nav-item" href="subpages/랭킹.html"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></a>
+        <a class="nav-item" href="subpages/마이페이지.html"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
     </nav>
 
     <!-- ===== Walk Screen (Full-screen with REAL MAP) ===== -->
@@ -514,7 +515,6 @@
             <div class="walk-timer" id="walkTimer">00:00:00</div>
             <div class="walk-stats-grid">
                 <div class="walk-stat"><div class="value"><span id="wDist">0.00</span> <span class="unit">km</span></div><div class="label">거리</div></div>
-                <div class="walk-stat"><div class="value"><span id="wSpd">0.0</span> <span class="unit">km/h</span></div><div class="label">속도</div></div>
                 <div class="walk-stat"><div class="value"><span id="wCal">0</span> <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
             </div>
             <div class="walk-controls" id="preStartControls">
@@ -525,7 +525,7 @@
             <div class="walk-controls" id="walkingControls" style="display:none">
                 <button class="walk-ctrl-btn pause" id="pauseBtn" onclick="togglePause()">⏸</button>
                 <button class="walk-ctrl-btn stop" onclick="stopWalk()">⏹</button>
-                <button class="walk-ctrl-btn camera" onclick="toast('📷 사진 기능은 앱 버전에서!')">📷</button>
+                <button class="walk-ctrl-btn camera" onclick="toast('📷 사진 촬영!')">📷</button>
             </div>
         </div>
     </div>
@@ -542,7 +542,6 @@
             <div class="result-stats">
                 <div class="result-stat"><div class="icon">📏</div><div class="value" id="rDist">0 km</div><div class="label">거리</div></div>
                 <div class="result-stat"><div class="icon">⏱</div><div class="value" id="rTime">0:00</div><div class="label">시간</div></div>
-                <div class="result-stat"><div class="icon">🏃</div><div class="value" id="rSpd">0 km/h</div><div class="label">평균 속도</div></div>
                 <div class="result-stat"><div class="icon">🔥</div><div class="value" id="rCal">0 kcal</div><div class="label">칼로리</div></div>
             </div>
             <div class="result-badges" id="resBadges" style="display:none">
@@ -561,7 +560,7 @@
 
     <script>
     // ============================================================
-    //  PetRun - OpenStreetMap + Leaflet.js (무료, API 키 불필요)
+    //  멍이랑 (withbowwow) - OpenStreetMap + Leaflet.js
     // ============================================================
 
     // --- State ---
@@ -697,7 +696,6 @@
         document.getElementById('walkPauseLabel').classList.remove('on');
         document.getElementById('walkTimer').textContent='00:00:00';
         document.getElementById('wDist').textContent='0.00';
-        document.getElementById('wSpd').textContent='0.0';
         document.getElementById('wCal').textContent='0';
         document.getElementById('walkScreenTitle').textContent=`🐕 산책 준비`;
         document.getElementById('walkPetLabel').textContent=
@@ -755,14 +753,12 @@
         walking=false; paused=false;
         clearInterval(tickId);
 
-        const km=dist/1000, hrs=secs/3600;
-        const spd=hrs>0?km/hrs:0;
+        const km=dist/1000;
         const cal=Math.round(km*55);
         const mm=Math.floor(secs/60), ss=secs%60;
 
         document.getElementById('rDist').textContent=km.toFixed(2)+' km';
         document.getElementById('rTime').textContent=`${mm}분 ${ss}초`;
-        document.getElementById('rSpd').textContent=spd.toFixed(1)+' km/h';
         document.getElementById('rCal').textContent=cal+' kcal';
         document.getElementById('resultPetMsg').textContent=`${selectedPet}와(과) 즐거운 산책이었어요`;
 
@@ -773,7 +769,7 @@
         if(km>=5) badges.push('💎 5km 달성');
         if(mm>=30) badges.push('⏱ 30분 산책');
         if(mm>=60) badges.push('🔥 1시간 산책');
-        if(spd>=5) badges.push('⚡ 스피드 워커');
+        if(km>=10) badges.push('⚡ 10km 달성');
         const bd=document.getElementById('resBadges'), bl=document.getElementById('badgeList');
         if(badges.length>0){
             bd.style.display='block';
@@ -785,10 +781,10 @@
         setTimeout(()=>buildResultMap(),300);
 
         // Save
-        const h=JSON.parse(localStorage.getItem('petrun_walks')||'[]');
-        h.unshift({pet:selectedPet,distance:km,duration:secs,speed:spd,calories:cal,route,date:new Date().toISOString()});
+        const h=JSON.parse(localStorage.getItem('withbowwow_walks')||'[]');
+        h.unshift({pet:selectedPet,distance:km,duration:secs,calories:cal,route,date:new Date().toISOString()});
         if(h.length>50)h.pop();
-        localStorage.setItem('petrun_walks',JSON.stringify(h));
+        localStorage.setItem('withbowwow_walks',JSON.stringify(h));
     }
 
     function closeWalk(){
@@ -805,11 +801,9 @@
         const s=String(secs%60).padStart(2,'0');
         document.getElementById('walkTimer').textContent=`${h}:${m}:${s}`;
 
-        const km=dist/1000, hrs=secs/3600;
-        const spd=hrs>0?km/hrs:0;
+        const km=dist/1000;
         const cal=Math.round(km*55);
         document.getElementById('wDist').textContent=km.toFixed(2);
-        document.getElementById('wSpd').textContent=spd.toFixed(1);
         document.getElementById('wCal').textContent=cal;
         document.getElementById('mapDistNum').textContent=km.toFixed(2);
     }

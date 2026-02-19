@@ -19,7 +19,7 @@
 | 키워드 | 설명 |
 |--------|------|
 | **Track** | GPS 기반 산책 경로, 거리, 시간 실시간 기록 |
-| **Compete** | 주간/월간 랭킹, 통합 뱃지 시스템 (Apple Fitness/Pikmin 스타일) |
+| **Compete** | 소셜 리더보드, 통합 뱃지 시스템 (Apple Fitness/Pikmin 스타일) |
 | **Connect** | 동네 산책 친구 찾기, 산책 코스 공유 |
 
 ### 1.3 타겟 사용자
@@ -48,7 +48,7 @@
 | 무료 | 프리미엄 |
 |------|---------|
 | 기본 산책 기록 | 상세 통계 & 리포트 |
-| 주간 랭킹 | 실시간 랭킹 + 지역별 |
+| 주간 리더보드 | 실시간 리더보드 + 지역별 |
 | 기본 뱃지만 | 프리미엄 전용 뱃지 + 무제한 |
 | 광고 노출 | 광고 제거 |
 | - | 커스텀 산책 코스 생성 |
@@ -82,7 +82,7 @@ PG사: 토스페이먼츠 (Toss Payments)
 
 | 탭 | 화면명 | 핵심 기능 | 상세 기획 | 목업 |
 |---|---|---|---|---|
-| Tab 1 | 🏠 홈 | 날씨, 주간 요약, 산책 시작 CTA, 진행 중 뱃지, 랭킹 미리보기 | [reference/메인페이지.md](reference/메인페이지.md) | [prototype/멍이랑_메인페이지_시안.html](prototype/멍이랑_메인페이지_시안.html) |
+| Tab 1 | 🏠 홈 | 날씨, 주간 요약, 최근 산책, 진행 중 뱃지, 주변 추천 코스 | [reference/메인페이지.md](reference/메인페이지.md) | [prototype/멍이랑_메인페이지_시안.html](prototype/멍이랑_메인페이지_시안.html) |
 | Tab 2 | 👥 소셜 | 산책 친구 추천, 피드, 초대, 모임 게시판 | [reference/탭2_소셜.md](reference/탭2_소셜.md) | [prototype/소셜.html](prototype/소셜.html) |
 | Tab 3 | 🐾 산책 | GPS 트래킹, 실시간 지도, 타이머, 완료 요약 | [reference/탭3_산책.md](reference/탭3_산책.md) | 메인페이지 내 오버레이 |
 | Tab 4 | 🗺️ 지도 | 주변 반려동물 친화 장소 탐색 (상점, 공원, 동물병원, 약국, 카페) | [reference/탭4_지도.md](reference/탭4_지도.md) | [prototype/지도탭.html](prototype/지도탭.html) |
@@ -95,7 +95,7 @@ PG사: 토스페이먼츠 (Toss Payments)
 | 🏅 뱃지 컬렉션 | 홈/마이페이지 → 전체보기 | 6개 카테고리 뱃지 그리드, 진행률, 획득 현황 | [reference/추가_뱃지컬렉션.md](reference/추가_뱃지컬렉션.md) | [prototype/뱃지.html](prototype/뱃지.html) |
 | 🗺️ 지도 | 홈 → 지도보기 | 전체 지도, 장소 핀, 산책 코스, 바텀시트 | [reference/추가_지도.md](reference/추가_지도.md) | [prototype/지도.html](prototype/지도.html) |
 | 📊 산책 상세 | 마이페이지 → 기록 선택 | 경로 지도, 통계, 속도 그래프, 사진, 공유 | [reference/추가_산책상세.md](reference/추가_산책상세.md) | [prototype/산책상세.html](prototype/산책상세.html) |
-| 🔔 알림 | 헤더 → 벨 아이콘 | 뱃지 획득/진행, 랭킹 변동, 리마인더, 소셜 | [reference/추가_알림.md](reference/추가_알림.md) | [prototype/알림.html](prototype/알림.html) |
+| 🔔 알림 | 헤더 → 벨 아이콘 | 뱃지 획득/진행, 리더보드 변동, 리마인더, 소셜 | [reference/추가_알림.md](reference/추가_알림.md) | [prototype/알림.html](prototype/알림.html) |
 | 💎 프리미엄 | 홈/마이페이지 → 배너 | 혜택 비교, 가격 플랜, 결제 | [reference/추가_프리미엄.md](reference/추가_프리미엄.md) | [prototype/프리미엄.html](prototype/프리미엄.html) |
 | 🔐 온보딩 | 앱 최초 실행 | 소개 슬라이드, 소셜 로그인, 펫 등록, 권한 요청 | [reference/추가_온보딩.md](reference/추가_온보딩.md) | [prototype/온보딩.html](prototype/온보딩.html) |
 | ⚙️ 설정 | 헤더 → 톱니 아이콘 | 알림 설정, 구독 관리, 계정 설정, 앱 정보, 로그아웃 | [reference/추가_설정.md](reference/추가_설정.md) | [prototype/설정.html](prototype/설정.html) |
@@ -160,7 +160,7 @@ PG사: 토스페이먼츠 (Toss Payments)
 
 | 기능 | 우선순위 | 설명 |
 |------|---------|------|
-| 푸시 알림 | ✅ 필수 | 산책 리마인더, 뱃지 획득/진행 알림, 랭킹 변동 |
+| 푸시 알림 | ✅ 필수 | 산책 리마인더, 뱃지 획득/진행 알림, 리더보드 변동 |
 | 백그라운드 GPS | ✅ 필수 | 화면 꺼져도 산책 기록 지속 |
 | 위젯 (iOS/Android) | ⭐ 선택 | 홈 화면에서 바로 산책 시작 |
 | Apple Watch / WearOS | 💡 향후 | 워치에서 산책 트래킹 |
@@ -255,8 +255,8 @@ challenges (
   start_date, end_date
 )
 
--- 랭킹 (주간/월간 집계)
-rankings (
+-- 리더보드 (주간/월간 집계)
+leaderboards (
   id, user_id, period_type, period_key,
   total_distance, total_time, walk_count,
   rank, region
@@ -309,11 +309,6 @@ user_titles (
 │  │  12.5km  3회      │    │
 │  │  ████████░░ 70%   │    │  ← 주간 목표 진행률
 │  └──────────────────┘    │
-├──────────────────────────┤
-│  🏆 동네 랭킹             │  ← 실시간 랭킹
-│  1. 초코아빠  45.2km      │
-│  2. 나         38.1km  ← │
-│  3. 달이맘    32.7km      │
 ├──────────────────────────┤
 │  🏅 진행 중 뱃지           │  ← 뱃지
 │  ┌────┐ ┌────┐ ┌────┐   │
@@ -510,7 +505,7 @@ await Notifications.scheduleNotificationAsync({
 | NRC 기능 | 멍이랑 적용 |
 |---------|-----------|
 | 소셜 피드 + 리액션 | 소셜 탭: 이모지 리액션(👏🔥❤️👍🐶) + 응원하기 |
-| 주간 리더보드 | 소셜 탭: 친구 주간 거리 순위 |
+| 주간 리더보드 | 소셜 탭: 친구 주간 거리 순위 (랭킹 탭 대체) |
 | 챌린지 | 소셜 탭: 친구 간 거리 대결 |
 | Run Club | 소셜 탭: 산책 클럽 (그룹 커뮤니티) |
 | Guided Runs | 소셜 탭: 가이드 산책 (큐레이션 코스) |
@@ -555,7 +550,7 @@ await Notifications.scheduleNotificationAsync({
 | 연속왕 | 🔥 | 7일 연속 산책 달성 |
 | 사진왕 | 📸 | 산책 중 사진 50장 촬영 |
 | 소셜스타 | ⭐ | 받은 좋아요 100개 |
-| 동네챔피언 | 👑 | 주간 랭킹 1위 달성 |
+| 동네챔피언 | 👑 | 주간 리더보드 1위 달성 |
 | 비바람워커 | 🌧️ | 비/눈 오는 날 산책 5회 |
 | 원년멤버 | 🏅 | 서비스 초기(출시 후 30일 이내) 가입 |
 

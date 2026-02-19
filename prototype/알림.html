@@ -197,6 +197,17 @@
                     <span class="notif-action-tag tag-social">소셜</span>
                 </div>
             </div>
+            <div class="notif-item unread animate-in">
+                <div class="notif-icon" style="background: #FEF3C7;">🏅</div>
+                <div class="notif-content">
+                    <div class="notif-message"><strong>초코#1234</strong>님이 <strong>'주간 30km 도전'</strong> 챌린지에 초대했어요</div>
+                    <div class="notif-time">30분 전</div>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button onclick="acceptChallenge(this)" style="padding: 6px 20px; background: #10B981; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;">참가</button>
+                        <button onclick="rejectChallenge(this)" style="padding: 6px 20px; background: #F3F4F6; color: #6B7280; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;">거절</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Yesterday -->
@@ -278,6 +289,20 @@
         document.querySelectorAll('.notif-item.unread').forEach(item => {
             item.classList.remove('unread');
         });
+    }
+
+    function acceptChallenge(btn) {
+        const parent = btn.parentElement;
+        parent.innerHTML = '<span style="font-size: 13px; font-weight: 600; color: #10B981;">✅ 참가 완료!</span>';
+        const item = parent.closest('.notif-item');
+        if (item) item.classList.remove('unread');
+    }
+
+    function rejectChallenge(btn) {
+        const parent = btn.parentElement;
+        parent.innerHTML = '<span style="font-size: 13px; font-weight: 600; color: #9CA3AF;">거절됨</span>';
+        const item = parent.closest('.notif-item');
+        if (item) item.classList.remove('unread');
     }
     </script>
 </body>

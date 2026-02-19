@@ -899,20 +899,22 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 22px; flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+        }
+        .pet-edit-avatar::after {
+            content: '\1F4F7';
+            position: absolute;
+            bottom: -2px; right: -2px;
+            width: 18px; height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--white);
+            line-height: 1;
         }
         .pet-edit-header h4 { font-size: 15px; font-weight: 700; }
-        .pet-edit-btn {
-            margin-left: auto;
-            padding: 6px 12px;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-xs);
-            font-size: 12px; font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer; font-family: inherit;
-            transition: all 0.2s;
-        }
-        .pet-edit-btn:hover { border-color: var(--primary); color: var(--primary); }
         .pet-edit-fields {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 10px;
@@ -1008,7 +1010,7 @@
                 <div class="profile-avatar">&#x1F60A;</div>
                 <div class="profile-info">
                     <div class="profile-name-row">
-                        <span class="profile-name">산책러버</span>
+                        <span class="profile-name">초코#1234</span>
                         <span class="title-badge" id="currentTitleBadge">&#x1F3C3; 마라토너</span>
                     </div>
                     <div class="profile-sub-row">
@@ -1026,7 +1028,7 @@
         <div class="section-divider"></div>
 
         <!-- ===== 2. Grade Card (산책 등급) ===== -->
-        <div class="section-title"><h3>&#x1F3C5; 산책 등급</h3></div>
+        <div class="section-title"><h3>&#x1F3C5; 산책 등급</h3><a class="more" onclick="openModal('gradeModal')">전체 등급 보기 &rarr;</a></div>
 
         <div class="grade-card animate-in">
             <div class="grade-card-header">
@@ -1044,11 +1046,11 @@
             </div>
             <div class="grade-progress-section">
                 <div class="grade-progress-bar">
-                    <div class="grade-progress-fill" style="width: 85%"></div>
+                    <div class="grade-progress-fill" style="width: 95%"></div>
                 </div>
                 <div class="grade-progress-text">
-                    <span>다음 등급: 산책 매니아 (100km)</span>
-                    <span>142.5 / 250km</span>
+                    <span>다음 등급: 활발한 산책러 (150km)</span>
+                    <span>142.5 / 150km</span>
                 </div>
             </div>
         </div>
@@ -1056,7 +1058,7 @@
         <div class="section-divider" style="margin-top:20px;"></div>
 
         <!-- ===== 3. Pet Cards (horizontal scroll, clickable -> archive) ===== -->
-        <div class="section-title"><h3>&#x1F43E; 반려동물</h3></div>
+        <div class="section-title"><h3>&#x1F43E; 반려동물과의 추억</h3></div>
 
         <div class="pet-scroll">
             <div class="pet-profile-card selected" onclick="openPetArchive('초코', '&#x1F415;')">
@@ -1152,10 +1154,10 @@
         </div>
 
         <!-- More Records Button -->
-        <button class="more-records-btn" id="moreRecordsBtn" onclick="openModal('historyModal')">
+        <a class="more-records-btn" id="moreRecordsBtn" href="산책기록.html" style="text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:center;">
             <span>더보기</span>
             <span>&#x25BC;</span>
-        </button>
+        </a>
 
         <div class="section-divider" style="margin-top:20px;"></div>
 
@@ -1444,12 +1446,20 @@
         </div>
     </div>
 
-    <!-- ===== Modal: Pet Photo Archive ===== -->
+    <!-- ===== Modal: Pet Photo Archive (일/월/년 tabs) ===== -->
     <div class="modal-overlay" id="archiveModal">
         <div class="modal-container" style="max-height:95vh;">
             <div class="modal-header">
-                <h3 id="archiveTitle">&#x1F415; 초코의 추억</h3>
+                <h3 id="archiveTitle">&#x1F415; 초코와의 추억</h3>
                 <button class="modal-close" onclick="closeModal('archiveModal')">&times;</button>
+            </div>
+            <!-- Archive Tabs -->
+            <div class="archive-tabs" style="display:flex;border-bottom:2px solid var(--border);flex-shrink:0;">
+                <button class="archive-tab active" onclick="switchArchiveTab(this, 'day')" style="flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--primary);cursor:pointer;border:none;background:none;font-family:inherit;position:relative;">일
+                    <span class="archive-tab-bar" style="position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--primary);"></span>
+                </button>
+                <button class="archive-tab" onclick="switchArchiveTab(this, 'month')" style="flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--text-light);cursor:pointer;border:none;background:none;font-family:inherit;position:relative;">월</button>
+                <button class="archive-tab" onclick="switchArchiveTab(this, 'year')" style="flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--text-light);cursor:pointer;border:none;background:none;font-family:inherit;position:relative;">년</button>
             </div>
             <div class="modal-body" id="archiveBody">
                 <!-- Dynamically populated -->
@@ -1457,52 +1467,29 @@
         </div>
     </div>
 
-    <!-- ===== Modal: Profile Edit (Dual Tab) ===== -->
+    <!-- ===== Modal: Profile Edit (Pet Only) ===== -->
     <div class="modal-overlay" id="editModal">
         <div class="modal-container" style="max-height:95vh;">
             <div class="modal-header">
                 <h3>&#x270F;&#xFE0F; 프로필 편집</h3>
                 <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
             </div>
-            <div class="edit-tabs">
-                <button class="edit-tab active" onclick="switchEditTab(this, 'editTabAccount')">계정 프로필</button>
-                <button class="edit-tab" onclick="switchEditTab(this, 'editTabPets')">반려동물 프로필</button>
-            </div>
             <div class="modal-body">
-                <!-- Tab: 계정 프로필 -->
-                <div class="edit-tab-content active" id="editTabAccount">
-                    <div class="edit-field">
-                        <label>프로필 아이콘</label>
-                        <div class="icon-selector">
-                            <div class="icon-option selected" onclick="selectIcon(this)">&#x1F60A;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x1F436;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x1F431;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x1F43B;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x1F338;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x2B50;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x1F525;</div>
-                            <div class="icon-option" onclick="selectIcon(this)">&#x1F3C3;</div>
-                        </div>
+                <!-- Pet Selector with 대표 프로필 button -->
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+                    <div style="display:flex;gap:8px;flex:1;overflow-x:auto;">
+                        <button class="pet-select-btn active" onclick="selectPetEdit(this, 'petEdit_choco')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid var(--primary);background:var(--primary-light);font-size:13px;font-weight:600;color:var(--primary-dark);cursor:pointer;font-family:inherit;white-space:nowrap;">&#x1F415; 초코</button>
+                        <button class="pet-select-btn" onclick="selectPetEdit(this, 'petEdit_nabi')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--white);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;white-space:nowrap;">&#x1F408; 나비</button>
                     </div>
-                    <div class="edit-field">
-                        <label>닉네임</label>
-                        <input type="text" value="산책러버" placeholder="닉네임을 입력하세요">
-                    </div>
-                    <div class="edit-field">
-                        <label>상태 메시지</label>
-                        <textarea placeholder="상태 메시지를 입력하세요">오늘도 산책 중!</textarea>
-                    </div>
-                    <button class="edit-save-btn" onclick="saveProfile()">저장하기</button>
+                    <button onclick="toast('대표 프로필이 설정되었습니다')" style="padding:8px 12px;border-radius:var(--radius-xs);border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);font-size:11px;font-weight:700;color:var(--primary-dark);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.2s;">&#x2B50; 대표 프로필로 설정</button>
                 </div>
 
-                <!-- Tab: 반려동물 프로필 -->
-                <div class="edit-tab-content" id="editTabPets">
-                    <!-- 초코 -->
+                <!-- Pet Edit: 초코 -->
+                <div class="pet-edit-panel active" id="petEdit_choco">
                     <div class="pet-edit-card">
                         <div class="pet-edit-header">
-                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);">&#x1F415;</div>
+                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F415;</div>
                             <h4>초코</h4>
-                            <button class="pet-edit-btn" onclick="togglePetDetail(this)">편집</button>
                         </div>
                         <div class="pet-edit-fields">
                             <div class="pet-edit-field">
@@ -1522,7 +1509,7 @@
                                 <input type="text" value="28kg">
                             </div>
                         </div>
-                        <div class="pet-detail-fields" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+                        <div class="pet-detail-fields" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
                             <div class="pet-edit-fields">
                                 <div class="pet-edit-field">
                                     <label>성별</label>
@@ -1536,15 +1523,17 @@
                                     <input type="date" value="2023-03-15">
                                 </div>
                             </div>
-                            <button style="margin-top:10px;width:100%;padding:10px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F4F7; 프로필 사진 변경</button>
                         </div>
                     </div>
-                    <!-- 나비 -->
+                    <button class="edit-save-btn" onclick="savePets()">저장하기</button>
+                </div>
+
+                <!-- Pet Edit: 나비 -->
+                <div class="pet-edit-panel" id="petEdit_nabi" style="display:none;">
                     <div class="pet-edit-card">
                         <div class="pet-edit-header">
-                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4);">&#x1F408;</div>
+                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4);" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F408;</div>
                             <h4>나비</h4>
-                            <button class="pet-edit-btn" onclick="togglePetDetail(this)">편집</button>
                         </div>
                         <div class="pet-edit-fields">
                             <div class="pet-edit-field">
@@ -1564,7 +1553,7 @@
                                 <input type="text" value="4.2kg">
                             </div>
                         </div>
-                        <div class="pet-detail-fields" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+                        <div class="pet-detail-fields" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
                             <div class="pet-edit-fields">
                                 <div class="pet-edit-field">
                                     <label>성별</label>
@@ -1578,12 +1567,13 @@
                                     <input type="date" value="2024-01-20">
                                 </div>
                             </div>
-                            <button style="margin-top:10px;width:100%;padding:10px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F4F7; 프로필 사진 변경</button>
                         </div>
                     </div>
-
                     <button class="edit-save-btn" onclick="savePets()">저장하기</button>
                 </div>
+
+                <!-- Add Pet Button -->
+                <button onclick="toast('반려동물 추가 화면으로 이동')" style="width:100%;padding:14px;margin-top:12px;background:var(--bg);border:2px dashed var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;transition:all 0.2s;">+ 반려동물 추가</button>
             </div>
         </div>
     </div>
@@ -1731,6 +1721,149 @@
         </div>
     </div>
 
+    <!-- ===== Modal: Grade Detail (전체 등급 보기) ===== -->
+    <div class="modal-overlay" id="gradeModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x1F3C5; 전체 등급 보기</h3>
+                <button class="modal-close" onclick="closeModal('gradeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <!-- Grade 1: 산책 입문자 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);">
+                        <span style="font-size:28px;">&#x1F43E;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 입문자</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.1</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">0 ~ 10km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--primary);font-weight:700;">&#x2713; 달성</span>
+                    </div>
+                    <!-- Grade 2: 산책 초보 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);">
+                        <span style="font-size:28px;">&#x1F436;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 초보</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.2</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">10 ~ 50km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--primary);font-weight:700;">&#x2713; 달성</span>
+                    </div>
+                    <!-- Grade 3: 동네 산책러 (현재) -->
+                    <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:rgba(16,185,129,0.06);border-radius:var(--radius-sm);border:2px solid var(--primary);position:relative;">
+                        <span style="font-size:28px;">&#x1F415;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">동네 산책러</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.3</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">50 ~ 150km</div>
+                            <div style="margin-top:8px;">
+                                <div style="width:100%;height:8px;background:var(--border);border-radius:8px;overflow:hidden;">
+                                    <div style="width:95%;height:100%;background:linear-gradient(90deg,var(--primary),#34D399);border-radius:8px;"></div>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                                    <span style="font-size:10px;color:var(--text-light);">142.5km / 150km</span>
+                                    <span style="font-size:10px;font-weight:700;color:var(--primary);">95%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="font-size:14px;color:var(--accent);font-weight:700;">&#x2605; 현재</span>
+                    </div>
+                    <!-- Grade 4: 활발한 산책러 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F3C3;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">활발한 산책러</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.4</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">150 ~ 300km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 5: 산책 매니아 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F4AA;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 매니아</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.5</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">300 ~ 500km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 6: 산책 고수 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F525;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 고수</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.6</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">500 ~ 750km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 7: 산책 달인 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F9ED;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 달인</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.7</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">750 ~ 1,000km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 8: 산책 마스터 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F31F;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 마스터</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.8</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">1,000 ~ 1,500km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 9: 산책 그랜드마스터 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F3C5;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 그랜드마스터</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.9</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">1,500 ~ 2,000km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 10: 산책 레전드 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,rgba(254,243,199,0.3),rgba(253,230,138,0.3));border-radius:var(--radius-sm);border:1px solid #FDE68A;opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F451;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 레전드</span>
+                                <span style="font-size:11px;color:var(--text-light);">Lv.10</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">2,000km 이상</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-light);">&#x1F512;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== Common Bottom Nav ===== -->
     <nav class="bottom-nav">
         <a href="멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">&#x1F3E0;</span><span class="nav-label">홈</span></a>
@@ -1801,89 +1934,132 @@
         }
     }
 
-    // ===== Pet Photo Archive =====
-    const archiveData = {
-        '초코': {
-            icon: '\uD83D\uDC15',
-            months: [
-                {
-                    label: '2026년 2월',
-                    photos: [
-                        { date: '2.12', color: '#A7F3D0', icon: '\uD83C\uDF33' },
-                        { date: '2.10', color: '#FDE68A', icon: '\uD83C\uDF05' },
-                        { date: '2.9', color: '#93C5FD', icon: '\uD83C\uDF0A' },
-                        { date: '2.8', color: '#C4B5FD', icon: '\uD83C\uDF19' },
-                        { date: '2.7', color: '#FCA5A5', icon: '\uD83C\uDF38' },
-                        { date: '2.5', color: '#6EE7B7', icon: '\uD83C\uDFDE\uFE0F' },
-                    ]
-                },
-                {
-                    label: '2026년 1월',
-                    photos: [
-                        { date: '1.28', color: '#FCD34D', icon: '\u2744\uFE0F' },
-                        { date: '1.25', color: '#A78BFA', icon: '\uD83D\uDC3E' },
-                        { date: '1.20', color: '#F9A8D4', icon: '\u2764\uFE0F' },
-                        { date: '1.15', color: '#67E8F9', icon: '\uD83D\uDC15' },
-                        { date: '1.10', color: '#86EFAC', icon: '\uD83C\uDFDE\uFE0F' },
-                        { date: '1.5', color: '#FCA5A5', icon: '\uD83C\uDF1F' },
-                        { date: '1.3', color: '#FDBA74', icon: '\uD83C\uDF89' },
-                        { date: '1.1', color: '#C4B5FD', icon: '\uD83C\uDF86' },
-                    ]
-                },
-                {
-                    label: '2025년 12월',
-                    photos: [
-                        { date: '12.25', color: '#FCA5A5', icon: '\uD83C\uDF84' },
-                        { date: '12.20', color: '#93C5FD', icon: '\u2744\uFE0F' },
-                        { date: '12.15', color: '#86EFAC', icon: '\uD83C\uDF33' },
-                    ]
-                }
-            ]
-        },
-        '나비': {
-            icon: '\uD83D\uDC08',
-            months: [
-                {
-                    label: '2026년 2월',
-                    photos: [
-                        { date: '2.10', color: '#F9A8D4', icon: '\uD83C\uDF38' },
-                        { date: '2.8', color: '#C4B5FD', icon: '\uD83C\uDF19' },
-                        { date: '2.3', color: '#FDE68A', icon: '\u2600\uFE0F' },
-                    ]
-                },
-                {
-                    label: '2026년 1월',
-                    photos: [
-                        { date: '1.22', color: '#67E8F9', icon: '\uD83D\uDC08' },
-                        { date: '1.14', color: '#FCA5A5', icon: '\u2764\uFE0F' },
-                        { date: '1.8', color: '#86EFAC', icon: '\uD83C\uDFDE\uFE0F' },
-                    ]
-                }
-            ]
-        }
+    // ===== Pet Photo Archive (일/월/년) =====
+    let currentArchivePet = '초코';
+    let currentArchiveTab = 'day';
+
+    const archiveDataByDay = {
+        '초코': [
+            { label: '2026년 2월 19일', photos: [
+                { color: '#A7F3D0', icon: '\uD83D\uDCF7' },
+                { color: '#FDE68A', icon: '\uD83D\uDCF7' },
+                { color: '#93C5FD', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 18일', photos: [
+                { color: '#C4B5FD', icon: '\uD83D\uDCF7' },
+                { color: '#FCA5A5', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 15일', photos: [
+                { color: '#6EE7B7', icon: '\uD83D\uDCF7' },
+                { color: '#FCD34D', icon: '\uD83D\uDCF7' },
+                { color: '#A78BFA', icon: '\uD83D\uDCF7' },
+                { color: '#F9A8D4', icon: '\uD83D\uDCF7' },
+            ]},
+        ],
+        '나비': [
+            { label: '2026년 2월 19일', photos: [
+                { color: '#F9A8D4', icon: '\uD83D\uDCF7' },
+                { color: '#C4B5FD', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 17일', photos: [
+                { color: '#FDE68A', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 14일', photos: [
+                { color: '#67E8F9', icon: '\uD83D\uDCF7' },
+                { color: '#FCA5A5', icon: '\uD83D\uDCF7' },
+                { color: '#86EFAC', icon: '\uD83D\uDCF7' },
+            ]},
+        ]
+    };
+
+    const archiveDataByMonth = {
+        '초코': [
+            { label: '2026년 2월', photos: Array.from({length: 8}, (_, i) => ({ color: ['#A7F3D0','#FDE68A','#93C5FD','#C4B5FD','#FCA5A5','#6EE7B7','#FCD34D','#A78BFA'][i], icon: '\uD83D\uDCF7' })) },
+            { label: '2026년 1월', photos: Array.from({length: 12}, (_, i) => ({ color: ['#FCD34D','#A78BFA','#F9A8D4','#67E8F9','#86EFAC','#FCA5A5','#FDBA74','#C4B5FD','#A7F3D0','#FDE68A','#93C5FD','#6EE7B7'][i], icon: '\uD83D\uDCF7' })) },
+        ],
+        '나비': [
+            { label: '2026년 2월', photos: Array.from({length: 5}, (_, i) => ({ color: ['#F9A8D4','#C4B5FD','#FDE68A','#67E8F9','#FCA5A5'][i], icon: '\uD83D\uDCF7' })) },
+            { label: '2026년 1월', photos: Array.from({length: 6}, (_, i) => ({ color: ['#67E8F9','#FCA5A5','#86EFAC','#F9A8D4','#FDBA74','#A78BFA'][i], icon: '\uD83D\uDCF7' })) },
+        ]
+    };
+
+    const archiveDataByYear = {
+        '초코': [
+            { label: '2026년', photos: Array.from({length: 20}, (_, i) => ({ color: ['#A7F3D0','#FDE68A','#93C5FD','#C4B5FD','#FCA5A5','#6EE7B7','#FCD34D','#A78BFA','#F9A8D4','#67E8F9','#86EFAC','#FDBA74','#A7F3D0','#FDE68A','#93C5FD','#C4B5FD','#FCA5A5','#6EE7B7','#FCD34D','#A78BFA'][i], icon: '\uD83D\uDCF7' })) },
+        ],
+        '나비': [
+            { label: '2026년', photos: Array.from({length: 11}, (_, i) => ({ color: ['#F9A8D4','#C4B5FD','#FDE68A','#67E8F9','#FCA5A5','#86EFAC','#FDBA74','#A78BFA','#A7F3D0','#FDE68A','#93C5FD'][i], icon: '\uD83D\uDCF7' })) },
+        ]
     };
 
     function openPetArchive(petName, petIcon) {
-        const data = archiveData[petName];
-        if (!data) { toast('사진이 없습니다'); return; }
+        currentArchivePet = petName;
+        currentArchiveTab = 'day';
+        const petIconMap = { '초코': '\uD83D\uDC15', '나비': '\uD83D\uDC08' };
+        document.getElementById('archiveTitle').innerHTML = (petIconMap[petName] || '') + ' ' + petName + '와의 추억';
 
-        document.getElementById('archiveTitle').innerHTML = data.icon + ' ' + petName + '의 추억';
+        // Reset tab styling
+        document.querySelectorAll('.archive-tab').forEach((tab, idx) => {
+            tab.style.color = idx === 0 ? 'var(--primary)' : 'var(--text-light)';
+            const bar = tab.querySelector('.archive-tab-bar');
+            if (idx === 0) {
+                if (!bar) {
+                    const span = document.createElement('span');
+                    span.className = 'archive-tab-bar';
+                    span.style.cssText = 'position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--primary);';
+                    tab.appendChild(span);
+                }
+            } else {
+                if (bar) bar.remove();
+            }
+        });
+
+        renderArchiveContent();
+        openModal('archiveModal');
+    }
+
+    function switchArchiveTab(btn, tabType) {
+        currentArchiveTab = tabType;
+        document.querySelectorAll('.archive-tab').forEach(tab => {
+            tab.style.color = 'var(--text-light)';
+            const bar = tab.querySelector('.archive-tab-bar');
+            if (bar) bar.remove();
+        });
+        btn.style.color = 'var(--primary)';
+        const barSpan = document.createElement('span');
+        barSpan.className = 'archive-tab-bar';
+        barSpan.style.cssText = 'position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--primary);';
+        btn.appendChild(barSpan);
+        renderArchiveContent();
+    }
+
+    function renderArchiveContent() {
+        let dataSource;
+        if (currentArchiveTab === 'day') {
+            dataSource = archiveDataByDay[currentArchivePet] || [];
+        } else if (currentArchiveTab === 'month') {
+            dataSource = archiveDataByMonth[currentArchivePet] || [];
+        } else {
+            dataSource = archiveDataByYear[currentArchivePet] || [];
+        }
 
         let html = '';
-        data.months.forEach(month => {
-            html += '<div class="archive-month-label">' + month.label + '</div>';
+        dataSource.forEach(group => {
+            html += '<div class="archive-month-label">' + group.label + '</div>';
             html += '<div class="archive-grid">';
-            month.photos.forEach(photo => {
+            group.photos.forEach(photo => {
                 html += '<div class="archive-photo" style="background:' + photo.color + ';">';
                 html += '<span class="photo-icon">' + photo.icon + '</span>';
-                html += '<span class="photo-date">' + photo.date + '</span>';
                 html += '</div>';
             });
             html += '</div>';
         });
 
+        if (!html) {
+            html = '<div style="text-align:center;padding:40px 0;color:var(--text-light);font-size:14px;">사진이 없습니다</div>';
+        }
+
         document.getElementById('archiveBody').innerHTML = html;
-        openModal('archiveModal');
     }
 
     // ===== Profile Edit Modal =====
@@ -1891,21 +2067,20 @@
         openModal('editModal');
     }
 
-    function switchEditTab(btn, tabId) {
-        document.querySelectorAll('.edit-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.edit-tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-    }
+    function selectPetEdit(btn, panelId) {
+        // Update button styles
+        document.querySelectorAll('.pet-select-btn').forEach(b => {
+            b.style.borderColor = 'var(--border)';
+            b.style.background = 'var(--white)';
+            b.style.color = 'var(--text-secondary)';
+        });
+        btn.style.borderColor = 'var(--primary)';
+        btn.style.background = 'var(--primary-light)';
+        btn.style.color = 'var(--primary-dark)';
 
-    function selectIcon(el) {
-        document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-    }
-
-    function saveProfile() {
-        toast('프로필이 저장되었습니다');
-        closeModal('editModal');
+        // Show/hide panels
+        document.querySelectorAll('.pet-edit-panel').forEach(p => p.style.display = 'none');
+        document.getElementById(panelId).style.display = 'block';
     }
 
     function savePets() {
@@ -1923,21 +2098,8 @@
     // ===== Open Pet Tab (from + add button) =====
     function openPetTab() {
         openModal('editModal');
-        // Switch to pet tab
-        const petTabBtn = document.querySelectorAll('.edit-tab')[1];
-        if (petTabBtn) switchEditTab(petTabBtn, 'editTabPets');
     }
 
-    // ===== Toggle Pet Detail Fields =====
-    function togglePetDetail(btn) {
-        const card = btn.closest('.pet-edit-card');
-        const detail = card.querySelector('.pet-detail-fields');
-        if (detail) {
-            const isHidden = detail.style.display === 'none';
-            detail.style.display = isHidden ? 'block' : 'none';
-            btn.textContent = isHidden ? '접기' : '편집';
-        }
-    }
     </script>
 </body>
 </html>

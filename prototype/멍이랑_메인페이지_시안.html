@@ -66,11 +66,7 @@
         .header-btn:hover { background: var(--border); }
         .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
 
-        /* ===== GPS Badge ===== */
-        .gps-badge { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--bg); color: var(--text-light); transition: all 0.3s; }
-        .gps-badge.on { background: var(--primary-light); color: var(--primary-dark); }
-        .gps-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-light); }
-        .gps-badge.on .gps-dot { background: var(--primary); animation: gpsPulse 1.5s infinite; }
+        /* ===== GPS Badge (internal use only) ===== */
         @keyframes gpsPulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{opacity:0.7;box-shadow:0 0 0 4px rgba(16,185,129,0)} }
 
         /* ===== Main Content ===== */
@@ -102,15 +98,10 @@
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 10px; transition: width 1s ease; position: relative; }
         .progress-fill::after { content:''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background: var(--white); border: 3px solid var(--primary); border-radius: 50%; box-shadow: var(--shadow-sm); }
 
-        /* ===== Walk Start ===== */
-        .walk-start-section { margin: 0 16px; }
+        /* ===== Walk Start (used in walk screen) ===== */
         .walk-start-btn { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius); font-size: 18px; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 24px rgba(16,185,129,0.35); transition: all 0.3s; position: relative; overflow: hidden; }
         .walk-start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16,185,129,0.45); }
         .walk-start-btn:active { transform: translateY(0); }
-        .walk-start-btn .btn-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .walk-start-btn .btn-text { text-align: left; }
-        .walk-start-btn .btn-text .sub { font-size: 12px; font-weight: 500; opacity: 0.85; margin-top: 2px; }
-        .walk-start-btn .btn-arrow { margin-left: auto; font-size: 24px; opacity: 0.7; }
 
         /* ===== Section Title ===== */
         .section-title { padding: 24px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -118,26 +109,42 @@
         .section-title .more { font-size: 13px; color: var(--text-light); text-decoration: none; cursor: pointer; }
         .section-title .more:hover { color: var(--primary); }
 
-        /* ===== Ranking ===== */
-        .ranking-card { margin: 0 16px; background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-        .ranking-tabs { display: flex; border-bottom: 1px solid var(--border); }
-        .ranking-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-light); border: none; background: none; cursor: pointer; font-family: inherit; position: relative; transition: color 0.2s; }
-        .ranking-tab.active { color: var(--primary); }
-        .ranking-tab.active::after { content:''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; }
-        .ranking-list { padding: 8px 0; }
-        .ranking-item { display: flex; align-items: center; padding: 12px 18px; gap: 14px; transition: background 0.2s; }
-        .ranking-item:hover { background: var(--bg); }
-        .ranking-item.me { background: var(--primary-light); }
-        .rank-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-secondary); background: var(--bg); flex-shrink: 0; }
-        .rank-1 { background: #FEF3C7; color: #D97706; }
-        .rank-2 { background: #F3F4F6; color: #6B7280; }
-        .rank-3 { background: #FED7AA; color: #C2410C; }
-        .rank-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--border)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .rank-info { flex: 1; min-width: 0; }
-        .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .rank-pet { font-size: 11px; color: var(--text-light); margin-top: 2px; }
-        .rank-distance { font-size: 15px; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
-        .rank-distance .unit { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+        /* ===== Pet Select Screen ===== */
+        .pet-select-screen {
+            display: none; position: fixed; inset: 0; z-index: 290;
+            background: var(--white); max-width: 480px; margin: 0 auto;
+            flex-direction: column;
+        }
+        .pet-select-screen.active { display: flex; }
+        .pet-select-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+        }
+        .pet-select-header h3 { font-size: 18px; font-weight: 700; }
+        .pet-select-close { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .pet-select-body { flex: 1; padding: 24px 16px; overflow-y: auto; }
+        .pet-select-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; text-align: center; }
+        .pet-select-list { display: flex; flex-direction: column; gap: 12px; }
+        .pet-select-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px; background: var(--bg);
+            border-radius: var(--radius-sm); border: 2px solid transparent;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .pet-select-card.selected { border-color: var(--primary); background: var(--primary-light); }
+        .pet-select-card:hover { border-color: var(--primary); }
+        .pet-select-avatar { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+        .pet-select-avatar.dog { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .pet-select-avatar.cat { background: linear-gradient(135deg, #FCE7F3, #F9A8D4); }
+        .pet-select-info { flex: 1; }
+        .pet-select-name { font-size: 16px; font-weight: 700; }
+        .pet-select-breed { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .pet-select-check { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--white); transition: all 0.2s; flex-shrink: 0; }
+        .pet-select-card.selected .pet-select-check { background: var(--primary); border-color: var(--primary); }
+        .pet-select-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+        .pet-select-start { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.35); transition: all 0.2s; }
+        .pet-select-start:hover { transform: translateY(-2px); }
+        .pet-select-start:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* ===== Challenge ===== */
         .challenge-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -160,18 +167,8 @@
         .bar-fill.purple { background: #8B5CF6; }
         .challenge-progress span { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
 
-        /* ===== Pets ===== */
-        .pets-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
-        .pets-scroll::-webkit-scrollbar { display: none; }
-        .pet-card { min-width: 140px; background: var(--white); border-radius: var(--radius-sm); padding: 16px; text-align: center; box-shadow: var(--shadow-sm); border: 2px solid transparent; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-        .pet-card:hover, .pet-card.selected { border-color: var(--primary); box-shadow: var(--shadow); }
-        .pet-avatar { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
-        .pet-avatar.dog { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-        .pet-avatar.cat { background: linear-gradient(135deg, #FCE7F3, #F9A8D4); }
-        .pet-avatar.add { background: var(--bg); border: 2px dashed var(--border); }
-        .pet-card h4 { font-size: 14px; font-weight: 600; }
-        .pet-card p { font-size: 11px; color: var(--text-light); margin-top: 2px; }
-        .pet-card .pet-stat { margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--primary); }
+        /* Walk Map Grayscale (NRC minimal style) */
+        #walkMap .leaflet-tile-pane { filter: grayscale(100%) brightness(1.1) contrast(0.9); }
 
         /* ===== Nearby ===== */
         .nearby-map-box { margin: 0 16px; height: 180px; border-radius: var(--radius); overflow: hidden; }
@@ -360,12 +357,11 @@
             <span>멍이<em>랑</em></span>
         </div>
         <div class="header-actions">
-            <div class="gps-badge" id="gpsBadge">
-                <span class="gps-dot"></span>
-                <span id="gpsLabel">GPS 대기</span>
-            </div>
             <a class="header-btn" href="알림.html" aria-label="알림">
                 🔔<span class="notification-dot"></span>
+            </a>
+            <a class="header-btn" href="설정.html" aria-label="설정">
+                ⚙️
             </a>
         </div>
     </header>
@@ -395,53 +391,13 @@
                 <div class="stat-item"><div class="stat-value">5<span class="unit">회</span></div><div class="stat-label">산책 횟수</div></div>
                 <div class="stat-item"><div class="stat-value">2:15</div><div class="stat-label">총 시간</div></div>
             </div>
-            <div class="progress-section">
-                <div class="progress-header"><span>주간 목표 20km</span><strong>62%</strong></div>
-                <div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>
-            </div>
         </div>
 
-        <!-- Walk Start -->
-        <div class="walk-start-section animate-in">
-            <button class="walk-start-btn" onclick="openWalkScreen()">
-                <span class="btn-icon">🐕</span>
-                <div class="btn-text">
-                    <div>산책 시작하기</div>
-                    <div class="sub">초코와 함께 걸어볼까요?</div>
-                </div>
-                <span class="btn-arrow">→</span>
-            </button>
-        </div>
-
-        <!-- My Pets -->
-        <div class="section-title"><h3>🐾 내 반려동물</h3><a class="more" href="마이페이지.html">관리 →</a></div>
-        <div class="pets-scroll">
-            <div class="pet-card selected" onclick="selectPet(this,'초코')">
-                <div class="pet-avatar dog">🐕</div><h4>초코</h4><p>골든 리트리버 · 3살</p><div class="pet-stat">총 142.5km</div>
-            </div>
-            <div class="pet-card" onclick="selectPet(this,'나비')">
-                <div class="pet-avatar cat">🐈</div><h4>나비</h4><p>코리안 숏헤어 · 2살</p><div class="pet-stat">총 28.3km</div>
-            </div>
-            <div class="pet-card">
-                <div class="pet-avatar add">➕</div><h4>추가하기</h4><p>반려동물 등록</p>
-            </div>
-        </div>
-
-        <!-- Ranking -->
-        <div class="section-title"><h3>🏆 동네 랭킹</h3><a class="more" href="랭킹.html">전체보기 →</a></div>
-        <div class="ranking-card">
-            <div class="ranking-tabs">
-                <button class="ranking-tab active">주간</button>
-                <button class="ranking-tab">월간</button>
-                <button class="ranking-tab">전체</button>
-            </div>
-            <div class="ranking-list">
-                <div class="ranking-item"><span class="rank-num rank-1">1</span><div class="rank-avatar">🐕</div><div class="rank-info"><div class="rank-name">초코아빠</div><div class="rank-pet">골든 리트리버 · 4살</div></div><div class="rank-distance">45.2 <span class="unit">km</span></div></div>
-                <div class="ranking-item me"><span class="rank-num rank-2">2</span><div class="rank-avatar">🐕</div><div class="rank-info"><div class="rank-name">나 ⭐</div><div class="rank-pet">골든 리트리버 · 3살</div></div><div class="rank-distance">38.1 <span class="unit">km</span></div></div>
-                <div class="ranking-item"><span class="rank-num rank-3">3</span><div class="rank-avatar">🐩</div><div class="rank-info"><div class="rank-name">달이맘</div><div class="rank-pet">푸들 · 2살</div></div><div class="rank-distance">32.7 <span class="unit">km</span></div></div>
-                <div class="ranking-item"><span class="rank-num">4</span><div class="rank-avatar">🐕</div><div class="rank-info"><div class="rank-name">바둑이집사</div><div class="rank-pet">진돗개 · 5살</div></div><div class="rank-distance">28.4 <span class="unit">km</span></div></div>
-                <div class="ranking-item"><span class="rank-num">5</span><div class="rank-avatar">🐈</div><div class="rank-info"><div class="rank-name">콩이엄마</div><div class="rank-pet">러시안블루 · 3살</div></div><div class="rank-distance">21.9 <span class="unit">km</span></div></div>
-            </div>
+        <!-- Recent Walks (moved up) -->
+        <div class="section-title"><h3>🕐 최근 산책</h3><a class="more" href="마이페이지.html">전체보기 →</a></div>
+        <div class="recent-walks">
+            <a class="walk-item" href="산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 L10 14 L18 18 L26 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="26" r="3" fill="#10B981"/><circle cx="26" cy="6" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">오늘 오전 7:30</div><div class="walk-title">보라매공원 코스 🐕 초코</div><div class="walk-meta"><span>📏 <strong>3.2km</strong></span><span>⏱ <strong>42분</strong></span><span>🔥 <strong>165kcal</strong></span></div></div></a>
+            <a class="walk-item" href="산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M8 24 L16 8 L24 20" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="24" r="3" fill="#10B981"/><circle cx="24" cy="20" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">어제 오후 6:15</div><div class="walk-title">한강 산책로 🐕 초코</div><div class="walk-meta"><span>📏 <strong>4.7km</strong></span><span>⏱ <strong>58분</strong></span><span>🔥 <strong>231kcal</strong></span></div></div></a>
         </div>
 
         <!-- Challenges -->
@@ -465,13 +421,6 @@
         <!-- Ad -->
         <div class="ad-banner"><span class="ad-badge">AD</span><span class="ad-icon">🦴</span><div class="ad-text"><h4>프리미엄 강아지 간식 20% 할인!</h4><p>산책 후 맛있는 간식 어때요?</p></div></div>
 
-        <!-- Recent Walks -->
-        <div class="section-title"><h3>🕐 최근 산책</h3><a class="more" href="마이페이지.html">전체보기 →</a></div>
-        <div class="recent-walks">
-            <a class="walk-item" href="산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 L10 14 L18 18 L26 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="26" r="3" fill="#10B981"/><circle cx="26" cy="6" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">오늘 오전 7:30</div><div class="walk-title">보라매공원 코스 🐕 초코</div><div class="walk-meta"><span>📏 <strong>3.2km</strong></span><span>⏱ <strong>42분</strong></span><span>🔥 <strong>165kcal</strong></span></div></div></a>
-            <a class="walk-item" href="산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M8 24 L16 8 L24 20" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="24" r="3" fill="#10B981"/><circle cx="24" cy="20" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">어제 오후 6:15</div><div class="walk-title">한강 산책로 🐕 초코</div><div class="walk-meta"><span>📏 <strong>4.7km</strong></span><span>⏱ <strong>58분</strong></span><span>🔥 <strong>231kcal</strong></span></div></div></a>
-        </div>
-
         <!-- Premium -->
         <a class="premium-banner" href="프리미엄.html" style="text-decoration:none"><div class="premium-badge">👑</div><div class="premium-text"><h4>멍이랑 프리미엄</h4><p>광고 제거 + 상세 통계 + 프리미엄 뱃지</p></div><div class="premium-price"><div class="price">₩3,900</div><div class="period">/월</div></div></a>
         <div style="height:24px"></div>
@@ -482,26 +431,47 @@
         <a class="nav-item active" href="#"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
         <a class="nav-item" href="소셜.html"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
         <button class="nav-item center-btn" onclick="openWalkScreen()"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></button>
-        <a class="nav-item" href="랭킹.html"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></a>
+        <a class="nav-item" href="지도.html"><span class="nav-icon">🗺️</span><span class="nav-label">지도</span></a>
         <a class="nav-item" href="마이페이지.html"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
     </nav>
 
+    <!-- ===== Pet Selection Screen ===== -->
+    <div class="pet-select-screen" id="petSelectScreen">
+        <div class="pet-select-header">
+            <button class="pet-select-close" onclick="closePetSelect()">✕</button>
+            <h3>함께 산책할 반려동물</h3>
+            <div style="width:36px"></div>
+        </div>
+        <div class="pet-select-body">
+            <p class="pet-select-subtitle">산책할 반려동물을 선택해주세요 (복수 선택 가능)</p>
+            <div class="pet-select-list">
+                <div class="pet-select-card selected" onclick="togglePetCard(this)" data-pet="초코">
+                    <div class="pet-select-avatar dog">🐕</div>
+                    <div class="pet-select-info">
+                        <div class="pet-select-name">초코</div>
+                        <div class="pet-select-breed">골든 리트리버 · 3살</div>
+                    </div>
+                    <div class="pet-select-check">✓</div>
+                </div>
+                <div class="pet-select-card" onclick="togglePetCard(this)" data-pet="나비">
+                    <div class="pet-select-avatar cat">🐈</div>
+                    <div class="pet-select-info">
+                        <div class="pet-select-name">나비</div>
+                        <div class="pet-select-breed">코리안 숏헤어 · 2살</div>
+                    </div>
+                    <div class="pet-select-check">✓</div>
+                </div>
+            </div>
+        </div>
+        <div class="pet-select-footer">
+            <button class="pet-select-start" onclick="proceedToWalk()">산책 시작하기</button>
+        </div>
+    </div>
+
     <!-- ===== Walk Screen (Full-screen with REAL MAP) ===== -->
     <div class="walk-screen" id="walkScreen">
-        <div class="walk-screen-header">
-            <div class="gps-badge" id="walkGpsBadge"><span class="gps-dot"></span><span id="walkGpsLabel">GPS</span></div>
-            <h3 id="walkScreenTitle">🐕 산책 준비</h3>
-            <button class="walk-close-btn" onclick="closeWalk()">✕</button>
-        </div>
-
         <div class="walk-map-area">
             <div id="walkMap"></div>
-            <div class="walk-map-controls">
-                <button class="wmap-btn" onclick="centerMe()" title="내 위치">📍</button>
-                <button class="wmap-btn on" id="followBtn" onclick="toggleFollow()" title="따라가기">🎯</button>
-                <button class="wmap-btn" onclick="wMap.zoomIn()">＋</button>
-                <button class="wmap-btn" onclick="wMap.zoomOut()">－</button>
-            </div>
             <div class="walk-dist-chip" id="walkDistChip" style="display:none">
                 <span class="live-dot"></span>
                 <span class="dist-num" id="mapDistNum">0.00</span>
@@ -566,7 +536,7 @@
     // --- State ---
     let curPos = null;
     let curAcc = null;
-    let selectedPet = '초코';
+    let selectedPets = ['초코'];
     let nearbyMapObj = null;
     let nearbyMarker = null;
     let wMap = null;
@@ -576,7 +546,6 @@
     let wStartMarker = null;
     let resMapObj = null;
 
-    let follow = true;
     let walking = false;
     let paused = false;
     let secs = 0;
@@ -609,7 +578,7 @@
         nearbyMarker = L.marker([lat,lng],{icon:makeDot('#10B981',16)}).addTo(nearbyMapObj);
     }
 
-    // --- Init walk map (fullscreen) ---
+    // --- Init walk map (fullscreen, NRC-style: no drag, no zoom, auto-follow) ---
     function initWalkMap(lat, lng){
         if(wMap){
             wMap.setView([lat,lng],17);
@@ -617,7 +586,11 @@
             wAccCircle.setLatLng([lat,lng]);
             return;
         }
-        wMap = L.map('walkMap',{zoomControl:false, attributionControl:false}).setView([lat,lng],17);
+        wMap = L.map('walkMap',{
+            zoomControl:false, attributionControl:false,
+            dragging:false, touchZoom:false, doubleClickZoom:false,
+            scrollWheelZoom:false, boxZoom:false, keyboard:false
+        }).setView([lat,lng],17);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(wMap);
 
         wMarker = L.marker([lat,lng],{icon:makeDot('#10B981',20)}).addTo(wMap);
@@ -633,12 +606,10 @@
             p=>{
                 const {latitude:lat,longitude:lng,accuracy}=p.coords;
                 curPos={lat,lng}; curAcc=accuracy;
-                setGPS(true);
                 initNearbyMap(lat,lng);
                 toast('📍 현재 위치를 찾았습니다');
             },
             e=>{
-                setGPS(false);
                 initNearbyMap(37.5665,126.978);
                 toast('⚠️ GPS: '+e.message);
             },
@@ -660,32 +631,45 @@
                 }
 
                 curPos=newPos; curAcc=accuracy;
-                setGPS(true);
 
                 if(nearbyMarker) nearbyMarker.setLatLng([lat,lng]);
                 if(wMarker){
                     wMarker.setLatLng([lat,lng]);
                     wAccCircle.setLatLng([lat,lng]).setRadius(accuracy);
-                    if(follow && wMap) wMap.panTo([lat,lng]);
+                    if(wMap) wMap.panTo([lat,lng]);
                 }
             },
-            e=>{ setGPS(false); },
+            e=>{},
             {enableHighAccuracy:true, maximumAge:3000, timeout:10000}
         );
     }
 
-    function setGPS(on){
-        ['gpsBadge','walkGpsBadge'].forEach(id=>{
-            const el=document.getElementById(id);
-            if(el) el.classList.toggle('on',on);
+    // --- Pet Selection ---
+    function openWalkScreen(){
+        document.getElementById('petSelectScreen').classList.add('active');
+    }
+    function closePetSelect(){
+        document.getElementById('petSelectScreen').classList.remove('active');
+    }
+    function togglePetCard(card){
+        card.classList.toggle('selected');
+        updateSelectedPets();
+    }
+    function updateSelectedPets(){
+        selectedPets = [];
+        document.querySelectorAll('.pet-select-card.selected').forEach(c=>{
+            selectedPets.push(c.dataset.pet);
         });
-        document.getElementById('gpsLabel').textContent = on?'GPS 활성':'GPS 오류';
-        const wl=document.getElementById('walkGpsLabel');
-        if(wl) wl.textContent = on ? (curAcc?`±${Math.round(curAcc)}m`:'GPS') : 'GPS 오류';
+        document.querySelector('.pet-select-start').disabled = selectedPets.length === 0;
+    }
+    function proceedToWalk(){
+        if(selectedPets.length===0){ toast('반려동물을 선택해주세요'); return; }
+        closePetSelect();
+        openWalkTracking();
     }
 
     // --- Walk Screen ---
-    function openWalkScreen(){
+    function openWalkTracking(){
         const ws = document.getElementById('walkScreen');
         ws.classList.add('active');
 
@@ -697,9 +681,8 @@
         document.getElementById('walkTimer').textContent='00:00:00';
         document.getElementById('wDist').textContent='0.00';
         document.getElementById('wCal').textContent='0';
-        document.getElementById('walkScreenTitle').textContent=`🐕 산책 준비`;
-        document.getElementById('walkPetLabel').textContent=
-            selectedPet==='나비'?'🐈 나비와 산책':'🐕 '+selectedPet+'와 산책';
+        const petLabel = selectedPets.map(p=> p==='나비'?'🐈 '+p:'🐕 '+p).join(', ');
+        document.getElementById('walkPetLabel').textContent= petLabel + '와 산책';
 
         setTimeout(()=>{
             const lat = curPos ? curPos.lat : 37.5665;
@@ -724,8 +707,8 @@
         document.getElementById('preStartControls').style.display='none';
         document.getElementById('walkingControls').style.display='flex';
         document.getElementById('walkDistChip').style.display='flex';
-        document.getElementById('walkScreenTitle').textContent=
-            selectedPet==='나비'?'🐈 나비와 산책 중':'🐕 '+selectedPet+'와 산책 중';
+        const trackLabel = selectedPets.map(p=> p==='나비'?'🐈 '+p:'🐕 '+p).join(', ');
+        document.getElementById('walkPetLabel').textContent= trackLabel + '와 산책 중';
 
         wMap.setZoom(18);
 
@@ -736,7 +719,7 @@
             }
         },1000);
 
-        toast(`🐾 ${selectedPet}와(과) 산책을 시작합니다!`);
+        toast(`🐾 ${selectedPets.join(', ')}와(과) 산책을 시작합니다!`);
     }
 
     function togglePause(){
@@ -760,7 +743,7 @@
         document.getElementById('rDist').textContent=km.toFixed(2)+' km';
         document.getElementById('rTime').textContent=`${mm}분 ${ss}초`;
         document.getElementById('rCal').textContent=cal+' kcal';
-        document.getElementById('resultPetMsg').textContent=`${selectedPet}와(과) 즐거운 산책이었어요`;
+        document.getElementById('resultPetMsg').textContent=`${selectedPets.join(', ')}와(과) 즐거운 산책이었어요`;
 
         // Badges
         const badges=[];
@@ -782,7 +765,7 @@
 
         // Save
         const h=JSON.parse(localStorage.getItem('withbowwow_walks')||'[]');
-        h.unshift({pet:selectedPet,distance:km,duration:secs,calories:cal,route,date:new Date().toISOString()});
+        h.unshift({pet:selectedPets.join(','),distance:km,duration:secs,calories:cal,route,date:new Date().toISOString()});
         if(h.length>50)h.pop();
         localStorage.setItem('withbowwow_walks',JSON.stringify(h));
     }
@@ -822,33 +805,12 @@
         resMapObj.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
     }
 
-    // --- Map helpers ---
-    function centerMe(){ if(curPos&&wMap){ wMap.setView([curPos.lat,curPos.lng],17); toast('📍 내 위치'); } }
-    function toggleFollow(){ follow=!follow; document.getElementById('followBtn').classList.toggle('on',follow); toast(follow?'🎯 따라가기 ON':'🎯 따라가기 OFF'); }
-
     // --- UI helpers ---
-    function selectPet(el,name){
-        document.querySelectorAll('.pet-card').forEach(c=>c.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedPet=name;
-    }
-    function switchTab(el){
-        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-        el.classList.add('active');
-    }
     function closeResult(){
         document.getElementById('resultModal').classList.remove('active');
         if(resMapObj){resMapObj.remove();resMapObj=null;}
     }
     function saveAndClose(){ toast('✅ 산책 기록이 저장되었습니다'); closeResult(); }
-
-    // Ranking tabs
-    document.querySelectorAll('.ranking-tab').forEach(tab=>{
-        tab.addEventListener('click',()=>{
-            document.querySelectorAll('.ranking-tab').forEach(t=>t.classList.remove('active'));
-            tab.classList.add('active');
-        });
-    });
 
     // Toast
     let toastTimer;

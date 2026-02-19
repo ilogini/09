@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>설정 - 멍이랑 withbowwow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --nav-height: 72px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 0 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            background: var(--bg); font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; text-decoration: none; color: var(--text);
+        }
+        .back-btn:hover { background: var(--border); }
+        .header-title { font-size: 17px; font-weight: 700; }
+
+        /* ===== Content ===== */
+        .content { padding: 0 0 32px; }
+
+        /* ===== Settings Section ===== */
+        .settings-section {
+            background: var(--white);
+            margin-top: 12px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .settings-section:first-child { margin-top: 0; }
+        .section-header {
+            padding: 20px 20px 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== Settings Row ===== */
+        .settings-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px;
+            min-height: 52px;
+            transition: background 0.15s;
+        }
+        .settings-row:not(:last-child) {
+            border-bottom: 1px solid var(--border);
+        }
+        .settings-row.clickable { cursor: pointer; }
+        .settings-row.clickable:hover { background: var(--bg); }
+        .settings-row.clickable:active { background: var(--border); }
+
+        .row-left {
+            display: flex; align-items: center; gap: 14px;
+            flex: 1; min-width: 0;
+        }
+        .row-icon {
+            width: 36px; height: 36px;
+            border-radius: var(--radius-xs);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .row-icon.green { background: var(--primary-light); }
+        .row-icon.blue { background: rgba(59,130,246,0.1); }
+        .row-icon.yellow { background: var(--accent-light); }
+        .row-icon.gray { background: var(--bg); }
+        .row-icon.red { background: rgba(239,68,68,0.1); }
+
+        .row-text { flex: 1; min-width: 0; }
+        .row-label {
+            font-size: 15px; font-weight: 500;
+            color: var(--text);
+            line-height: 1.3;
+        }
+        .row-desc {
+            font-size: 12px; font-weight: 400;
+            color: var(--text-light);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .row-right {
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+        .row-value {
+            font-size: 13px; font-weight: 500;
+            color: var(--text-light);
+        }
+        .row-chevron {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1;
+        }
+
+        /* ===== Toggle Switch ===== */
+        .toggle-switch {
+            position: relative;
+            width: 48px; height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0; width: 0; height: 0;
+            position: absolute;
+        }
+        .toggle-slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--border);
+            border-radius: 28px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px; width: 22px;
+            left: 3px; bottom: 3px;
+            background: var(--white);
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--primary);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+        .toggle-switch input:focus-visible + .toggle-slider {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* ===== Plan Badge ===== */
+        .plan-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .plan-badge.premium {
+            background: var(--accent-light);
+            border-color: rgba(245,158,11,0.3);
+            color: #92400E;
+        }
+
+        /* ===== Action Button ===== */
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 7px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { background: var(--border); }
+        .action-btn:active { transform: scale(0.97); }
+
+        /* ===== Connected Account ===== */
+        .connected-account {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .kakao-icon {
+            width: 24px; height: 24px;
+            background: #FEE500;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800;
+            color: #3C1E1E;
+        }
+        .connected-label {
+            font-size: 13px; font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* ===== Logout Section ===== */
+        .logout-section {
+            padding: 24px 20px 40px;
+        }
+        .logout-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--white);
+            border: 1.5px solid var(--danger);
+            border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            color: var(--danger);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(239,68,68,0.05);
+        }
+        .logout-btn:active {
+            background: rgba(239,68,68,0.1);
+            transform: scale(0.98);
+        }
+
+        /* ===== App Version ===== */
+        .app-version-footer {
+            text-align: center;
+            padding: 8px 20px 0;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+
+        /* ===== Toast ===== */
+        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="마이페이지.html" class="back-btn" aria-label="뒤로가기">&#x2190;</a>
+            <span class="header-title">&#x2699;&#xFE0F; 설정</span>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- 알림 설정 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">알림 설정</div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon green">&#x23F0;</div>
+                    <div class="row-text">
+                        <div class="row-label">산책 리마인더</div>
+                        <div class="row-desc">설정한 시간에 산책 알림을 받아요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleNotification('산책 리마인더', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon yellow">&#x1F3C5;</div>
+                    <div class="row-text">
+                        <div class="row-label">뱃지 획득 알림</div>
+                        <div class="row-desc">새로운 뱃지를 획득하면 알려드려요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleNotification('뱃지 획득 알림', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon blue">&#x1F4AC;</div>
+                    <div class="row-text">
+                        <div class="row-label">소셜 알림</div>
+                        <div class="row-desc">친구 요청, 좋아요, 댓글 알림</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" onchange="toggleNotification('소셜 알림', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 구독 관리 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">구독 관리</div>
+
+            <div class="settings-row clickable" onclick="location.href='프리미엄.html'">
+                <div class="row-left">
+                    <div class="row-icon yellow">&#x1F451;</div>
+                    <div class="row-text">
+                        <div class="row-label">현재 플랜</div>
+                        <div class="row-desc">프리미엄으로 업그레이드하고 더 많은 기능을 즐겨보세요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="plan-badge">무료 플랜</span>
+                    <span class="row-chevron">&#x203A;</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 계정 설정 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">계정 설정</div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon gray">&#x1F517;</div>
+                    <div class="row-text">
+                        <div class="row-label">연결된 계정</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <div class="connected-account">
+                        <div class="kakao-icon">K</div>
+                        <span class="connected-label">카카오 로그인</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon gray">&#x1F512;</div>
+                    <div class="row-text">
+                        <div class="row-label">비밀번호 변경</div>
+                        <div class="row-desc">계정 보안을 위해 주기적으로 변경해주세요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <button class="action-btn" onclick="toast('비밀번호 변경 기능은 준비 중입니다')">변경</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 앱 정보 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">앱 정보</div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon green">&#x1F4F1;</div>
+                    <div class="row-text">
+                        <div class="row-label">앱 버전</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-value">v1.0.0</span>
+                </div>
+            </div>
+
+            <div class="settings-row clickable" onclick="toast('개인정보처리방침 페이지는 준비 중입니다')">
+                <div class="row-left">
+                    <div class="row-icon gray">&#x1F4C4;</div>
+                    <div class="row-text">
+                        <div class="row-label">개인정보처리방침</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-chevron">&#x203A;</span>
+                </div>
+            </div>
+
+            <div class="settings-row clickable" onclick="toast('이용약관 페이지는 준비 중입니다')">
+                <div class="row-left">
+                    <div class="row-icon gray">&#x1F4CB;</div>
+                    <div class="row-text">
+                        <div class="row-label">이용약관</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-chevron">&#x203A;</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로그아웃 -->
+        <div class="logout-section animate-in">
+            <button class="logout-btn" onclick="handleLogout()">로그아웃</button>
+        </div>
+
+        <div class="app-version-footer animate-in">
+            멍이랑 withbowwow &middot; Made with &#x1F43E;
+        </div>
+
+    </div>
+
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function toggleNotification(name, isOn) {
+        const state = isOn ? 'ON' : 'OFF';
+        toast(name + ' ' + state);
+    }
+
+    function handleLogout() {
+        if (confirm('정말 로그아웃 하시겠어요?')) {
+            toast('로그아웃 되었습니다');
+            setTimeout(() => {
+                location.href = '멍이랑_메인페이지_시안.html';
+            }, 1200);
+        }
+    }
+    </script>
+
+</body>
+</html>

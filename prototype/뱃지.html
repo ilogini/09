@@ -743,6 +743,20 @@
         btn.classList.add('active');
     }
 
+    // URL parameter handling: auto-activate category from ?cat=
+    const catMap = { '거리': '🏃 거리', '연속': '🔥 연속', '탐험': '🧭 탐험', '시간': '⏱ 시간', '스페셜': '🌟 스페셜', '시즌': '🏆 시즌' };
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get('cat');
+    if (catParam && catMap[catParam]) {
+        const target = catMap[catParam];
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.trim() === target) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
     // Animate ring on load
     window.addEventListener('load', () => {
         setTimeout(() => {

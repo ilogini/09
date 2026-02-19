@@ -54,17 +54,51 @@
             height: var(--header-height);
             border-bottom: 1px solid var(--border);
         }
-        .header-left { display: flex; align-items: center; gap: 10px; }
-        .header-logo { display: flex; align-items: center; gap: 8px; }
+        .header-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--text); }
         .header-logo .paw-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .header-title { font-size: 20px; font-weight: 800; color: var(--text); }
+        .header-logo em { font-style: normal; color: var(--primary); }
         .header-actions { display: flex; gap: 8px; }
         .header-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s; text-decoration: none; }
         .header-btn:hover { background: var(--border); }
         .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
 
+        /* ===== Social Tabs (NRC style) ===== */
+        .social-tabs {
+            position: sticky; top: var(--header-height); z-index: 99;
+            display: flex;
+            background: var(--white);
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .social-tabs::-webkit-scrollbar { display: none; }
+        .social-tab {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .social-tab:hover { color: var(--text-secondary); }
+        .social-tab.active {
+            color: var(--text);
+            border-bottom-color: var(--primary);
+        }
+
         /* ===== Content ===== */
         .content { padding-bottom: calc(var(--nav-height) + 20px); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
         /* ===== Section Title ===== */
         .section-title { padding: 24px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -72,89 +106,52 @@
         .section-title .more { font-size: 13px; color: var(--text-light); text-decoration: none; cursor: pointer; }
         .section-title .more:hover { color: var(--primary); }
 
-        /* ===== Search Bar ===== */
-        .search-bar {
-            margin: 12px 16px 0;
-            display: flex; align-items: center; gap: 10px;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 10px 16px;
-            transition: border-color 0.2s;
-        }
-        .search-bar:focus-within { border-color: var(--primary); }
-        .search-bar .search-icon { font-size: 16px; color: var(--text-light); }
-        .search-bar input {
-            flex: 1; border: none; outline: none; font-family: inherit;
-            font-size: 14px; color: var(--text); background: transparent;
-        }
-        .search-bar input::placeholder { color: var(--text-light); }
-
-        /* ===== Friend Recommend (Horizontal Scroll) ===== */
-        .friend-scroll {
-            padding: 0 16px;
-            display: flex; gap: 12px;
-            overflow-x: auto; scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none;
-        }
-        .friend-scroll::-webkit-scrollbar { display: none; }
-        .friend-card {
-            min-width: 150px; flex-shrink: 0;
-            background: var(--white);
-            border-radius: var(--radius-sm);
-            padding: 20px 16px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            scroll-snap-align: start;
-            transition: all 0.2s;
-            border: 1px solid var(--border);
-        }
-        .friend-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-        .friend-avatar {
-            width: 64px; height: 64px; border-radius: 50%;
-            margin: 0 auto 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px;
-            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-            position: relative;
-        }
-        .friend-avatar .online-dot {
-            position: absolute; bottom: 2px; right: 2px;
-            width: 12px; height: 12px; background: var(--primary);
-            border-radius: 50%; border: 2px solid var(--white);
-        }
-        .friend-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-        .friend-card .breed { font-size: 11px; color: var(--text-light); margin-bottom: 12px; }
-        .friend-add-btn {
-            width: 100%; padding: 8px;
-            background: var(--primary-light); color: var(--primary-dark);
-            border: none; border-radius: var(--radius-xs);
-            font-size: 12px; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .friend-add-btn:hover { background: var(--primary); color: var(--white); }
-
-        /* ===== Walk Invite Banner ===== */
-        .invite-banner {
+        /* ===== Leaderboard ===== */
+        .leaderboard-card {
             margin: 16px 16px 0;
-            padding: 18px 20px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--white);
             border-radius: var(--radius);
-            display: flex; align-items: center; gap: 14px;
-            cursor: pointer; transition: transform 0.2s;
-            box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
         }
-        .invite-banner:hover { transform: translateY(-2px); }
-        .invite-icon {
-            width: 48px; height: 48px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
+        .leaderboard-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .leaderboard-header h4 { font-size: 15px; font-weight: 700; }
+        .leaderboard-header span { font-size: 12px; color: var(--text-light); }
+        .leaderboard-list { display: flex; flex-direction: column; gap: 10px; }
+        .leaderboard-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 8px 12px;
+            border-radius: var(--radius-xs);
+            transition: background 0.15s;
+        }
+        .leaderboard-row:hover { background: var(--bg); }
+        .leaderboard-row.me {
+            background: var(--primary-light);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+        .lb-rank {
+            width: 24px; height: 24px;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; flex-shrink: 0;
+            font-size: 12px; font-weight: 800;
+            flex-shrink: 0;
         }
-        .invite-text h4 { font-size: 15px; font-weight: 700; color: white; }
-        .invite-text p { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
-        .invite-arrow { margin-left: auto; font-size: 20px; color: rgba(255,255,255,0.7); }
+        .lb-rank.gold { background: #FEF3C7; color: #D97706; }
+        .lb-rank.silver { background: #F3F4F6; color: #6B7280; }
+        .lb-rank.bronze { background: #FED7AA; color: #C2410C; }
+        .lb-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .lb-info { flex: 1; min-width: 0; }
+        .lb-name { font-size: 13px; font-weight: 600; }
+        .lb-dog { font-size: 11px; color: var(--text-light); }
+        .lb-distance { font-size: 14px; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
 
         /* ===== Feed ===== */
         .feed-list { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
@@ -176,10 +173,29 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 20px; flex-shrink: 0;
             background: linear-gradient(135deg, var(--primary-light), #A7F3D0);
+            position: relative;
         }
         .feed-user-info { flex: 1; }
-        .feed-username { font-size: 14px; font-weight: 600; }
+        .feed-username { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .feed-time { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+        .live-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-size: 10px; font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .live-dot {
+            width: 6px; height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
         .feed-more-btn {
             width: 28px; height: 28px; border: none; background: none;
             font-size: 16px; color: var(--text-light); cursor: pointer;
@@ -199,9 +215,7 @@
             color: var(--primary-dark); font-size: 13px; font-weight: 500;
         }
         .feed-map-preview .map-placeholder .icon { font-size: 32px; }
-        .feed-route-line {
-            position: absolute; inset: 0;
-        }
+        .feed-route-line { position: absolute; inset: 0; }
         .feed-route-line svg { width: 100%; height: 100%; }
         .feed-stats {
             display: flex; gap: 0; padding: 0 16px; margin-bottom: 10px;
@@ -215,10 +229,34 @@
         .feed-stat .value { font-size: 15px; font-weight: 700; color: var(--text); }
         .feed-stat .value .unit { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
         .feed-stat .label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+
+        /* Reaction bar */
+        .feed-reactions {
+            display: flex; align-items: center; gap: 4px;
+            padding: 6px 16px 2px;
+        }
+        .reaction-btn {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--white);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex; align-items: center; gap: 3px;
+            font-family: inherit;
+        }
+        .reaction-btn .r-count { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+        .reaction-btn:hover { background: var(--bg); transform: scale(1.08); }
+        .reaction-btn.reacted {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+        .reaction-btn.reacted .r-count { color: var(--primary-dark); }
+
         .feed-actions {
             display: flex; align-items: center;
-            padding: 10px 16px;
-            border-top: 1px solid var(--border);
+            padding: 8px 16px 10px;
         }
         .feed-action-btn {
             display: flex; align-items: center; gap: 6px;
@@ -230,36 +268,242 @@
         .feed-action-btn:hover { background: var(--bg); color: var(--primary); }
         .feed-action-btn .icon { font-size: 18px; }
         .feed-action-btn.liked { color: var(--danger); }
+        .cheer-btn {
+            margin-left: auto;
+            padding: 7px 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+        }
+        .cheer-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.35); }
+        .cheer-btn.cheered {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: none;
+        }
 
-        /* ===== Meeting Board ===== */
-        .meeting-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
-        .meeting-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px;
+        /* ===== Challenges ===== */
+        .challenge-card {
+            margin: 0 16px 12px;
             background: var(--white);
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius);
+            padding: 18px 20px;
             box-shadow: var(--shadow-sm);
-            cursor: pointer; transition: all 0.2s;
             border: 1px solid var(--border);
         }
-        .meeting-item:hover { box-shadow: var(--shadow); transform: translateX(4px); }
-        .meeting-icon {
-            width: 48px; height: 48px; border-radius: 14px;
+        .challenge-card-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 14px;
+        }
+        .challenge-type {
+            font-size: 11px; font-weight: 600;
+            padding: 3px 10px; border-radius: 10px;
+        }
+        .challenge-type.versus { background: #FEE2E2; color: #DC2626; }
+        .challenge-type.streak { background: #DBEAFE; color: #2563EB; }
+        .challenge-type.completed { background: var(--primary-light); color: var(--primary-dark); }
+        .challenge-deadline { font-size: 11px; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+        .challenge-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+        .challenge-participants { display: flex; flex-direction: column; gap: 12px; }
+        .challenge-participant {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .cp-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; flex-shrink: 0;
-            background: var(--primary-light);
+            font-size: 16px; flex-shrink: 0;
         }
-        .meeting-info { flex: 1; min-width: 0; }
-        .meeting-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .meeting-meta { display: flex; flex-wrap: wrap; gap: 8px; }
-        .meeting-tag {
-            font-size: 11px; color: var(--text-secondary);
-            display: flex; align-items: center; gap: 3px;
+        .cp-info { flex: 1; min-width: 0; }
+        .cp-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .cp-bar-track {
+            height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden;
         }
-        .meeting-members {
-            font-size: 13px; font-weight: 600; color: var(--primary-dark);
+        .cp-bar-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        .cp-value { font-size: 12px; font-weight: 700; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; }
+
+        /* Streak progress */
+        .streak-progress {
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            padding: 8px 0;
+        }
+        .streak-ring {
+            width: 80px; height: 80px;
+            position: relative;
+        }
+        .streak-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .streak-ring .ring-bg { fill: none; stroke: var(--bg); stroke-width: 6; }
+        .streak-ring .ring-fill { fill: none; stroke: var(--secondary); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+        .streak-center {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: var(--secondary-dark);
+            transform: rotate(0deg);
+        }
+        .streak-center small { font-size: 9px; font-weight: 500; color: var(--text-light); }
+        .streak-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+        .cta-btn {
+            display: block;
+            margin: 20px 16px 8px;
+            padding: 16px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 15px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+            width: calc(100% - 32px);
+        }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
+
+        .completed-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 12px; font-weight: 600; color: var(--primary-dark);
+        }
+
+        /* ===== Clubs ===== */
+        .club-card {
+            margin: 0 16px 12px;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .club-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+        .club-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; flex-shrink: 0;
+        }
+        .club-info { flex: 1; min-width: 0; }
+        .club-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .club-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .club-meta-item { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 3px; }
+        .club-activity-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .club-activity-dot.high { background: var(--primary); }
+        .club-activity-dot.medium { background: var(--accent); }
+        .club-join-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
             white-space: nowrap;
+            flex-shrink: 0;
+            border: none;
         }
+        .club-join-btn.join {
+            background: var(--primary);
+            color: var(--white);
+        }
+        .club-join-btn.join:hover { background: var(--primary-dark); }
+        .club-join-btn.joined {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        /* ===== Guided Walks ===== */
+        .featured-walk {
+            margin: 16px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .featured-walk:hover { transform: translateY(-2px); }
+        .featured-walk-bg {
+            height: 200px;
+            background: linear-gradient(135deg, #065F46, #059669, #10B981);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 24px;
+            position: relative;
+        }
+        .featured-walk-bg::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.4), transparent 60%);
+        }
+        .featured-walk-icon {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 48px; opacity: 0.3;
+        }
+        .featured-walk-badge {
+            position: relative; z-index: 1;
+            display: inline-flex;
+            align-self: flex-start;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            font-size: 11px; font-weight: 600; color: white;
+            margin-bottom: 8px;
+        }
+        .featured-walk-title {
+            position: relative; z-index: 1;
+            font-size: 20px; font-weight: 800; color: white;
+            margin-bottom: 4px;
+        }
+        .featured-walk-desc {
+            position: relative; z-index: 1;
+            font-size: 13px; color: rgba(255,255,255,0.8);
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .walk-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 16px;
+        }
+        .walk-program-card {
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .walk-program-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+        .walk-program-thumb {
+            height: 90px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+            position: relative;
+        }
+        .walk-program-info { padding: 12px; }
+        .walk-program-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+        .walk-program-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .walk-difficulty {
+            font-size: 10px; font-weight: 600;
+            padding: 2px 8px; border-radius: 8px;
+        }
+        .walk-difficulty.beginner { background: var(--primary-light); color: var(--primary-dark); }
+        .walk-difficulty.intermediate { background: var(--accent-light); color: #B45309; }
+        .walk-difficulty.all { background: #EDE9FE; color: #7C3AED; }
+        .walk-duration { font-size: 11px; color: var(--text-light); }
 
         /* ===== Bottom Nav ===== */
         .bottom-nav {
@@ -302,6 +546,129 @@
         .animate-in:nth-child(3) { animation-delay: 0.15s; }
         .animate-in:nth-child(4) { animation-delay: 0.2s; }
         .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+
+        /* Tab content transition */
+        .tab-panel.active > * {
+            animation: fadeInUp 0.35s ease forwards;
+            opacity: 0;
+        }
+        .tab-panel.active > *:nth-child(1) { animation-delay: 0.03s; }
+        .tab-panel.active > *:nth-child(2) { animation-delay: 0.06s; }
+        .tab-panel.active > *:nth-child(3) { animation-delay: 0.09s; }
+        .tab-panel.active > *:nth-child(4) { animation-delay: 0.12s; }
+        .tab-panel.active > *:nth-child(5) { animation-delay: 0.15s; }
+        .tab-panel.active > *:nth-child(6) { animation-delay: 0.18s; }
+        .tab-panel.active > *:nth-child(7) { animation-delay: 0.21s; }
+        .tab-panel.active > *:nth-child(8) { animation-delay: 0.24s; }
+
+        /* ===== Modal Overlay ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none; align-items: flex-end; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-container {
+            width: 100%; max-width: 480px;
+            max-height: 85vh;
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column;
+        }
+        .modal-overlay.show .modal-container { transform: translateY(0); }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: none; background: var(--bg);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: var(--border); }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
+
+        /* ===== Comment Modal ===== */
+        .comment-item { display: flex; gap: 10px; margin-bottom: 16px; }
+        .comment-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary-light), #A7F3D0);
+        }
+        .comment-body { flex: 1; }
+        .comment-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .comment-text { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+        .comment-time { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+        .comment-input-row {
+            display: flex; gap: 8px; align-items: center;
+            padding: 12px 20px; border-top: 1px solid var(--border);
+            background: var(--white); flex-shrink: 0;
+        }
+        .comment-input {
+            flex: 1; padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 24px; font-size: 13px; font-family: inherit;
+            outline: none; background: var(--bg);
+            transition: border-color 0.2s;
+        }
+        .comment-input:focus { border-color: var(--primary); background: var(--white); }
+        .comment-send {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--primary); color: white;
+            border: none; font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; flex-shrink: 0;
+        }
+        .comment-send:hover { background: var(--primary-dark); }
+
+        /* ===== Create Modal Form ===== */
+        .form-field { margin-bottom: 20px; }
+        .form-field label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 8px;
+        }
+        .form-field input, .form-field textarea, .form-field select {
+            width: 100%; padding: 12px 14px;
+            border: 1px solid var(--border); border-radius: var(--radius-xs);
+            font-size: 14px; font-family: inherit; color: var(--text);
+            background: var(--bg); outline: none; transition: border-color 0.2s;
+        }
+        .form-field textarea { resize: vertical; min-height: 60px; }
+        .form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+            border-color: var(--primary); background: var(--white);
+        }
+        .form-chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .form-chip {
+            padding: 8px 16px; border-radius: 24px;
+            border: 1.5px solid var(--border); background: var(--white);
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .form-chip:hover { border-color: var(--primary); color: var(--primary); }
+        .form-chip.selected {
+            background: var(--primary); border-color: var(--primary); color: white;
+        }
+        .form-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+            margin-top: 8px;
+        }
+        .form-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
 
         /* ===== Toast ===== */
         .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
@@ -312,244 +679,488 @@
 
     <!-- Header -->
     <header class="header">
-        <div class="header-left">
-            <div class="header-logo">
-                <div class="paw-icon">🐾</div>
-            </div>
-            <span class="header-title">소셜</span>
+        <div class="header-logo">
+            <div class="paw-icon">🐾</div>
+            <span>멍이<em>랑</em></span>
         </div>
         <div class="header-actions">
-            <a href="뱃지.html" class="header-btn" aria-label="알림">
-                🔔<span class="notification-dot"></span>
-            </a>
-            <button class="header-btn" aria-label="검색" onclick="toggleSearch()">🔍</button>
+            <a class="header-btn" href="알림.html" aria-label="알림">🔔<span class="notification-dot"></span></a>
+            <a class="header-btn" href="설정.html" aria-label="설정">⚙️</a>
         </div>
     </header>
+
+    <!-- Social Tabs (NRC style) -->
+    <div class="social-tabs">
+        <button class="social-tab active" data-tab="feed">피드</button>
+        <button class="social-tab" data-tab="challenge">챌린지</button>
+        <button class="social-tab" data-tab="club">클럽</button>
+        <button class="social-tab" data-tab="guide">가이드 산책</button>
+    </div>
 
     <!-- Main Content -->
     <main class="content">
 
-        <!-- Search Bar (hidden by default) -->
-        <div class="search-bar" id="searchBar" style="display: none;">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="닉네임, 견종으로 검색..." />
-        </div>
+        <!-- ==================== TAB 1: 피드 ==================== -->
+        <div class="tab-panel active" id="tab-feed">
 
-        <!-- Walk Invite Banner -->
-        <div class="invite-banner animate-in" onclick="toast('초대 링크가 복사되었습니다!')">
-            <div class="invite-icon">🤝</div>
-            <div class="invite-text">
-                <h4>함께 산책해요!</h4>
-                <p>근처 산책 친구에게 초대를 보내보세요</p>
-            </div>
-            <span class="invite-arrow">→</span>
-        </div>
-
-        <!-- Friend Recommend -->
-        <div class="section-title"><h3>🐕 동네 산책 친구 추천</h3><a class="more" href="#">전체보기 →</a></div>
-        <div class="friend-scroll">
-            <div class="friend-card animate-in">
-                <div class="friend-avatar">
-                    🐕
-                    <span class="online-dot"></span>
+            <!-- Friends Weekly Leaderboard -->
+            <div class="leaderboard-card">
+                <div class="leaderboard-header">
+                    <h4>🏆 이번 주 친구 랭킹</h4>
+                    <span>2/12 ~ 2/18</span>
                 </div>
-                <h4>초코</h4>
-                <p class="breed">골든 리트리버</p>
-                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
-            </div>
-            <div class="friend-card animate-in">
-                <div class="friend-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">
-                    🐩
-                </div>
-                <h4>뽀삐</h4>
-                <p class="breed">토이 푸들</p>
-                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
-            </div>
-            <div class="friend-card animate-in">
-                <div class="friend-avatar" style="background: linear-gradient(135deg, #DBEAFE, #93C5FD);">
-                    🐕‍🦺
-                </div>
-                <h4>바둑이</h4>
-                <p class="breed">진돗개</p>
-                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
-            </div>
-            <div class="friend-card animate-in">
-                <div class="friend-avatar" style="background: linear-gradient(135deg, #EDE9FE, #C4B5FD);">
-                    🦮
-                </div>
-                <h4>모카</h4>
-                <p class="breed">시바 이누</p>
-                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
-            </div>
-            <div class="friend-card animate-in">
-                <div class="friend-avatar" style="background: linear-gradient(135deg, #FEE2E2, #FCA5A5);">
-                    🐶
-                </div>
-                <h4>콩이</h4>
-                <p class="breed">비숑 프리제</p>
-                <button class="friend-add-btn" onclick="this.textContent='요청됨'; this.style.background='var(--border)'; this.style.color='var(--text-light)';">산책 친구 추가</button>
-            </div>
-        </div>
-
-        <!-- Walk Feed -->
-        <div class="section-title"><h3>📸 산책 피드</h3><a class="more" href="#">새로고침 →</a></div>
-        <div class="feed-list">
-            <!-- Feed 1 -->
-            <article class="feed-card animate-in">
-                <div class="feed-header">
-                    <div class="feed-user-avatar">🐕</div>
-                    <div class="feed-user-info">
-                        <div class="feed-username">초코아빠</div>
-                        <div class="feed-time">30분 전 · 보라매공원</div>
+                <div class="leaderboard-list">
+                    <div class="leaderboard-row">
+                        <div class="lb-rank gold">1</div>
+                        <div class="lb-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">🐩</div>
+                        <div class="lb-info">
+                            <div class="lb-name">달이맘</div>
+                            <div class="lb-dog">토이 푸들 달이</div>
+                        </div>
+                        <div class="lb-distance">32.4 km</div>
                     </div>
-                    <button class="feed-more-btn">···</button>
+                    <div class="leaderboard-row">
+                        <div class="lb-rank silver">2</div>
+                        <div class="lb-avatar" style="background: linear-gradient(135deg, var(--primary-light), #A7F3D0);">🐕</div>
+                        <div class="lb-info">
+                            <div class="lb-name">초코아빠</div>
+                            <div class="lb-dog">골든 리트리버 초코</div>
+                        </div>
+                        <div class="lb-distance">28.7 km</div>
+                    </div>
+                    <div class="leaderboard-row me">
+                        <div class="lb-rank bronze">3</div>
+                        <div class="lb-avatar" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐶</div>
+                        <div class="lb-info">
+                            <div class="lb-name">나 (콩이엄마)</div>
+                            <div class="lb-dog">비숑 프리제 콩이</div>
+                        </div>
+                        <div class="lb-distance">21.3 km</div>
+                    </div>
                 </div>
-                <div class="feed-map-preview">
-                    <div class="feed-route-line">
-                        <svg viewBox="0 0 300 160" fill="none">
-                            <path d="M30 130 Q80 40 150 80 Q220 120 270 30" stroke="#10B981" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
-                            <circle cx="30" cy="130" r="6" fill="#10B981"/>
-                            <circle cx="270" cy="30" r="6" fill="#059669"/>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="section-title"><h3>활동 피드</h3><a class="more" href="#" onclick="toast('새로고침 완료!')">새로고침 →</a></div>
+            <div class="feed-list">
+
+                <!-- Feed 1 - with live indicator -->
+                <article class="feed-card animate-in">
+                    <div class="feed-header">
+                        <div class="feed-user-avatar">🐕</div>
+                        <div class="feed-user-info">
+                            <div class="feed-username">초코아빠 <span class="live-badge"><span class="live-dot"></span>산책 중</span></div>
+                            <div class="feed-time">방금 전 · 보라매공원</div>
+                        </div>
+                        <button class="feed-more-btn">···</button>
+                    </div>
+                    <div class="feed-map-preview">
+                        <div class="feed-route-line">
+                            <svg viewBox="0 0 300 160" fill="none">
+                                <path d="M30 130 Q80 40 150 80 Q220 120 270 30" stroke="#10B981" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
+                                <circle cx="30" cy="130" r="6" fill="#10B981"/>
+                                <circle cx="270" cy="30" r="6" fill="#059669">
+                                    <animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/>
+                                    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </div>
+                        <div class="map-placeholder">
+                            <span class="icon">🗺️</span>
+                            산책 경로
+                        </div>
+                    </div>
+                    <div class="feed-stats">
+                        <div class="feed-stat"><div class="value">4.2 <span class="unit">km</span></div><div class="label">거리</div></div>
+                        <div class="feed-stat"><div class="value">52 <span class="unit">분</span></div><div class="label">시간</div></div>
+                        <div class="feed-stat"><div class="value">210 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                    </div>
+                    <div class="feed-reactions">
+                        <button class="reaction-btn reacted" onclick="toggleReaction(this)">👏 <span class="r-count">12</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">🔥 <span class="r-count">5</span></button>
+                        <button class="reaction-btn reacted" onclick="toggleReaction(this)">❤️ <span class="r-count">8</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">👍 <span class="r-count">3</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">🐶 <span class="r-count">2</span></button>
+                    </div>
+                    <div class="feed-actions">
+                        <button class="feed-action-btn" onclick="openCommentModal('초코아빠', 8)"><span class="icon">💬</span> 8</button>
+                        <button class="feed-action-btn" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
+                        <button class="cheer-btn" onclick="toggleCheer(this)">📣 응원하기</button>
+                    </div>
+                </article>
+
+                <!-- Feed 2 -->
+                <article class="feed-card animate-in">
+                    <div class="feed-header">
+                        <div class="feed-user-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">🐩</div>
+                        <div class="feed-user-info">
+                            <div class="feed-username">달이맘</div>
+                            <div class="feed-time">1시간 전 · 한강공원</div>
+                        </div>
+                        <button class="feed-more-btn">···</button>
+                    </div>
+                    <div class="feed-map-preview">
+                        <div class="feed-route-line">
+                            <svg viewBox="0 0 300 160" fill="none">
+                                <path d="M20 80 Q100 20 150 90 Q200 150 280 60" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
+                                <circle cx="20" cy="80" r="6" fill="#3B82F6"/>
+                                <circle cx="280" cy="60" r="6" fill="#1D4ED8"/>
+                            </svg>
+                        </div>
+                        <div class="map-placeholder">
+                            <span class="icon">🗺️</span>
+                            산책 경로
+                        </div>
+                    </div>
+                    <div class="feed-stats">
+                        <div class="feed-stat"><div class="value">6.8 <span class="unit">km</span></div><div class="label">거리</div></div>
+                        <div class="feed-stat"><div class="value">1:15</div><div class="label">시간</div></div>
+                        <div class="feed-stat"><div class="value">340 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                    </div>
+                    <div class="feed-reactions">
+                        <button class="reaction-btn" onclick="toggleReaction(this)">👏 <span class="r-count">6</span></button>
+                        <button class="reaction-btn reacted" onclick="toggleReaction(this)">🔥 <span class="r-count">9</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">❤️ <span class="r-count">4</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">👍 <span class="r-count">1</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">🐶 <span class="r-count">7</span></button>
+                    </div>
+                    <div class="feed-actions">
+                        <button class="feed-action-btn" onclick="openCommentModal('달이맘', 5)"><span class="icon">💬</span> 5</button>
+                        <button class="feed-action-btn" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
+                        <button class="cheer-btn" onclick="toggleCheer(this)">📣 응원하기</button>
+                    </div>
+                </article>
+
+                <!-- Feed 3 - with live indicator -->
+                <article class="feed-card animate-in">
+                    <div class="feed-header">
+                        <div class="feed-user-avatar" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐶</div>
+                        <div class="feed-user-info">
+                            <div class="feed-username">콩이엄마 <span class="live-badge"><span class="live-dot"></span>산책 중</span></div>
+                            <div class="feed-time">10분 전 · 올림픽공원</div>
+                        </div>
+                        <button class="feed-more-btn">···</button>
+                    </div>
+                    <div class="feed-map-preview">
+                        <div class="feed-route-line">
+                            <svg viewBox="0 0 300 160" fill="none">
+                                <path d="M40 100 L100 40 L180 120 L260 50" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+                                <circle cx="40" cy="100" r="6" fill="#F59E0B"/>
+                                <circle cx="260" cy="50" r="6" fill="#D97706">
+                                    <animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/>
+                                    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </div>
+                        <div class="map-placeholder">
+                            <span class="icon">🗺️</span>
+                            산책 경로
+                        </div>
+                    </div>
+                    <div class="feed-stats">
+                        <div class="feed-stat"><div class="value">3.5 <span class="unit">km</span></div><div class="label">거리</div></div>
+                        <div class="feed-stat"><div class="value">40 <span class="unit">분</span></div><div class="label">시간</div></div>
+                        <div class="feed-stat"><div class="value">175 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                    </div>
+                    <div class="feed-reactions">
+                        <button class="reaction-btn" onclick="toggleReaction(this)">👏 <span class="r-count">3</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">🔥 <span class="r-count">2</span></button>
+                        <button class="reaction-btn reacted" onclick="toggleReaction(this)">❤️ <span class="r-count">11</span></button>
+                        <button class="reaction-btn" onclick="toggleReaction(this)">👍 <span class="r-count">5</span></button>
+                        <button class="reaction-btn reacted" onclick="toggleReaction(this)">🐶 <span class="r-count">4</span></button>
+                    </div>
+                    <div class="feed-actions">
+                        <button class="feed-action-btn" onclick="openCommentModal('콩이엄마', 3)"><span class="icon">💬</span> 3</button>
+                        <button class="feed-action-btn" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
+                        <button class="cheer-btn" onclick="toggleCheer(this)">📣 응원하기</button>
+                    </div>
+                </article>
+
+            </div>
+            <div style="height: 16px;"></div>
+        </div>
+
+        <!-- ==================== TAB 2: 챌린지 ==================== -->
+        <div class="tab-panel" id="tab-challenge">
+
+            <div class="section-title"><h3>🔥 진행 중인 챌린지</h3></div>
+
+            <!-- Challenge 1: Versus -->
+            <div class="challenge-card animate-in">
+                <div class="challenge-card-header">
+                    <span class="challenge-type versus">⚔️ 대결</span>
+                    <span class="challenge-deadline">⏰ 3일 남음</span>
+                </div>
+                <div class="challenge-title">주간 거리 대결</div>
+                <div class="challenge-participants">
+                    <div class="challenge-participant">
+                        <div class="cp-avatar" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐶</div>
+                        <div class="cp-info">
+                            <div class="cp-name">나 (콩이엄마)</div>
+                            <div class="cp-bar-track">
+                                <div class="cp-bar-fill" style="width: 65%; background: linear-gradient(90deg, var(--primary), var(--primary-dark));"></div>
+                            </div>
+                        </div>
+                        <div class="cp-value">21.3 km</div>
+                    </div>
+                    <div class="challenge-participant">
+                        <div class="cp-avatar" style="background: linear-gradient(135deg, var(--primary-light), #A7F3D0);">🐕</div>
+                        <div class="cp-info">
+                            <div class="cp-name">초코아빠</div>
+                            <div class="cp-bar-track">
+                                <div class="cp-bar-fill" style="width: 85%; background: linear-gradient(90deg, var(--secondary), var(--secondary-dark));"></div>
+                            </div>
+                        </div>
+                        <div class="cp-value">28.7 km</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 2: Streak -->
+            <div class="challenge-card animate-in">
+                <div class="challenge-card-header">
+                    <span class="challenge-type streak">🔥 연속</span>
+                    <span class="challenge-deadline">⏰ 18일 남음</span>
+                </div>
+                <div class="challenge-title">30일 연속 산책</div>
+                <div class="streak-progress">
+                    <div class="streak-ring">
+                        <svg viewBox="0 0 80 80">
+                            <circle class="ring-bg" cx="40" cy="40" r="34"/>
+                            <circle class="ring-fill" cx="40" cy="40" r="34"
+                                stroke-dasharray="213.6"
+                                stroke-dashoffset="71.2"/>
                         </svg>
+                        <div class="streak-center">
+                            12
+                            <small>/ 30일</small>
+                        </div>
                     </div>
-                    <div class="map-placeholder">
-                        <span class="icon">🗺️</span>
-                        산책 경로
-                    </div>
+                    <div class="streak-label">연속 12일째 산책 중! 💪</div>
                 </div>
-                <div class="feed-stats">
-                    <div class="feed-stat"><div class="value">4.2 <span class="unit">km</span></div><div class="label">거리</div></div>
-                    <div class="feed-stat"><div class="value">52 <span class="unit">분</span></div><div class="label">시간</div></div>
-                    <div class="feed-stat"><div class="value">210 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
-                </div>
-                <div class="feed-actions">
-                    <button class="feed-action-btn liked" onclick="toggleLike(this)"><span class="icon">❤️</span> 24</button>
-                    <button class="feed-action-btn" onclick="toast('댓글 기능 준비 중!')"><span class="icon">💬</span> 8</button>
-                    <button class="feed-action-btn" style="margin-left:auto" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
-                </div>
-            </article>
+            </div>
 
-            <!-- Feed 2 -->
-            <article class="feed-card animate-in">
-                <div class="feed-header">
-                    <div class="feed-user-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">🐩</div>
-                    <div class="feed-user-info">
-                        <div class="feed-username">달이맘</div>
-                        <div class="feed-time">1시간 전 · 한강공원</div>
-                    </div>
-                    <button class="feed-more-btn">···</button>
-                </div>
-                <div class="feed-map-preview">
-                    <div class="feed-route-line">
-                        <svg viewBox="0 0 300 160" fill="none">
-                            <path d="M20 80 Q100 20 150 90 Q200 150 280 60" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
-                            <circle cx="20" cy="80" r="6" fill="#3B82F6"/>
-                            <circle cx="280" cy="60" r="6" fill="#1D4ED8"/>
-                        </svg>
-                    </div>
-                    <div class="map-placeholder">
-                        <span class="icon">🗺️</span>
-                        산책 경로
-                    </div>
-                </div>
-                <div class="feed-stats">
-                    <div class="feed-stat"><div class="value">6.8 <span class="unit">km</span></div><div class="label">거리</div></div>
-                    <div class="feed-stat"><div class="value">1:15</div><div class="label">시간</div></div>
-                    <div class="feed-stat"><div class="value">340 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
-                </div>
-                <div class="feed-actions">
-                    <button class="feed-action-btn" onclick="toggleLike(this)"><span class="icon">🤍</span> 18</button>
-                    <button class="feed-action-btn" onclick="toast('댓글 기능 준비 중!')"><span class="icon">💬</span> 5</button>
-                    <button class="feed-action-btn" style="margin-left:auto" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
-                </div>
-            </article>
+            <!-- CTA Button -->
+            <button class="cta-btn" onclick="openModal('challengeCreateModal')">
+                + 새 챌린지 만들기
+            </button>
 
-            <!-- Feed 3 -->
-            <article class="feed-card animate-in">
-                <div class="feed-header">
-                    <div class="feed-user-avatar" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐶</div>
-                    <div class="feed-user-info">
-                        <div class="feed-username">콩이엄마</div>
-                        <div class="feed-time">3시간 전 · 올림픽공원</div>
-                    </div>
-                    <button class="feed-more-btn">···</button>
+            <!-- Completed Challenges -->
+            <div class="section-title"><h3>✅ 완료한 챌린지</h3></div>
+
+            <div class="challenge-card animate-in" style="opacity: 0.85;">
+                <div class="challenge-card-header">
+                    <span class="challenge-type completed">✅ 완료</span>
+                    <span class="completed-badge">🎉 승리!</span>
                 </div>
-                <div class="feed-map-preview">
-                    <div class="feed-route-line">
-                        <svg viewBox="0 0 300 160" fill="none">
-                            <path d="M40 100 L100 40 L180 120 L260 50" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
-                            <circle cx="40" cy="100" r="6" fill="#F59E0B"/>
-                            <circle cx="260" cy="50" r="6" fill="#D97706"/>
+                <div class="challenge-title">주간 걸음 수 대결</div>
+                <div class="challenge-participants">
+                    <div class="challenge-participant">
+                        <div class="cp-avatar" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐶</div>
+                        <div class="cp-info">
+                            <div class="cp-name">나 (콩이엄마) 🏆</div>
+                            <div class="cp-bar-track">
+                                <div class="cp-bar-fill" style="width: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark));"></div>
+                            </div>
+                        </div>
+                        <div class="cp-value">45.2 km</div>
+                    </div>
+                    <div class="challenge-participant">
+                        <div class="cp-avatar" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">🐩</div>
+                        <div class="cp-info">
+                            <div class="cp-name">달이맘</div>
+                            <div class="cp-bar-track">
+                                <div class="cp-bar-fill" style="width: 82%; background: var(--border);"></div>
+                            </div>
+                        </div>
+                        <div class="cp-value">37.1 km</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-card animate-in" style="opacity: 0.85;">
+                <div class="challenge-card-header">
+                    <span class="challenge-type completed">✅ 완료</span>
+                    <span class="completed-badge">🎉 달성!</span>
+                </div>
+                <div class="challenge-title">7일 연속 산책 챌린지</div>
+                <div class="streak-progress">
+                    <div class="streak-ring">
+                        <svg viewBox="0 0 80 80">
+                            <circle class="ring-bg" cx="40" cy="40" r="34"/>
+                            <circle class="ring-fill" cx="40" cy="40" r="34"
+                                stroke-dasharray="213.6"
+                                stroke-dashoffset="0"
+                                style="stroke: var(--primary);"/>
                         </svg>
+                        <div class="streak-center" style="color: var(--primary-dark);">
+                            7
+                            <small>/ 7일</small>
+                        </div>
                     </div>
-                    <div class="map-placeholder">
-                        <span class="icon">🗺️</span>
-                        산책 경로
-                    </div>
+                    <div class="streak-label">7일 연속 산책 달성 완료!</div>
                 </div>
-                <div class="feed-stats">
-                    <div class="feed-stat"><div class="value">3.5 <span class="unit">km</span></div><div class="label">거리</div></div>
-                    <div class="feed-stat"><div class="value">40 <span class="unit">분</span></div><div class="label">시간</div></div>
-                    <div class="feed-stat"><div class="value">175 <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
-                </div>
-                <div class="feed-actions">
-                    <button class="feed-action-btn" onclick="toggleLike(this)"><span class="icon">🤍</span> 12</button>
-                    <button class="feed-action-btn" onclick="toast('댓글 기능 준비 중!')"><span class="icon">💬</span> 3</button>
-                    <button class="feed-action-btn" style="margin-left:auto" onclick="toast('공유 링크 복사됨!')"><span class="icon">🔗</span></button>
-                </div>
-            </article>
+            </div>
+
+            <div style="height: 16px;"></div>
         </div>
 
-        <!-- Walk Meeting Board -->
-        <div class="section-title"><h3>📋 산책 모임 게시판</h3><a class="more" href="#">글쓰기 →</a></div>
-        <div class="meeting-list">
-            <div class="meeting-item animate-in">
-                <div class="meeting-icon">🌅</div>
-                <div class="meeting-info">
-                    <div class="meeting-title">주말 아침 한강 산책 같이해요!</div>
-                    <div class="meeting-meta">
-                        <span class="meeting-tag">📍 여의도 한강공원</span>
-                        <span class="meeting-tag">📅 2/15 (토) 오전 8시</span>
+        <!-- ==================== TAB 3: 클럽 ==================== -->
+        <div class="tab-panel" id="tab-club">
+
+            <div class="section-title"><h3>🏠 내 클럽</h3></div>
+
+            <div class="club-card animate-in">
+                <div class="club-icon" style="background: linear-gradient(135deg, #DBEAFE, #93C5FD);">🌊</div>
+                <div class="club-info">
+                    <div class="club-name">한강 산책 모임</div>
+                    <div class="club-meta">
+                        <span class="club-meta-item">👥 128명</span>
+                        <span class="club-meta-item"><span class="club-activity-dot high"></span> 활동 활발</span>
                     </div>
                 </div>
-                <span class="meeting-members">4/8</span>
+                <button class="club-join-btn joined" onclick="toast('이미 가입된 클럽입니다')">가입됨</button>
             </div>
-            <div class="meeting-item animate-in">
-                <div class="meeting-icon" style="background: var(--accent-light);">🐕</div>
-                <div class="meeting-info">
-                    <div class="meeting-title">대형견 산책 모임 (골든, 래브라도)</div>
-                    <div class="meeting-meta">
-                        <span class="meeting-tag">📍 보라매공원</span>
-                        <span class="meeting-tag">📅 2/13 (목) 오후 5시</span>
+
+            <div class="club-card animate-in">
+                <div class="club-icon" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">🐕</div>
+                <div class="club-info">
+                    <div class="club-name">대형견 아빠들</div>
+                    <div class="club-meta">
+                        <span class="club-meta-item">👥 64명</span>
+                        <span class="club-meta-item"><span class="club-activity-dot high"></span> 활동 활발</span>
                     </div>
                 </div>
-                <span class="meeting-members">6/10</span>
+                <button class="club-join-btn joined" onclick="toast('이미 가입된 클럽입니다')">가입됨</button>
             </div>
-            <div class="meeting-item animate-in">
-                <div class="meeting-icon" style="background: #EDE9FE;">🌙</div>
-                <div class="meeting-info">
-                    <div class="meeting-title">퇴근 후 야간 산책 번개</div>
-                    <div class="meeting-meta">
-                        <span class="meeting-tag">📍 서초구 반포천</span>
-                        <span class="meeting-tag">📅 매주 수요일 저녁 8시</span>
+
+            <div class="section-title"><h3>🔍 추천 클럽</h3></div>
+
+            <div class="club-card animate-in">
+                <div class="club-icon" style="background: linear-gradient(135deg, #FCE7F3, #F9A8D4);">🐩</div>
+                <div class="club-info">
+                    <div class="club-name">소형견 산책 모임</div>
+                    <div class="club-meta">
+                        <span class="club-meta-item">👥 256명</span>
+                        <span class="club-meta-item"><span class="club-activity-dot high"></span> 활동 활발</span>
                     </div>
                 </div>
-                <span class="meeting-members">3/6</span>
+                <button class="club-join-btn join" onclick="joinClub(this)">가입</button>
             </div>
-            <div class="meeting-item animate-in">
-                <div class="meeting-icon" style="background: #FEE2E2;">🐾</div>
-                <div class="meeting-info">
-                    <div class="meeting-title">소형견 플레이데이트 모집</div>
-                    <div class="meeting-meta">
-                        <span class="meeting-tag">📍 마포구 상암 월드컵공원</span>
-                        <span class="meeting-tag">📅 2/16 (일) 오후 2시</span>
+
+            <div class="club-card animate-in">
+                <div class="club-icon" style="background: linear-gradient(135deg, #D1FAE5, #A7F3D0);">🌅</div>
+                <div class="club-info">
+                    <div class="club-name">아침 산책러 모임</div>
+                    <div class="club-meta">
+                        <span class="club-meta-item">👥 89명</span>
+                        <span class="club-meta-item"><span class="club-activity-dot medium"></span> 활동 보통</span>
                     </div>
                 </div>
-                <span class="meeting-members">5/8</span>
+                <button class="club-join-btn join" onclick="joinClub(this)">가입</button>
             </div>
+
+            <div class="club-card animate-in">
+                <div class="club-icon" style="background: linear-gradient(135deg, #EDE9FE, #C4B5FD);">🌙</div>
+                <div class="club-info">
+                    <div class="club-name">야간 산책 동호회</div>
+                    <div class="club-meta">
+                        <span class="club-meta-item">👥 45명</span>
+                        <span class="club-meta-item"><span class="club-activity-dot medium"></span> 활동 보통</span>
+                    </div>
+                </div>
+                <button class="club-join-btn join" onclick="joinClub(this)">가입</button>
+            </div>
+
+            <div class="club-card animate-in">
+                <div class="club-icon" style="background: linear-gradient(135deg, #FEE2E2, #FCA5A5);">🏃</div>
+                <div class="club-info">
+                    <div class="club-name">런닝 + 산책 크루</div>
+                    <div class="club-meta">
+                        <span class="club-meta-item">👥 112명</span>
+                        <span class="club-meta-item"><span class="club-activity-dot high"></span> 활동 활발</span>
+                    </div>
+                </div>
+                <button class="club-join-btn join" onclick="joinClub(this)">가입</button>
+            </div>
+
+            <button class="cta-btn" onclick="openModal('clubCreateModal')">
+                + 클럽 만들기
+            </button>
+
+            <div style="height: 16px;"></div>
         </div>
 
-        <div style="height: 24px;"></div>
+        <!-- ==================== TAB 4: 가이드 산책 ==================== -->
+        <div class="tab-panel" id="tab-guide">
+
+            <!-- Featured Walk -->
+            <div class="featured-walk" onclick="location.href='멍이랑_메인페이지_시안.html'">
+                <div class="featured-walk-bg">
+                    <span class="featured-walk-icon">🐾</span>
+                    <span class="featured-walk-badge">추천 코스</span>
+                    <div class="featured-walk-title">초보자를 위한 15분 산책</div>
+                    <div class="featured-walk-desc">
+                        <span>🟢 초급</span>
+                        <span>⏱️ 15분</span>
+                        <span>📏 1.2km</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Walk Programs Grid -->
+            <div class="section-title"><h3>🗺️ 산책 프로그램</h3></div>
+            <div class="walk-grid">
+
+                <div class="walk-program-card animate-in" onclick="location.href='멍이랑_메인페이지_시안.html'">
+                    <div class="walk-program-thumb" style="background: linear-gradient(135deg, #DBEAFE, #BFDBFE);">🌊</div>
+                    <div class="walk-program-info">
+                        <div class="walk-program-title">한강 따라 5km 코스</div>
+                        <div class="walk-program-meta">
+                            <span class="walk-difficulty intermediate">중급</span>
+                            <span class="walk-duration">50분</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="walk-program-card animate-in" onclick="location.href='멍이랑_메인페이지_시안.html'">
+                    <div class="walk-program-thumb" style="background: linear-gradient(135deg, #D1FAE5, #A7F3D0);">🌿</div>
+                    <div class="walk-program-info">
+                        <div class="walk-program-title">산책로 힐링 30분</div>
+                        <div class="walk-program-meta">
+                            <span class="walk-difficulty beginner">초급</span>
+                            <span class="walk-duration">30분</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="walk-program-card animate-in" onclick="location.href='멍이랑_메인페이지_시안.html'">
+                    <div class="walk-program-thumb" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">☀️</div>
+                    <div class="walk-program-info">
+                        <div class="walk-program-title">활력 충전 아침 산책</div>
+                        <div class="walk-program-meta">
+                            <span class="walk-difficulty beginner">초급</span>
+                            <span class="walk-duration">20분</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="walk-program-card animate-in" onclick="location.href='멍이랑_메인페이지_시안.html'">
+                    <div class="walk-program-thumb" style="background: linear-gradient(135deg, #EDE9FE, #DDD6FE);">🌙</div>
+                    <div class="walk-program-info">
+                        <div class="walk-program-title">저녁 산책 루틴</div>
+                        <div class="walk-program-meta">
+                            <span class="walk-difficulty all">모든 레벨</span>
+                            <span class="walk-duration">25분</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="height: 16px;"></div>
+        </div>
+
     </main>
 
     <!-- Bottom Nav -->
@@ -557,42 +1168,262 @@
         <a href="멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
         <a href="소셜.html" class="nav-item active"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
         <a href="멍이랑_메인페이지_시안.html" class="nav-item center-btn"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></a>
-        <a href="랭킹.html" class="nav-item"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></a>
+        <a href="지도.html" class="nav-item"><span class="nav-icon">🗺️</span><span class="nav-label">지도</span></a>
         <a href="마이페이지.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
     </nav>
+
+    <!-- ===== Modal: Comment ===== -->
+    <div class="modal-overlay" id="commentModal">
+        <div class="modal-container" style="max-height:70vh;">
+            <div class="modal-header">
+                <h3 id="commentModalTitle">💬 댓글</h3>
+                <button class="modal-close" onclick="closeModal('commentModal')">×</button>
+            </div>
+            <div class="modal-body" id="commentList">
+                <!-- Populated by JS -->
+            </div>
+            <div class="comment-input-row">
+                <input type="text" class="comment-input" id="commentInput" placeholder="댓글을 입력하세요...">
+                <button class="comment-send" onclick="submitComment()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Challenge Create ===== -->
+    <div class="modal-overlay" id="challengeCreateModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🏅 새 챌린지 만들기</h3>
+                <button class="modal-close" onclick="closeModal('challengeCreateModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-field">
+                    <label>챌린지 유형</label>
+                    <div class="form-chip-group">
+                        <button class="form-chip selected" onclick="selectChip(this)">⚔️ 거리 대결</button>
+                        <button class="form-chip" onclick="selectChip(this)">🔥 연속 산책</button>
+                        <button class="form-chip" onclick="selectChip(this)">🎯 월간 목표</button>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>챌린지 이름</label>
+                    <input type="text" placeholder="예: 주간 거리 대결">
+                </div>
+                <div class="form-field">
+                    <label>목표 설정</label>
+                    <input type="text" placeholder="예: 30km">
+                </div>
+                <div class="form-field">
+                    <label>기간</label>
+                    <div class="form-chip-group">
+                        <button class="form-chip selected" onclick="selectChip(this)">1주</button>
+                        <button class="form-chip" onclick="selectChip(this)">2주</button>
+                        <button class="form-chip" onclick="selectChip(this)">1개월</button>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>친구 초대</label>
+                    <input type="text" placeholder="닉네임으로 검색...">
+                </div>
+                <button class="form-submit" onclick="toast('챌린지가 생성되었습니다! 🎉'); closeModal('challengeCreateModal')">챌린지 시작하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Club Create ===== -->
+    <div class="modal-overlay" id="clubCreateModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🏠 클럽 만들기</h3>
+                <button class="modal-close" onclick="closeModal('clubCreateModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-field">
+                    <label>클럽 이름</label>
+                    <input type="text" placeholder="예: 우리 동네 산책 모임">
+                </div>
+                <div class="form-field">
+                    <label>클럽 설명</label>
+                    <textarea placeholder="클럽을 소개해주세요..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label>클럽 유형</label>
+                    <div class="form-chip-group">
+                        <button class="form-chip selected" onclick="selectChip(this)">🏘️ 동네</button>
+                        <button class="form-chip" onclick="selectChip(this)">🐕 견종</button>
+                        <button class="form-chip" onclick="selectChip(this)">🏃 스타일</button>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>클럽 아이콘</label>
+                    <div class="form-chip-group">
+                        <button class="form-chip selected" onclick="selectChip(this)" style="font-size:18px;">🌊</button>
+                        <button class="form-chip" onclick="selectChip(this)" style="font-size:18px;">🌿</button>
+                        <button class="form-chip" onclick="selectChip(this)" style="font-size:18px;">🐾</button>
+                        <button class="form-chip" onclick="selectChip(this)" style="font-size:18px;">🌅</button>
+                        <button class="form-chip" onclick="selectChip(this)" style="font-size:18px;">⛰️</button>
+                        <button class="form-chip" onclick="selectChip(this)" style="font-size:18px;">🌙</button>
+                    </div>
+                </div>
+                <button class="form-submit" onclick="toast('클럽이 생성되었습니다! 🎉'); closeModal('clubCreateModal')">클럽 만들기</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast -->
     <div class="toast-el" id="toastEl"></div>
 
     <script>
-    // Toggle search bar
-    function toggleSearch() {
-        const sb = document.getElementById('searchBar');
-        if (sb.style.display === 'none') {
-            sb.style.display = 'flex';
-            sb.querySelector('input').focus();
-        } else {
-            sb.style.display = 'none';
-        }
-    }
+    // ===== Tab Switching =====
+    const tabs = document.querySelectorAll('.social-tab');
+    const panels = document.querySelectorAll('.tab-panel');
 
-    // Toggle like
-    function toggleLike(btn) {
-        const isLiked = btn.classList.contains('liked');
-        const numMatch = btn.textContent.match(/\d+/);
-        let count = numMatch ? parseInt(numMatch[0]) : 0;
-        if (isLiked) {
-            btn.classList.remove('liked');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+
+            // Update tab active state
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Show/hide panels
+            panels.forEach(p => {
+                p.classList.remove('active');
+                if (p.id === 'tab-' + target) {
+                    p.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // ===== Reaction Toggle =====
+    function toggleReaction(btn) {
+        const countEl = btn.querySelector('.r-count');
+        let count = parseInt(countEl.textContent);
+
+        if (btn.classList.contains('reacted')) {
+            btn.classList.remove('reacted');
             count--;
-            btn.innerHTML = `<span class="icon">🤍</span> ${count}`;
         } else {
-            btn.classList.add('liked');
+            btn.classList.add('reacted');
             count++;
-            btn.innerHTML = `<span class="icon">❤️</span> ${count}`;
+            // Small pop animation
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => { btn.style.transform = ''; }, 150);
+        }
+        countEl.textContent = count;
+    }
+
+    // ===== Cheer Button =====
+    function toggleCheer(btn) {
+        if (btn.classList.contains('cheered')) {
+            btn.classList.remove('cheered');
+            btn.textContent = '📣 응원하기';
+        } else {
+            btn.classList.add('cheered');
+            btn.textContent = '✅ 응원 완료!';
+            toast('응원을 보냈습니다! 🎉');
         }
     }
 
-    // Toast
+    // ===== Club Join =====
+    function joinClub(btn) {
+        if (btn.classList.contains('join')) {
+            btn.classList.remove('join');
+            btn.classList.add('joined');
+            btn.textContent = '가입됨';
+            toast('클럽에 가입했습니다!');
+        } else {
+            btn.classList.remove('joined');
+            btn.classList.add('join');
+            btn.textContent = '가입';
+            toast('클럽에서 탈퇴했습니다');
+        }
+    }
+
+    // ===== Modal Open/Close =====
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => { modal.classList.add('show'); });
+        });
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('show');
+        setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = ''; }, 350);
+    }
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(this.id);
+        });
+    });
+
+    // ===== Comment Modal =====
+    const commentData = {
+        '초코아빠': [
+            { name: '달이맘', avatar: '🐩', text: '초코 오늘도 열심히 산책했네요! 👏', time: '10분 전' },
+            { name: '콩이엄마', avatar: '🐶', text: '보라매공원 코스 좋죠~ 우리도 자주 가요', time: '25분 전' },
+            { name: '뽀삐아빠', avatar: '🐕', text: '대단해요! 4km 넘게 걸으셨네', time: '1시간 전' }
+        ],
+        '달이맘': [
+            { name: '초코아빠', avatar: '🐕', text: '한강공원 코스 어디서 시작하셨어요?', time: '30분 전' },
+            { name: '뽀삐아빠', avatar: '🐕', text: '6.8km 대단하다! 💪', time: '45분 전' }
+        ],
+        '콩이엄마': [
+            { name: '달이맘', avatar: '🐩', text: '콩이 오늘도 힘내서 산책하네요!', time: '5분 전' },
+            { name: '초코아빠', avatar: '🐕', text: '올림픽공원 좋아요~ 같이 걸어요', time: '15분 전' },
+            { name: '뽀삐아빠', avatar: '🐕', text: '화이팅! 🔥', time: '20분 전' }
+        ]
+    };
+
+    function openCommentModal(username, count) {
+        document.getElementById('commentModalTitle').textContent = '💬 댓글 ' + count + '개';
+        const list = document.getElementById('commentList');
+        const comments = commentData[username] || [];
+        let html = '';
+        comments.forEach(c => {
+            html += '<div class="comment-item">';
+            html += '<div class="comment-avatar">' + c.avatar + '</div>';
+            html += '<div class="comment-body">';
+            html += '<div class="comment-name">' + c.name + '</div>';
+            html += '<div class="comment-text">' + c.text + '</div>';
+            html += '<div class="comment-time">' + c.time + '</div>';
+            html += '</div></div>';
+        });
+        list.innerHTML = html;
+        document.getElementById('commentInput').value = '';
+        openModal('commentModal');
+    }
+
+    function submitComment() {
+        const input = document.getElementById('commentInput');
+        const text = input.value.trim();
+        if (!text) return;
+        const list = document.getElementById('commentList');
+        const html = '<div class="comment-item">' +
+            '<div class="comment-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);">😊</div>' +
+            '<div class="comment-body">' +
+            '<div class="comment-name">나</div>' +
+            '<div class="comment-text">' + text.replace(/</g,'&lt;') + '</div>' +
+            '<div class="comment-time">방금 전</div>' +
+            '</div></div>';
+        list.innerHTML += html;
+        input.value = '';
+        list.scrollTop = list.scrollHeight;
+        toast('댓글이 등록되었습니다');
+    }
+
+    // ===== Chip Selection =====
+    function selectChip(chip) {
+        const group = chip.parentElement;
+        group.querySelectorAll('.form-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+    }
+
+    // ===== Toast =====
     let toastTimer;
     function toast(msg) {
         const el = document.getElementById('toastEl');

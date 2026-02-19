@@ -45,7 +45,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== Header ===== */
+        /* ===== Common Header ===== */
         .header {
             position: sticky; top: 0; z-index: 100;
             background: var(--white);
@@ -54,13 +54,16 @@
             height: var(--header-height);
             border-bottom: 1px solid var(--border);
         }
-        .header-title { font-size: 20px; font-weight: 800; }
+        .header-title {
+            font-size: 20px; font-weight: 800;
+        }
         .header-actions { display: flex; gap: 8px; }
         .header-btn {
             width: 36px; height: 36px; border-radius: 50%; border: none;
             background: var(--bg); font-size: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             position: relative; transition: background 0.2s; text-decoration: none;
+            color: inherit;
         }
         .header-btn:hover { background: var(--border); }
 
@@ -84,7 +87,7 @@
         }
         .profile-header {
             display: flex; align-items: center; gap: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .profile-avatar {
             width: 64px; height: 64px; border-radius: 50%;
@@ -94,37 +97,153 @@
             box-shadow: 0 4px 12px rgba(16,185,129,0.2);
         }
         .profile-info { flex: 1; }
+        .profile-name-row {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap;
+        }
         .profile-name { font-size: 20px; font-weight: 800; }
-        .profile-id { font-size: 12px; color: var(--text-light); margin-top: 2px; }
-        .profile-edit-btn {
-            padding: 8px 16px;
+        .title-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            color: var(--primary-dark);
+            white-space: nowrap;
+        }
+        .profile-sub-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 4px;
+        }
+        .profile-id { font-size: 12px; color: var(--text-light); }
+        .profile-status { font-size: 12px; color: var(--text-secondary); }
+        .profile-actions {
+            display: flex; gap: 8px;
+            flex-shrink: 0;
+        }
+        .profile-edit-btn,
+        .title-change-btn {
+            padding: 8px 14px;
             background: var(--bg); border: 1px solid var(--border);
             border-radius: var(--radius-xs);
             font-size: 12px; font-weight: 600; font-family: inherit;
             color: var(--text-secondary); cursor: pointer;
             transition: all 0.2s;
         }
-        .profile-edit-btn:hover { background: var(--border); }
+        .profile-edit-btn:hover,
+        .title-change-btn:hover { background: var(--border); }
+        .title-change-btn {
+            background: rgba(16,185,129,0.08);
+            border-color: rgba(16,185,129,0.2);
+            color: var(--primary-dark);
+        }
+        .title-change-btn:hover { background: rgba(16,185,129,0.15); }
+
+        /* ===== Running Grade Section ===== */
+        .grade-card {
+            margin: 0 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, #065F46, #047857, #059669);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .grade-card::before {
+            content: '';
+            position: absolute; top: -30px; right: -30px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .grade-card::after {
+            content: '';
+            position: absolute; bottom: -20px; left: -20px;
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .grade-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+            position: relative; z-index: 1;
+        }
+        .grade-current {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .grade-icon {
+            font-size: 36px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .grade-info h4 {
+            font-size: 18px; font-weight: 800;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .grade-info .grade-level {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2px;
+        }
+        .grade-total {
+            text-align: right;
+            position: relative; z-index: 1;
+        }
+        .grade-total .total-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+        .grade-total .total-value {
+            font-size: 22px; font-weight: 800;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .grade-total .total-unit {
+            font-size: 13px; font-weight: 500;
+        }
+        .grade-progress-section {
+            position: relative; z-index: 1;
+        }
+        .grade-progress-bar {
+            width: 100%; height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .grade-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FCD34D, #F59E0B);
+            border-radius: 10px;
+            transition: width 1s ease;
+            box-shadow: 0 0 8px rgba(252, 211, 77, 0.4);
+        }
+        .grade-progress-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            display: flex; justify-content: space-between;
+        }
 
         /* ===== Pet Profile Cards (Horizontal Scroll) ===== */
         .pet-scroll {
             display: flex; gap: 12px;
             overflow-x: auto; scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch; scrollbar-width: none;
-            padding-bottom: 4px;
+            padding: 0 16px 4px;
         }
         .pet-scroll::-webkit-scrollbar { display: none; }
         .pet-profile-card {
             min-width: 260px; flex-shrink: 0;
-            background: var(--bg);
+            background: var(--white);
             border-radius: var(--radius-sm);
             padding: 16px;
             scroll-snap-align: start;
-            border: 2px solid transparent;
+            border: 2px solid var(--border);
             cursor: pointer; transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
         .pet-profile-card.selected { border-color: var(--primary); background: var(--primary-light); }
-        .pet-profile-card:hover { border-color: var(--primary); }
+        .pet-profile-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
         .pet-profile-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .pet-profile-avatar {
             width: 52px; height: 52px; border-radius: 50%;
@@ -141,101 +260,24 @@
         }
         .pet-stat-mini {
             text-align: center;
-            background: var(--white);
+            background: var(--bg);
             border-radius: var(--radius-xs);
             padding: 8px 4px;
         }
+        .pet-profile-card.selected .pet-stat-mini { background: var(--white); }
         .pet-stat-mini .value { font-size: 14px; font-weight: 700; color: var(--primary-dark); }
         .pet-stat-mini .label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+        .pet-profile-card .photo-hint {
+            display: flex; align-items: center; justify-content: center;
+            gap: 4px; margin-top: 10px;
+            font-size: 11px; color: var(--text-light);
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .pet-profile-card.selected .photo-hint { border-top-color: rgba(16,185,129,0.2); }
 
         /* ===== Walk Record Section ===== */
-        .record-segment {
-            display: flex;
-            background: var(--white);
-            margin: 0 16px;
-            border-radius: var(--radius-sm);
-            padding: 4px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-        }
-        .record-seg-btn {
-            flex: 1; padding: 9px;
-            text-align: center;
-            font-size: 13px; font-weight: 600;
-            color: var(--text-secondary);
-            border: none; background: none;
-            border-radius: var(--radius-xs);
-            font-family: inherit; cursor: pointer;
-            transition: all 0.25s;
-        }
-        .record-seg-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
-        }
-
-        /* ===== Calendar ===== */
-        .calendar-card {
-            margin: 12px 16px 0;
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-        }
-        .cal-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        .cal-header h4 { font-size: 15px; font-weight: 700; }
-        .cal-nav { display: flex; gap: 8px; }
-        .cal-nav-btn {
-            width: 28px; height: 28px; border-radius: 50%;
-            border: 1px solid var(--border); background: var(--white);
-            font-size: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-        }
-        .cal-nav-btn:hover { background: var(--bg); }
-        .cal-weekdays {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            gap: 0; margin-bottom: 8px;
-        }
-        .cal-weekday {
-            text-align: center;
-            font-size: 11px; font-weight: 600;
-            color: var(--text-light);
-            padding: 4px 0;
-        }
-        .cal-weekday:first-child { color: var(--danger); }
-        .cal-weekday:last-child { color: var(--secondary); }
-        .cal-days {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-        }
-        .cal-day {
-            aspect-ratio: 1;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 500;
-            border-radius: 50%;
-            position: relative; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .cal-day:hover { background: var(--bg); }
-        .cal-day.empty { pointer-events: none; }
-        .cal-day.today { background: var(--primary-light); font-weight: 700; color: var(--primary-dark); }
-        .cal-day.walked::after {
-            content: '';
-            position: absolute; bottom: 4px;
-            width: 6px; height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-        }
-        .cal-day.future { color: var(--text-light); }
-
-        /* ===== Recent Records ===== */
-        .recent-records { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+        .recent-records { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
         .record-item {
             display: flex; align-items: center; gap: 14px;
             padding: 14px;
@@ -261,11 +303,58 @@
         .record-meta span strong { color: var(--text); }
         .record-arrow { font-size: 16px; color: var(--text-light); }
 
+        /* More records expandable */
+        .more-records-btn {
+            display: flex; align-items: center; justify-content: center;
+            padding: 12px;
+            margin: 12px 16px 0;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
+            font-family: inherit;
+            gap: 6px;
+            width: calc(100% - 32px);
+        }
+        .more-records-btn:hover { background: var(--bg); color: var(--primary); }
+
+        .expanded-records {
+            display: none;
+            padding: 0 16px;
+            flex-direction: column; gap: 10px;
+        }
+        .expanded-records.show { display: flex; }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px 0;
+            display: none;
+        }
+        .filter-tabs.show { display: flex; }
+        .filter-tab {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .filter-tab:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
         /* ===================================================
            BADGE SECTION - Apple Fitness / Pikmin Bloom Style
            =================================================== */
 
-        /* Badge Section Container */
         .badge-section {
             margin: 0 16px;
             padding: 20px;
@@ -296,7 +385,6 @@
         }
         .badge-view-all:hover { color: var(--primary-dark); }
 
-        /* --- In Progress Badges --- */
         .badge-subsection { margin-bottom: 20px; }
         .badge-subsection:last-child { margin-bottom: 0; }
         .badge-subsection-title {
@@ -317,7 +405,6 @@
         }
         .badge-progress-scroll::-webkit-scrollbar { display: none; }
 
-        /* In-progress badge card */
         .badge-progress-card {
             min-width: 180px; flex-shrink: 0;
             background: linear-gradient(145deg, var(--bg), var(--white));
@@ -406,7 +493,6 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 32px;
             position: relative;
-            /* Apple Fitness glow effect */
             box-shadow:
                 0 0 15px rgba(16,185,129,0.3),
                 0 0 30px rgba(16,185,129,0.15),
@@ -519,36 +605,6 @@
         .premium-price .price { font-size: 16px; font-weight: 700; color: #FCD34D; }
         .premium-price .period { font-size: 11px; color: #A5B4FC; }
 
-        /* ===== Menu List ===== */
-        .menu-list {
-            margin: 20px 16px 0;
-            background: var(--white);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-        }
-        .menu-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px 18px;
-            border-bottom: 1px solid rgba(229,231,235,0.5);
-            cursor: pointer; transition: background 0.2s;
-            text-decoration: none; color: inherit;
-        }
-        .menu-item:last-child { border-bottom: none; }
-        .menu-item:hover { background: var(--bg); }
-        .menu-icon {
-            width: 36px; height: 36px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; flex-shrink: 0;
-            background: var(--bg);
-        }
-        .menu-item .menu-label { flex: 1; font-size: 14px; font-weight: 500; }
-        .menu-item .menu-arrow { font-size: 14px; color: var(--text-light); }
-        .menu-item .menu-value { font-size: 12px; color: var(--text-light); margin-right: 4px; }
-        .menu-item.danger .menu-label { color: var(--danger); }
-        .menu-item.danger .menu-icon { background: rgba(239,68,68,0.08); }
-
         /* ===== Bottom Nav ===== */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -598,135 +654,455 @@
             height: 8px;
             background: var(--bg);
         }
+
+        /* ===== Full-screen Modal (shared) ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none; align-items: flex-end; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal-container {
+            width: 100%; max-width: 480px;
+            max-height: 92vh;
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column;
+        }
+        .modal-overlay.show .modal-container { transform: translateY(0); }
+
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .modal-header h3 {
+            font-size: 18px; font-weight: 800;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: none; background: var(--bg);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: var(--border); }
+
+        .modal-body {
+            flex: 1; overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== Photo Archive Modal ===== */
+        .archive-month-label {
+            font-size: 15px; font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .archive-month-label:first-child { margin-top: 0; }
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+        .archive-photo {
+            aspect-ratio: 1;
+            border-radius: var(--radius-xs);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 11px; color: white; font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        .archive-photo .photo-date {
+            position: absolute; bottom: 6px; left: 6px;
+            font-size: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 6px; border-radius: 4px;
+            color: white;
+        }
+        .archive-photo .photo-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        /* ===== Title Selection Modal ===== */
+        .title-selector {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .title-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .title-option:hover { border-color: var(--primary); background: rgba(16,185,129,0.04); }
+        .title-option.selected {
+            border-color: var(--primary);
+            background: rgba(16,185,129,0.06);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        .title-option .title-icon { font-size: 22px; }
+        .title-option .title-name {
+            font-size: 14px; font-weight: 600;
+            flex: 1;
+        }
+        .title-option .title-desc {
+            font-size: 11px; color: var(--text-light);
+            margin-top: 2px;
+        }
+        .title-option .title-check {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: white;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .title-option.selected .title-check {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .title-option.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .title-option.locked .title-name {
+            color: var(--text-light);
+        }
+        .title-option .title-info {
+            flex: 1; min-width: 0;
+        }
+        .title-apply-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+            margin-top: 16px;
+        }
+        .title-apply-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+
+        /* ===== Profile Edit Modal ===== */
+        .edit-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+        .edit-tab {
+            flex: 1; padding: 14px;
+            text-align: center;
+            font-size: 14px; font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer; transition: all 0.2s;
+            border: none; background: none;
+            font-family: inherit;
+            position: relative;
+        }
+        .edit-tab.active {
+            color: var(--primary);
+        }
+        .edit-tab.active::after {
+            content: '';
+            position: absolute; bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .edit-tab-content { display: none; }
+        .edit-tab-content.active { display: block; }
+
+        .edit-field {
+            margin-bottom: 20px;
+        }
+        .edit-field label {
+            display: block;
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .edit-field input,
+        .edit-field textarea,
+        .edit-field select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 14px; font-family: inherit;
+            color: var(--text);
+            background: var(--bg);
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .edit-field textarea {
+            resize: vertical; min-height: 60px;
+        }
+        .edit-field input:focus,
+        .edit-field textarea:focus,
+        .edit-field select:focus {
+            border-color: var(--primary);
+            background: var(--white);
+        }
+
+        /* Icon selector */
+        .icon-selector {
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .icon-option {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            font-size: 24px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .icon-option:hover { border-color: var(--primary); background: var(--primary-light); }
+        .icon-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+        }
+
+        /* Pet edit list */
+        .pet-edit-card {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .pet-edit-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 14px;
+        }
+        .pet-edit-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .pet-edit-header h4 { font-size: 15px; font-weight: 700; }
+        .pet-edit-btn {
+            margin-left: auto;
+            padding: 6px 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .pet-edit-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .pet-edit-fields {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .pet-edit-field label {
+            display: block;
+            font-size: 11px; font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+        .pet-edit-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-family: inherit;
+            color: var(--text);
+            background: var(--white);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .pet-edit-field input:focus { border-color: var(--primary); }
+
+        .edit-save-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+            margin-top: 8px;
+        }
+        .edit-save-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+
+        /* ===== Walk History Expanded Modal ===== */
+        .history-filter-row {
+            display: flex; gap: 8px; margin-bottom: 16px;
+        }
+        .history-filter-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--white);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
+            font-family: inherit;
+            text-align: center;
+        }
+        .history-filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .history-filter-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        .history-summary {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin-bottom: 20px;
+        }
+        .history-stat {
+            text-align: center;
+            padding: 14px 8px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+        }
+        .history-stat .stat-value { font-size: 18px; font-weight: 800; color: var(--primary-dark); }
+        .history-stat .stat-label { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+        .history-records { display: flex; flex-direction: column; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- ===== Common Header ===== -->
     <header class="header">
-        <h1 class="header-title">MY</h1>
+        <h1 class="header-title">&#x1F43E; 멍이랑</h1>
         <div class="header-actions">
-            <a href="알림.html" class="header-btn" aria-label="설정">⚙️</a>
+            <a href="알림.html" class="header-btn">&#x1F514;</a>
+            <a href="설정.html" class="header-btn">&#x2699;&#xFE0F;</a>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="content">
 
-        <!-- ===== Profile Section ===== -->
+        <!-- ===== 1. Profile Section (with active title) ===== -->
         <section class="profile-section animate-in">
             <div class="profile-header">
-                <div class="profile-avatar">😊</div>
+                <div class="profile-avatar">&#x1F60A;</div>
                 <div class="profile-info">
-                    <div class="profile-name">산책러버</div>
-                    <div class="profile-id">@walk_lover_2026</div>
+                    <div class="profile-name-row">
+                        <span class="profile-name">산책러버</span>
+                        <span class="title-badge" id="currentTitleBadge">&#x1F3C3; 마라토너</span>
+                    </div>
+                    <div class="profile-sub-row">
+                        <span class="profile-id">@walk_lover_2026</span>
+                        <span class="profile-status">&middot; 오늘도 산책 중!</span>
+                    </div>
                 </div>
-                <button class="profile-edit-btn" onclick="toast('프로필 편집 화면으로 이동')">편집</button>
             </div>
-
-            <!-- Pet Profile Cards -->
-            <div class="pet-scroll">
-                <div class="pet-profile-card selected" onclick="selectPet(this)">
-                    <div class="pet-profile-top">
-                        <div class="pet-profile-avatar dog">🐕</div>
-                        <div class="pet-profile-info">
-                            <h4>초코</h4>
-                            <p>골든 리트리버 · 3살 · 28kg</p>
-                        </div>
-                    </div>
-                    <div class="pet-stats-row">
-                        <div class="pet-stat-mini"><div class="value">142.5km</div><div class="label">총 거리</div></div>
-                        <div class="pet-stat-mini"><div class="value">38:20</div><div class="label">총 시간</div></div>
-                        <div class="pet-stat-mini"><div class="value">86회</div><div class="label">총 횟수</div></div>
-                    </div>
-                </div>
-                <div class="pet-profile-card" onclick="selectPet(this)">
-                    <div class="pet-profile-top">
-                        <div class="pet-profile-avatar cat">🐈</div>
-                        <div class="pet-profile-info">
-                            <h4>나비</h4>
-                            <p>코리안 숏헤어 · 2살 · 4.2kg</p>
-                        </div>
-                    </div>
-                    <div class="pet-stats-row">
-                        <div class="pet-stat-mini"><div class="value">28.3km</div><div class="label">총 거리</div></div>
-                        <div class="pet-stat-mini"><div class="value">8:45</div><div class="label">총 시간</div></div>
-                        <div class="pet-stat-mini"><div class="value">22회</div><div class="label">총 횟수</div></div>
-                    </div>
-                </div>
-                <div class="pet-profile-card" style="min-width:120px;display:flex;align-items:center;justify-content:center;background:var(--bg);border:2px dashed var(--border);">
-                    <div style="text-align:center;">
-                        <div style="font-size:28px;margin-bottom:6px;">➕</div>
-                        <div style="font-size:12px;font-weight:600;color:var(--text-light);">추가</div>
-                    </div>
-                </div>
+            <div style="display:flex;gap:8px;">
+                <button class="profile-edit-btn" onclick="openEditModal()" style="flex:1;">&#x270F;&#xFE0F; 프로필 편집</button>
+                <button class="title-change-btn" onclick="openModal('titleModal')" style="flex:1;">&#x1F3C5; 칭호 변경</button>
             </div>
         </section>
 
         <div class="section-divider"></div>
 
-        <!-- ===== Walk Record Section ===== -->
-        <div class="section-title"><h3>📊 산책 기록</h3><a class="more" href="산책상세.html">전체보기 →</a></div>
+        <!-- ===== 2. Grade Card (산책 등급) ===== -->
+        <div class="section-title"><h3>&#x1F3C5; 산책 등급</h3></div>
 
-        <!-- Record Segment -->
-        <div class="record-segment animate-in">
-            <button class="record-seg-btn active" onclick="switchRecordSeg(this)">캘린더</button>
-            <button class="record-seg-btn" onclick="switchRecordSeg(this)">리스트</button>
-            <button class="record-seg-btn" onclick="switchRecordSeg(this)">통계</button>
-        </div>
-
-        <!-- Calendar View -->
-        <div class="calendar-card animate-in">
-            <div class="cal-header">
-                <h4>2026년 2월</h4>
-                <div class="cal-nav">
-                    <button class="cal-nav-btn" onclick="toast('이전 달')">◀</button>
-                    <button class="cal-nav-btn" onclick="toast('다음 달')">▶</button>
+        <div class="grade-card animate-in">
+            <div class="grade-card-header">
+                <div class="grade-current">
+                    <span class="grade-icon">&#x1F415;</span>
+                    <div class="grade-info">
+                        <h4>동네 산책러</h4>
+                        <div class="grade-level">Lv.3</div>
+                    </div>
+                </div>
+                <div class="grade-total">
+                    <div class="total-label">누적 거리</div>
+                    <div class="total-value">142.5<span class="total-unit">km</span></div>
                 </div>
             </div>
-            <div class="cal-weekdays">
-                <span class="cal-weekday">일</span>
-                <span class="cal-weekday">월</span>
-                <span class="cal-weekday">화</span>
-                <span class="cal-weekday">수</span>
-                <span class="cal-weekday">목</span>
-                <span class="cal-weekday">금</span>
-                <span class="cal-weekday">토</span>
-            </div>
-            <div class="cal-days">
-                <!-- 2026.02 starts on Sunday -->
-                <div class="cal-day walked">1</div>
-                <div class="cal-day walked">2</div>
-                <div class="cal-day walked">3</div>
-                <div class="cal-day">4</div>
-                <div class="cal-day walked">5</div>
-                <div class="cal-day walked">6</div>
-                <div class="cal-day walked">7</div>
-                <div class="cal-day walked">8</div>
-                <div class="cal-day walked">9</div>
-                <div class="cal-day walked">10</div>
-                <div class="cal-day">11</div>
-                <div class="cal-day today walked">12</div>
-                <div class="cal-day future">13</div>
-                <div class="cal-day future">14</div>
-                <div class="cal-day future">15</div>
-                <div class="cal-day future">16</div>
-                <div class="cal-day future">17</div>
-                <div class="cal-day future">18</div>
-                <div class="cal-day future">19</div>
-                <div class="cal-day future">20</div>
-                <div class="cal-day future">21</div>
-                <div class="cal-day future">22</div>
-                <div class="cal-day future">23</div>
-                <div class="cal-day future">24</div>
-                <div class="cal-day future">25</div>
-                <div class="cal-day future">26</div>
-                <div class="cal-day future">27</div>
-                <div class="cal-day future">28</div>
+            <div class="grade-progress-section">
+                <div class="grade-progress-bar">
+                    <div class="grade-progress-fill" style="width: 85%"></div>
+                </div>
+                <div class="grade-progress-text">
+                    <span>다음 등급: 산책 매니아 (100km)</span>
+                    <span>142.5 / 250km</span>
+                </div>
             </div>
         </div>
 
-        <!-- Recent Walk Records -->
+        <div class="section-divider" style="margin-top:20px;"></div>
+
+        <!-- ===== 3. Pet Cards (horizontal scroll, clickable -> archive) ===== -->
+        <div class="section-title"><h3>&#x1F43E; 반려동물</h3></div>
+
+        <div class="pet-scroll">
+            <div class="pet-profile-card selected" onclick="openPetArchive('초코', '&#x1F415;')">
+                <div class="pet-profile-top">
+                    <div class="pet-profile-avatar dog">&#x1F415;</div>
+                    <div class="pet-profile-info">
+                        <h4>초코</h4>
+                        <p>골든 리트리버 &middot; 3살 &middot; 28kg</p>
+                    </div>
+                </div>
+                <div class="pet-stats-row">
+                    <div class="pet-stat-mini"><div class="value">142.5km</div><div class="label">총 거리</div></div>
+                    <div class="pet-stat-mini"><div class="value">38:20</div><div class="label">총 시간</div></div>
+                    <div class="pet-stat-mini"><div class="value">86회</div><div class="label">총 횟수</div></div>
+                </div>
+                <div class="photo-hint">&#x1F4F7; 탭하여 사진 앨범 보기</div>
+            </div>
+            <div class="pet-profile-card" onclick="openPetArchive('나비', '&#x1F408;')">
+                <div class="pet-profile-top">
+                    <div class="pet-profile-avatar cat">&#x1F408;</div>
+                    <div class="pet-profile-info">
+                        <h4>나비</h4>
+                        <p>코리안 숏헤어 &middot; 2살 &middot; 4.2kg</p>
+                    </div>
+                </div>
+                <div class="pet-stats-row">
+                    <div class="pet-stat-mini"><div class="value">28.3km</div><div class="label">총 거리</div></div>
+                    <div class="pet-stat-mini"><div class="value">8:45</div><div class="label">총 시간</div></div>
+                    <div class="pet-stat-mini"><div class="value">22회</div><div class="label">총 횟수</div></div>
+                </div>
+                <div class="photo-hint">&#x1F4F7; 탭하여 사진 앨범 보기</div>
+            </div>
+            <div class="pet-profile-card" style="min-width:120px;display:flex;align-items:center;justify-content:center;background:var(--bg);border:2px dashed var(--border);" onclick="openPetTab()">
+                <div style="text-align:center;">
+                    <div style="font-size:28px;margin-bottom:6px;">&#x2795;</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-light);">추가</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider" style="margin-top:20px;"></div>
+
+        <!-- ===== 4. Walk History (list only, 3 recent + 더보기) ===== -->
+        <div class="section-title"><h3>&#x1F550; 산책 기록</h3></div>
+
+        <!-- Recent Walk Records (3 items) -->
         <div class="recent-records">
             <a href="산책상세.html" class="record-item animate-in" style="text-decoration:none;color:inherit;">
                 <div class="record-route">
@@ -734,14 +1110,14 @@
                 </div>
                 <div class="record-info">
                     <div class="record-date">오늘 오전 7:30</div>
-                    <div class="record-title">보라매공원 코스 🐕</div>
+                    <div class="record-title">보라매공원 코스 &#x1F415;</div>
                     <div class="record-meta">
-                        <span>📏 <strong>3.2km</strong></span>
-                        <span>⏱ <strong>42분</strong></span>
-                        <span>🔥 <strong>165kcal</strong></span>
+                        <span>&#x1F4CF; <strong>3.2km</strong></span>
+                        <span>&#x23F1; <strong>42분</strong></span>
+                        <span>&#x1F525; <strong>165kcal</strong></span>
                     </div>
                 </div>
-                <span class="record-arrow">›</span>
+                <span class="record-arrow">&rsaquo;</span>
             </a>
             <a href="산책상세.html" class="record-item animate-in" style="text-decoration:none;color:inherit;">
                 <div class="record-route">
@@ -749,14 +1125,14 @@
                 </div>
                 <div class="record-info">
                     <div class="record-date">어제 오후 6:15</div>
-                    <div class="record-title">한강 산책로 🐕</div>
+                    <div class="record-title">한강 산책로 &#x1F415;</div>
                     <div class="record-meta">
-                        <span>📏 <strong>4.7km</strong></span>
-                        <span>⏱ <strong>58분</strong></span>
-                        <span>🔥 <strong>231kcal</strong></span>
+                        <span>&#x1F4CF; <strong>4.7km</strong></span>
+                        <span>&#x23F1; <strong>58분</strong></span>
+                        <span>&#x1F525; <strong>231kcal</strong></span>
                     </div>
                 </div>
-                <span class="record-arrow">›</span>
+                <span class="record-arrow">&rsaquo;</span>
             </a>
             <a href="산책상세.html" class="record-item animate-in" style="text-decoration:none;color:inherit;">
                 <div class="record-route">
@@ -764,40 +1140,43 @@
                 </div>
                 <div class="record-info">
                     <div class="record-date">2.10 (월) 오전 8:00</div>
-                    <div class="record-title">서리풀공원 🐈</div>
+                    <div class="record-title">서리풀공원 &#x1F408;</div>
                     <div class="record-meta">
-                        <span>📏 <strong>1.8km</strong></span>
-                        <span>⏱ <strong>25분</strong></span>
-                        <span>🔥 <strong>90kcal</strong></span>
+                        <span>&#x1F4CF; <strong>1.8km</strong></span>
+                        <span>&#x23F1; <strong>25분</strong></span>
+                        <span>&#x1F525; <strong>90kcal</strong></span>
                     </div>
                 </div>
-                <span class="record-arrow">›</span>
+                <span class="record-arrow">&rsaquo;</span>
             </a>
         </div>
 
+        <!-- More Records Button -->
+        <button class="more-records-btn" id="moreRecordsBtn" onclick="openModal('historyModal')">
+            <span>더보기</span>
+            <span>&#x25BC;</span>
+        </button>
+
         <div class="section-divider" style="margin-top:20px;"></div>
 
-        <!-- =====================================================
-             BADGE SECTION - Apple Fitness / Pikmin Bloom Style
-             ===================================================== -->
+        <!-- ===== 5. Badge Section (kept as-is) ===== -->
         <div class="section-title">
-            <h3>🏅 나의 뱃지</h3>
-            <a class="more" href="뱃지.html">전체보기 →</a>
+            <h3>&#x1F3C5; 나의 뱃지</h3>
+            <a class="more" href="뱃지.html">전체보기 &rarr;</a>
         </div>
 
         <div class="badge-section animate-in">
             <div class="badge-section-header">
-                <h3>🏅 뱃지 컬렉션</h3>
+                <h3>&#x1F3C5; 뱃지 컬렉션</h3>
                 <span class="badge-total-count">9 / 37 획득</span>
             </div>
 
             <!-- ---- In Progress Badges ---- -->
             <div class="badge-subsection">
-                <div class="badge-subsection-title">🔥 진행 중</div>
+                <div class="badge-subsection-title">&#x1F525; 진행 중</div>
                 <div class="badge-progress-scroll">
-                    <!-- Badge: 50km Marathon -->
                     <div class="badge-progress-card distance">
-                        <div class="badge-p-icon distance">🏃</div>
+                        <div class="badge-p-icon distance">&#x1F3C3;</div>
                         <h4>50km 마라토너</h4>
                         <div class="badge-p-desc">누적 50km 달성하기</div>
                         <div class="badge-progress-bar-wrap">
@@ -806,9 +1185,8 @@
                         </div>
                         <div class="badge-progress-detail">38 / 50 km</div>
                     </div>
-                    <!-- Badge: 7-day Streak -->
                     <div class="badge-progress-card streak">
-                        <div class="badge-p-icon streak">🔥</div>
+                        <div class="badge-p-icon streak">&#x1F525;</div>
                         <h4>7일 연속 산책</h4>
                         <div class="badge-p-desc">매일 산책 7일 연속</div>
                         <div class="badge-progress-bar-wrap">
@@ -817,9 +1195,8 @@
                         </div>
                         <div class="badge-progress-detail">5 / 7 일</div>
                     </div>
-                    <!-- Badge: Explorer -->
                     <div class="badge-progress-card explore">
-                        <div class="badge-p-icon explore">🧭</div>
+                        <div class="badge-p-icon explore">&#x1F9ED;</div>
                         <h4>동네 탐험가</h4>
                         <div class="badge-p-desc">서로 다른 5곳 방문</div>
                         <div class="badge-progress-bar-wrap">
@@ -828,9 +1205,8 @@
                         </div>
                         <div class="badge-progress-detail">3 / 5 곳</div>
                     </div>
-                    <!-- Badge: Time -->
                     <div class="badge-progress-card">
-                        <div class="badge-p-icon time">⏱</div>
+                        <div class="badge-p-icon time">&#x23F1;</div>
                         <h4>산책 마스터</h4>
                         <div class="badge-p-desc">누적 10시간 산책</div>
                         <div class="badge-progress-bar-wrap">
@@ -844,52 +1220,52 @@
 
             <!-- ---- Recently Earned Badges (Glow) ---- -->
             <div class="badge-subsection">
-                <div class="badge-subsection-title">✨ 최근 획득</div>
+                <div class="badge-subsection-title">&#x2728; 최근 획득</div>
                 <div class="badge-earned-scroll">
                     <div class="badge-earned-card">
                         <div class="badge-earned-icon green">
-                            🐾
-                            <span class="check-mark">✓</span>
+                            &#x1F43E;
+                            <span class="check-mark">&#x2713;</span>
                         </div>
                         <h4>첫 발자국</h4>
                         <div class="badge-date">2.3 획득</div>
                     </div>
                     <div class="badge-earned-card">
                         <div class="badge-earned-icon blue">
-                            🥈
-                            <span class="check-mark">✓</span>
+                            &#x1F948;
+                            <span class="check-mark">&#x2713;</span>
                         </div>
                         <h4>5km 워커</h4>
                         <div class="badge-date">2.5 획득</div>
                     </div>
                     <div class="badge-earned-card">
                         <div class="badge-earned-icon red">
-                            🔥
-                            <span class="check-mark">✓</span>
+                            &#x1F525;
+                            <span class="check-mark">&#x2713;</span>
                         </div>
                         <h4>3일 연속</h4>
                         <div class="badge-date">2.7 획득</div>
                     </div>
                     <div class="badge-earned-card">
                         <div class="badge-earned-icon amber">
-                            🌅
-                            <span class="check-mark">✓</span>
+                            &#x1F305;
+                            <span class="check-mark">&#x2713;</span>
                         </div>
                         <h4>얼리버드</h4>
                         <div class="badge-date">2.8 획득</div>
                     </div>
                     <div class="badge-earned-card">
                         <div class="badge-earned-icon purple">
-                            🌙
-                            <span class="check-mark">✓</span>
+                            &#x1F319;
+                            <span class="check-mark">&#x2713;</span>
                         </div>
                         <h4>나이트워커</h4>
                         <div class="badge-date">2.9 획득</div>
                     </div>
                     <div class="badge-earned-card">
                         <div class="badge-earned-icon green">
-                            🏃
-                            <span class="check-mark">✓</span>
+                            &#x1F3C3;
+                            <span class="check-mark">&#x2713;</span>
                         </div>
                         <h4>10km 달성</h4>
                         <div class="badge-date">2.10 획득</div>
@@ -899,56 +1275,50 @@
 
             <!-- ---- Category Grid 2x3 ---- -->
             <div class="badge-subsection">
-                <div class="badge-subsection-title">📂 카테고리</div>
+                <div class="badge-subsection-title">&#x1F4C2; 카테고리</div>
                 <div class="badge-category-grid">
-                    <!-- Distance -->
-                    <div class="badge-category-item" onclick="toast('거리 뱃지 목록')">
-                        <div class="badge-cat-icon distance">📏</div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=거리'">
+                        <div class="badge-cat-icon distance">&#x1F4CF;</div>
                         <div class="badge-cat-info">
                             <div class="badge-cat-name">거리</div>
                             <div class="badge-cat-count">3 / 8 획득</div>
                             <div class="badge-cat-bar"><div class="badge-cat-bar-fill blue" style="width:37.5%"></div></div>
                         </div>
                     </div>
-                    <!-- Streak -->
-                    <div class="badge-category-item" onclick="toast('연속 뱃지 목록')">
-                        <div class="badge-cat-icon streak">🔥</div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=연속'">
+                        <div class="badge-cat-icon streak">&#x1F525;</div>
                         <div class="badge-cat-info">
                             <div class="badge-cat-name">연속</div>
                             <div class="badge-cat-count">2 / 7 획득</div>
                             <div class="badge-cat-bar"><div class="badge-cat-bar-fill red" style="width:28.6%"></div></div>
                         </div>
                     </div>
-                    <!-- Explore -->
-                    <div class="badge-category-item" onclick="toast('탐험 뱃지 목록')">
-                        <div class="badge-cat-icon explore">🧭</div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=탐험'">
+                        <div class="badge-cat-icon explore">&#x1F9ED;</div>
                         <div class="badge-cat-info">
                             <div class="badge-cat-name">탐험</div>
                             <div class="badge-cat-count">1 / 5 획득</div>
                             <div class="badge-cat-bar"><div class="badge-cat-bar-fill amber" style="width:20%"></div></div>
                         </div>
                     </div>
-                    <!-- Time -->
-                    <div class="badge-category-item" onclick="toast('시간 뱃지 목록')">
-                        <div class="badge-cat-icon time">⏱</div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=시간'">
+                        <div class="badge-cat-icon time">&#x23F1;</div>
                         <div class="badge-cat-info">
                             <div class="badge-cat-name">시간</div>
                             <div class="badge-cat-count">2 / 5 획득</div>
                             <div class="badge-cat-bar"><div class="badge-cat-bar-fill purple" style="width:40%"></div></div>
                         </div>
                     </div>
-                    <!-- Special -->
-                    <div class="badge-category-item" onclick="toast('스페셜 뱃지 목록')">
-                        <div class="badge-cat-icon special">💎</div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=스페셜'">
+                        <div class="badge-cat-icon special">&#x1F48E;</div>
                         <div class="badge-cat-info">
                             <div class="badge-cat-name">스페셜</div>
                             <div class="badge-cat-count">1 / 8 획득</div>
                             <div class="badge-cat-bar"><div class="badge-cat-bar-fill pink" style="width:12.5%"></div></div>
                         </div>
                     </div>
-                    <!-- Season -->
-                    <div class="badge-category-item" onclick="toast('시즌 뱃지 목록')">
-                        <div class="badge-cat-icon season">🌸</div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=시즌'">
+                        <div class="badge-cat-icon season">&#x1F338;</div>
                         <div class="badge-cat-info">
                             <div class="badge-cat-name">시즌</div>
                             <div class="badge-cat-count">0 / 4 획득</div>
@@ -961,85 +1331,420 @@
 
         <div class="section-divider" style="margin-top:20px;"></div>
 
-        <!-- ===== Premium Banner ===== -->
+        <!-- ===== 6. Premium Banner (kept as-is) ===== -->
         <a href="프리미엄.html" class="premium-banner animate-in">
-            <div class="premium-badge">👑</div>
+            <div class="premium-badge">&#x1F451;</div>
             <div class="premium-text">
                 <h4>멍이랑 프리미엄</h4>
                 <p>광고 제거 + 상세 통계 + 무제한 뱃지</p>
             </div>
             <div class="premium-price">
-                <div class="price">₩3,900</div>
+                <div class="price">&#x20A9;3,900</div>
                 <div class="period">/월</div>
             </div>
         </a>
 
-        <!-- ===== Menu List ===== -->
-        <div class="menu-list animate-in">
-            <a href="알림.html" class="menu-item">
-                <span class="menu-icon">🔔</span>
-                <span class="menu-label">알림 설정</span>
-                <span class="menu-arrow">›</span>
-            </a>
-            <a href="프리미엄.html" class="menu-item">
-                <span class="menu-icon">💳</span>
-                <span class="menu-label">구독 관리</span>
-                <span class="menu-value">무료 플랜</span>
-                <span class="menu-arrow">›</span>
-            </a>
-            <div class="menu-item" onclick="toast('계정 설정 화면으로 이동')">
-                <span class="menu-icon">⚙️</span>
-                <span class="menu-label">계정 설정</span>
-                <span class="menu-arrow">›</span>
-            </div>
-            <div class="menu-item" onclick="toast('개인정보처리방침 페이지')">
-                <span class="menu-icon">📋</span>
-                <span class="menu-label">개인정보처리방침</span>
-                <span class="menu-arrow">›</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-icon">📱</span>
-                <span class="menu-label">앱 버전</span>
-                <span class="menu-value">v1.2.0</span>
-                <span class="menu-arrow"></span>
-            </div>
-            <div class="menu-item danger" onclick="toast('로그아웃 되었습니다')">
-                <span class="menu-icon">🚪</span>
-                <span class="menu-label">로그아웃</span>
-                <span class="menu-arrow">›</span>
-            </div>
-        </div>
-
         <div style="height: 24px;"></div>
     </main>
 
-    <!-- Bottom Nav -->
+    <!-- ===== Modal: Title Selection (칭호 변경) ===== -->
+    <div class="modal-overlay" id="titleModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x1F3C5; 칭호 변경</h3>
+                <button class="modal-close" onclick="closeModal('titleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="title-selector" id="titleSelector">
+                    <!-- Unlocked titles -->
+                    <div class="title-option selected" data-title="&#x1F3C3; 마라토너" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F3C3;</span>
+                        <div class="title-info">
+                            <div class="title-name">마라토너</div>
+                            <div class="title-desc">누적 42.195km 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F305; 얼리버드" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F305;</span>
+                        <div class="title-info">
+                            <div class="title-name">얼리버드</div>
+                            <div class="title-desc">새벽 산책 10회 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F989; 올빼미" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F989;</span>
+                        <div class="title-info">
+                            <div class="title-name">올빼미</div>
+                            <div class="title-desc">야간 산책 10회 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F525; 연속왕" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F525;</span>
+                        <div class="title-info">
+                            <div class="title-name">연속왕</div>
+                            <div class="title-desc">7일 연속 산책 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F4F8; 사진왕" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F4F8;</span>
+                        <div class="title-info">
+                            <div class="title-name">사진왕</div>
+                            <div class="title-desc">산책 사진 50장 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <!-- Locked titles -->
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F9ED;</span>
+                        <div class="title-info">
+                            <div class="title-name">탐험가</div>
+                            <div class="title-desc">10개 장소 방문 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x2B50;</span>
+                        <div class="title-info">
+                            <div class="title-name">소셜스타</div>
+                            <div class="title-desc">좋아요 100개 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F451;</span>
+                        <div class="title-info">
+                            <div class="title-name">동네챔피언</div>
+                            <div class="title-desc">주간 랭킹 1위 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F327;&#xFE0F;</span>
+                        <div class="title-info">
+                            <div class="title-name">비바람워커</div>
+                            <div class="title-desc">비오는 날 산책 5회 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F396;</span>
+                        <div class="title-info">
+                            <div class="title-name">원년멤버</div>
+                            <div class="title-desc">서비스 초기 가입 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                </div>
+                <button class="title-apply-btn" onclick="applyTitle()">칭호 적용하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Pet Photo Archive ===== -->
+    <div class="modal-overlay" id="archiveModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3 id="archiveTitle">&#x1F415; 초코의 추억</h3>
+                <button class="modal-close" onclick="closeModal('archiveModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="archiveBody">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Profile Edit (Dual Tab) ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x270F;&#xFE0F; 프로필 편집</h3>
+                <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <div class="edit-tabs">
+                <button class="edit-tab active" onclick="switchEditTab(this, 'editTabAccount')">계정 프로필</button>
+                <button class="edit-tab" onclick="switchEditTab(this, 'editTabPets')">반려동물 프로필</button>
+            </div>
+            <div class="modal-body">
+                <!-- Tab: 계정 프로필 -->
+                <div class="edit-tab-content active" id="editTabAccount">
+                    <div class="edit-field">
+                        <label>프로필 아이콘</label>
+                        <div class="icon-selector">
+                            <div class="icon-option selected" onclick="selectIcon(this)">&#x1F60A;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x1F436;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x1F431;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x1F43B;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x1F338;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x2B50;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x1F525;</div>
+                            <div class="icon-option" onclick="selectIcon(this)">&#x1F3C3;</div>
+                        </div>
+                    </div>
+                    <div class="edit-field">
+                        <label>닉네임</label>
+                        <input type="text" value="산책러버" placeholder="닉네임을 입력하세요">
+                    </div>
+                    <div class="edit-field">
+                        <label>상태 메시지</label>
+                        <textarea placeholder="상태 메시지를 입력하세요">오늘도 산책 중!</textarea>
+                    </div>
+                    <button class="edit-save-btn" onclick="saveProfile()">저장하기</button>
+                </div>
+
+                <!-- Tab: 반려동물 프로필 -->
+                <div class="edit-tab-content" id="editTabPets">
+                    <!-- 초코 -->
+                    <div class="pet-edit-card">
+                        <div class="pet-edit-header">
+                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);">&#x1F415;</div>
+                            <h4>초코</h4>
+                            <button class="pet-edit-btn" onclick="togglePetDetail(this)">편집</button>
+                        </div>
+                        <div class="pet-edit-fields">
+                            <div class="pet-edit-field">
+                                <label>이름</label>
+                                <input type="text" value="초코">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>견종/묘종</label>
+                                <input type="text" value="골든 리트리버">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>나이</label>
+                                <input type="text" value="3살">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>체중</label>
+                                <input type="text" value="28kg">
+                            </div>
+                        </div>
+                        <div class="pet-detail-fields" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+                            <div class="pet-edit-fields">
+                                <div class="pet-edit-field">
+                                    <label>성별</label>
+                                    <select style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;">
+                                        <option selected>남아</option>
+                                        <option>여아</option>
+                                    </select>
+                                </div>
+                                <div class="pet-edit-field">
+                                    <label>생일</label>
+                                    <input type="date" value="2023-03-15">
+                                </div>
+                            </div>
+                            <button style="margin-top:10px;width:100%;padding:10px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F4F7; 프로필 사진 변경</button>
+                        </div>
+                    </div>
+                    <!-- 나비 -->
+                    <div class="pet-edit-card">
+                        <div class="pet-edit-header">
+                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4);">&#x1F408;</div>
+                            <h4>나비</h4>
+                            <button class="pet-edit-btn" onclick="togglePetDetail(this)">편집</button>
+                        </div>
+                        <div class="pet-edit-fields">
+                            <div class="pet-edit-field">
+                                <label>이름</label>
+                                <input type="text" value="나비">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>견종/묘종</label>
+                                <input type="text" value="코리안 숏헤어">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>나이</label>
+                                <input type="text" value="2살">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>체중</label>
+                                <input type="text" value="4.2kg">
+                            </div>
+                        </div>
+                        <div class="pet-detail-fields" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+                            <div class="pet-edit-fields">
+                                <div class="pet-edit-field">
+                                    <label>성별</label>
+                                    <select style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;">
+                                        <option>남아</option>
+                                        <option selected>여아</option>
+                                    </select>
+                                </div>
+                                <div class="pet-edit-field">
+                                    <label>생일</label>
+                                    <input type="date" value="2024-01-20">
+                                </div>
+                            </div>
+                            <button style="margin-top:10px;width:100%;padding:10px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F4F7; 프로필 사진 변경</button>
+                        </div>
+                    </div>
+
+                    <button class="edit-save-btn" onclick="savePets()">저장하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Walk History Expanded ===== -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x1F4CB; 전체 산책 기록</h3>
+                <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Filter Tabs -->
+                <div class="history-filter-row">
+                    <button class="history-filter-btn active" onclick="switchHistoryFilter(this, 'weekly')">주간</button>
+                    <button class="history-filter-btn" onclick="switchHistoryFilter(this, 'monthly')">월간</button>
+                    <button class="history-filter-btn" onclick="switchHistoryFilter(this, 'yearly')">연간</button>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="history-summary">
+                    <div class="history-stat">
+                        <div class="stat-value">27.5km</div>
+                        <div class="stat-label">총 거리</div>
+                    </div>
+                    <div class="history-stat">
+                        <div class="stat-value">6:20</div>
+                        <div class="stat-label">총 시간</div>
+                    </div>
+                    <div class="history-stat">
+                        <div class="stat-value">7회</div>
+                        <div class="stat-label">산책 횟수</div>
+                    </div>
+                </div>
+
+                <!-- Full record list -->
+                <div class="history-records">
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L8 10 L16 14 L24 4" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#10B981"/><circle cx="24" cy="4" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">오늘 오전 7:30</div>
+                            <div class="record-title">보라매공원 코스 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>3.2km</strong></span>
+                                <span>&#x23F1; <strong>42분</strong></span>
+                                <span>&#x1F525; <strong>165kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M6 20 L14 6 L22 16" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="20" r="2.5" fill="#10B981"/><circle cx="22" cy="16" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">어제 오후 6:15</div>
+                            <div class="record-title">한강 산책로 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>4.7km</strong></span>
+                                <span>&#x23F1; <strong>58분</strong></span>
+                                <span>&#x1F525; <strong>231kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 18 Q14 4 24 12 Q18 24 8 20" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="4" cy="18" r="2.5" fill="#10B981"/><circle cx="8" cy="20" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.10 (월) 오전 8:00</div>
+                            <div class="record-title">서리풀공원 &#x1F408;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>1.8km</strong></span>
+                                <span>&#x23F1; <strong>25분</strong></span>
+                                <span>&#x1F525; <strong>90kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L12 8 L20 18 L24 6" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#10B981"/><circle cx="24" cy="6" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.9 (일) 오후 5:00</div>
+                            <div class="record-title">양재천 산책 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>5.1km</strong></span>
+                                <span>&#x23F1; <strong>63분</strong></span>
+                                <span>&#x1F525; <strong>248kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M6 20 L14 6 L22 16" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="20" r="2.5" fill="#10B981"/><circle cx="22" cy="16" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.8 (토) 오전 9:15</div>
+                            <div class="record-title">올림픽공원 코스 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>6.3km</strong></span>
+                                <span>&#x23F1; <strong>72분</strong></span>
+                                <span>&#x1F525; <strong>312kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 18 Q14 4 24 12 Q18 24 8 20" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="4" cy="18" r="2.5" fill="#10B981"/><circle cx="8" cy="20" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.7 (금) 오후 7:30</div>
+                            <div class="record-title">반포 한강공원 &#x1F408;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>2.4km</strong></span>
+                                <span>&#x23F1; <strong>32분</strong></span>
+                                <span>&#x1F525; <strong>118kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L8 10 L16 14 L24 4" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#10B981"/><circle cx="24" cy="4" r="2.5" fill="#059669"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.6 (목) 오전 6:45</div>
+                            <div class="record-title">남산 둘레길 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>4.2km</strong></span>
+                                <span>&#x23F1; <strong>55분</strong></span>
+                                <span>&#x1F525; <strong>210kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Common Bottom Nav ===== -->
     <nav class="bottom-nav">
-        <a href="멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
-        <a href="소셜.html" class="nav-item"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
-        <a href="멍이랑_메인페이지_시안.html" class="nav-item center-btn"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></a>
-        <a href="랭킹.html" class="nav-item"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></a>
-        <a href="마이페이지.html" class="nav-item active"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">&#x1F3E0;</span><span class="nav-label">홈</span></a>
+        <a href="소셜.html" class="nav-item"><span class="nav-icon">&#x1F465;</span><span class="nav-label">소셜</span></a>
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item center-btn"><span class="nav-icon">&#x1F43E;</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></a>
+        <a href="지도.html" class="nav-item"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span><span class="nav-label">지도</span></a>
+        <a href="마이페이지.html" class="nav-item active"><span class="nav-icon">&#x1F464;</span><span class="nav-label">MY</span></a>
     </nav>
 
     <!-- Toast -->
     <div class="toast-el" id="toastEl"></div>
 
     <script>
-    // Pet selection
-    function selectPet(card) {
-        document.querySelectorAll('.pet-profile-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-    }
-
-    // Record segment switch
-    function switchRecordSeg(btn) {
-        document.querySelectorAll('.record-seg-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        toast('📊 ' + btn.textContent + ' 뷰');
-    }
-
-    // Toast
+    // ===== Toast =====
     let toastTimer;
     function toast(msg) {
         const el = document.getElementById('toastEl');
@@ -1047,6 +1752,191 @@
         el.classList.add('show');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    // ===== Modal Open/Close =====
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+        });
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 350);
+    }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal(this.id);
+            }
+        });
+    });
+
+    // ===== Title Selection =====
+    function selectTitle(el) {
+        if (el.classList.contains('locked')) return;
+        document.querySelectorAll('#titleSelector .title-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function applyTitle() {
+        const selected = document.querySelector('#titleSelector .title-option.selected');
+        if (selected) {
+            const titleText = selected.getAttribute('data-title');
+            document.getElementById('currentTitleBadge').innerHTML = titleText;
+            toast('칭호가 변경되었습니다');
+            closeModal('titleModal');
+        }
+    }
+
+    // ===== Pet Photo Archive =====
+    const archiveData = {
+        '초코': {
+            icon: '\uD83D\uDC15',
+            months: [
+                {
+                    label: '2026년 2월',
+                    photos: [
+                        { date: '2.12', color: '#A7F3D0', icon: '\uD83C\uDF33' },
+                        { date: '2.10', color: '#FDE68A', icon: '\uD83C\uDF05' },
+                        { date: '2.9', color: '#93C5FD', icon: '\uD83C\uDF0A' },
+                        { date: '2.8', color: '#C4B5FD', icon: '\uD83C\uDF19' },
+                        { date: '2.7', color: '#FCA5A5', icon: '\uD83C\uDF38' },
+                        { date: '2.5', color: '#6EE7B7', icon: '\uD83C\uDFDE\uFE0F' },
+                    ]
+                },
+                {
+                    label: '2026년 1월',
+                    photos: [
+                        { date: '1.28', color: '#FCD34D', icon: '\u2744\uFE0F' },
+                        { date: '1.25', color: '#A78BFA', icon: '\uD83D\uDC3E' },
+                        { date: '1.20', color: '#F9A8D4', icon: '\u2764\uFE0F' },
+                        { date: '1.15', color: '#67E8F9', icon: '\uD83D\uDC15' },
+                        { date: '1.10', color: '#86EFAC', icon: '\uD83C\uDFDE\uFE0F' },
+                        { date: '1.5', color: '#FCA5A5', icon: '\uD83C\uDF1F' },
+                        { date: '1.3', color: '#FDBA74', icon: '\uD83C\uDF89' },
+                        { date: '1.1', color: '#C4B5FD', icon: '\uD83C\uDF86' },
+                    ]
+                },
+                {
+                    label: '2025년 12월',
+                    photos: [
+                        { date: '12.25', color: '#FCA5A5', icon: '\uD83C\uDF84' },
+                        { date: '12.20', color: '#93C5FD', icon: '\u2744\uFE0F' },
+                        { date: '12.15', color: '#86EFAC', icon: '\uD83C\uDF33' },
+                    ]
+                }
+            ]
+        },
+        '나비': {
+            icon: '\uD83D\uDC08',
+            months: [
+                {
+                    label: '2026년 2월',
+                    photos: [
+                        { date: '2.10', color: '#F9A8D4', icon: '\uD83C\uDF38' },
+                        { date: '2.8', color: '#C4B5FD', icon: '\uD83C\uDF19' },
+                        { date: '2.3', color: '#FDE68A', icon: '\u2600\uFE0F' },
+                    ]
+                },
+                {
+                    label: '2026년 1월',
+                    photos: [
+                        { date: '1.22', color: '#67E8F9', icon: '\uD83D\uDC08' },
+                        { date: '1.14', color: '#FCA5A5', icon: '\u2764\uFE0F' },
+                        { date: '1.8', color: '#86EFAC', icon: '\uD83C\uDFDE\uFE0F' },
+                    ]
+                }
+            ]
+        }
+    };
+
+    function openPetArchive(petName, petIcon) {
+        const data = archiveData[petName];
+        if (!data) { toast('사진이 없습니다'); return; }
+
+        document.getElementById('archiveTitle').innerHTML = data.icon + ' ' + petName + '의 추억';
+
+        let html = '';
+        data.months.forEach(month => {
+            html += '<div class="archive-month-label">' + month.label + '</div>';
+            html += '<div class="archive-grid">';
+            month.photos.forEach(photo => {
+                html += '<div class="archive-photo" style="background:' + photo.color + ';">';
+                html += '<span class="photo-icon">' + photo.icon + '</span>';
+                html += '<span class="photo-date">' + photo.date + '</span>';
+                html += '</div>';
+            });
+            html += '</div>';
+        });
+
+        document.getElementById('archiveBody').innerHTML = html;
+        openModal('archiveModal');
+    }
+
+    // ===== Profile Edit Modal =====
+    function openEditModal() {
+        openModal('editModal');
+    }
+
+    function switchEditTab(btn, tabId) {
+        document.querySelectorAll('.edit-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.edit-tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function selectIcon(el) {
+        document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function saveProfile() {
+        toast('프로필이 저장되었습니다');
+        closeModal('editModal');
+    }
+
+    function savePets() {
+        toast('반려동물 정보가 저장되었습니다');
+        closeModal('editModal');
+    }
+
+    // ===== Walk History Modal Filter =====
+    function switchHistoryFilter(btn, period) {
+        document.querySelectorAll('.history-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        toast(btn.textContent + ' 기록 보기');
+    }
+
+    // ===== Open Pet Tab (from + add button) =====
+    function openPetTab() {
+        openModal('editModal');
+        // Switch to pet tab
+        const petTabBtn = document.querySelectorAll('.edit-tab')[1];
+        if (petTabBtn) switchEditTab(petTabBtn, 'editTabPets');
+    }
+
+    // ===== Toggle Pet Detail Fields =====
+    function togglePetDetail(btn) {
+        const card = btn.closest('.pet-edit-card');
+        const detail = card.querySelector('.pet-detail-fields');
+        if (detail) {
+            const isHidden = detail.style.display === 'none';
+            detail.style.display = isHidden ? 'block' : 'none';
+            btn.textContent = isHidden ? '접기' : '편집';
+        }
     }
     </script>
 </body>

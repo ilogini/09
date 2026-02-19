@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멍이랑 디자인 컨셉 & 시스템 가이드</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --lime: #C5D900; --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10); --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF; --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08); --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C; --text-secondary: #5C6F82; --text-muted: #94A3B8;
+            --bg-base: #F8FCFA; --danger: #EF4444;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12); --glass-blur: blur(20px);
+            --radius-xl: 28px; --radius-lg: 24px; --radius-md: 20px; --radius-sm: 14px; --radius-xs: 10px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+            background: #F0F2F5; color: var(--text-primary); -webkit-font-smoothing: antialiased;
+        }
+        /* 네비 */
+        .nav { position:fixed; top:0; left:0; width:260px; height:100vh; background:white; border-right:1px solid #E5E7EB; padding:28px 0; overflow-y:auto; z-index:100; }
+        .nav-title { padding:0 24px 20px; font-size:18px; font-weight:700; border-bottom:1px solid #E5E7EB; margin-bottom:12px; }
+        .nav-title span { color: var(--lime-dark); }
+        .nav a { display:block; padding:9px 24px; font-size:13px; font-weight:500; color:var(--text-secondary); text-decoration:none; border-left:3px solid transparent; transition:all .2s; }
+        .nav a:hover { color:var(--text-primary); background:var(--lime-light); border-left-color:var(--lime); }
+        /* 메인 */
+        .main { margin-left:260px; padding:40px 48px 80px; max-width:1100px; }
+        @media(max-width:900px) { .nav{display:none;} .main{margin-left:0; padding:24px 20px 60px;} }
+        /* 섹션 */
+        .sec { margin-bottom:56px; }
+        .sec-head { margin-bottom:28px; padding-bottom:16px; border-bottom:2px solid var(--lime); }
+        .sec-num { font-size:12px; font-weight:700; color:var(--lime-dark); letter-spacing:1px; margin-bottom:4px; }
+        .sec-title { font-size:26px; font-weight:700; }
+        .sec-desc { font-size:14px; color:var(--text-secondary); margin-top:6px; line-height:1.6; }
+        .sub-title { font-size:17px; font-weight:700; margin:28px 0 14px; display:flex; align-items:center; gap:8px; }
+        .sub-title::before { content:''; width:4px; height:18px; background:var(--lime); border-radius:2px; }
+        /* 컬러 */
+        .c-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+        .c-card { background:white; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .c-swatch { height:80px; display:flex; align-items:flex-end; padding:10px 14px; }
+        .c-hex { font-size:12px; font-weight:600; color:white; background:rgba(0,0,0,.25); padding:2px 8px; border-radius:16px; }
+        .c-hex.dk { color:rgba(0,0,0,.6); background:rgba(255,255,255,.5); }
+        .c-info { padding:12px 14px; }
+        .c-name { font-size:14px; font-weight:700; margin-bottom:2px; }
+        .c-use { font-size:11px; color:var(--text-muted); line-height:1.4; }
+        /* 타이포 */
+        .t-list { background:white; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .t-row { display:grid; grid-template-columns:120px 1fr 110px; align-items:center; padding:16px 20px; border-bottom:1px solid #F0F0F0; }
+        .t-row:last-child { border-bottom:none; }
+        .t-label { font-size:12px; font-weight:700; color:var(--lime-dark); }
+        .t-spec { font-size:10px; color:var(--text-muted); margin-top:2px; }
+        .t-use { font-size:11px; color:var(--text-muted); text-align:right; }
+        /* 라운딩 */
+        .r-row { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end; }
+        .r-item { text-align:center; }
+        .r-box { background:var(--lime); margin-bottom:8px; }
+        .r-val { font-size:13px; font-weight:700; }
+        .r-name { font-size:10px; color:var(--text-muted); margin-top:2px; }
+        /* 글래스 */
+        .gl-area { background:linear-gradient(135deg,#A8E6CF,#88D8F7,#D4A5FF); border-radius:18px; padding:32px; display:flex; gap:20px; flex-wrap:wrap; }
+        .gl-card { padding:22px; border-radius:var(--radius-md); min-width:200px; flex:1; }
+        .gl-card h4 { font-size:13px; font-weight:700; margin-bottom:4px; }
+        .gl-card p { font-size:11px; color:var(--text-secondary); line-height:1.5; }
+        /* 그림자 */
+        .sh-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+        .sh-card { background:white; border-radius:14px; padding:22px; text-align:center; }
+        .sh-dot { width:50px; height:50px; border-radius:50%; margin:0 auto 10px; }
+        .sh-name { font-size:12px; font-weight:700; }
+        .sh-desc { font-size:10px; color:var(--text-muted); margin-top:3px; }
+        /* 아이콘 */
+        .i-sizes { display:flex; align-items:flex-end; gap:28px; background:white; border-radius:14px; padding:22px 28px; box-shadow:0 2px 8px rgba(0,0,0,.06); flex-wrap:wrap; }
+        .i-sizes .item { text-align:center; }
+        .i-sizes .item .lucide { color:var(--azure); margin-bottom:6px; }
+        .i-sizes .lbl { font-size:10px; font-weight:700; }
+        .i-sizes .desc { font-size:9px; color:var(--text-muted); margin-top:1px; }
+        .i-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:10px; }
+        .i-item { background:white; border-radius:10px; padding:14px 6px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.04); transition:all .2s; }
+        .i-item:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.08); }
+        .i-item .lucide { width:22px; height:22px; stroke-width:1.6; color:var(--text-secondary); margin-bottom:6px; }
+        .i-item span { display:block; font-size:9px; color:var(--text-muted); }
+        /* 컴포넌트 데모 */
+        .demo { background:var(--bg-base); border-radius:18px; padding:28px; border:1px solid #E5E7EB; }
+        .demo-label { font-size:10px; font-weight:700; color:var(--lime-dark); letter-spacing:.5px; margin-bottom:10px; }
+        .demo-row { display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:20px; }
+        .demo-row:last-child { margin-bottom:0; }
+        /* 버튼 */
+        .btn-outline { padding:12px 24px; border:2px solid var(--lime); background:transparent; border-radius:var(--radius-lg); font-size:14px; font-weight:600; font-family:inherit; color:var(--text-primary); cursor:pointer; transition:all .3s; }
+        .btn-outline:hover { background:var(--lime); box-shadow:0 8px 32px var(--lime-glow); }
+        .btn-lime { padding:12px 24px; border:none; background:linear-gradient(135deg,var(--lime),var(--lime-dark)); border-radius:var(--radius-md); font-size:14px; font-weight:600; font-family:inherit; color:var(--text-primary); cursor:pointer; box-shadow:0 6px 24px var(--lime-glow); }
+        .btn-azure { padding:12px 24px; border:none; background:var(--azure); border-radius:var(--radius-md); font-size:14px; font-weight:600; font-family:inherit; color:white; cursor:pointer; }
+        .btn-danger { width:48px; height:48px; border:none; background:linear-gradient(135deg,#EF4444,#DC2626); border-radius:50%; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(239,68,68,.3); }
+        .btn-danger .lucide { width:18px; height:18px; }
+        .btn-glass { width:42px; height:42px; border:1.5px solid var(--glass-border); background:var(--glass-bg); backdrop-filter:blur(8px); border-radius:50%; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .btn-glass .lucide { width:16px; height:16px; }
+        .btn-ghost { padding:10px 20px; border:none; background:rgba(0,0,0,.04); border-radius:var(--radius-sm); font-size:13px; font-weight:600; font-family:inherit; color:var(--text-secondary); cursor:pointer; }
+        .btn-nav { width:50px; height:50px; background:linear-gradient(135deg,var(--lime),var(--lime-dark)); border-radius:50%; border:none; color:white; font-size:22px; cursor:pointer; box-shadow:0 4px 20px var(--lime-glow); display:flex; align-items:center; justify-content:center; animation:float 3s ease-in-out infinite; }
+        /* GPS */
+        .gps { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:500; border:1px solid rgba(0,0,0,.04); }
+        .gps.off { background:rgba(248,252,250,.8); color:var(--text-muted); }
+        .gps.on { background:var(--lime-light); color:var(--lime-dark); border-color:rgba(197,217,0,.2); }
+        .gps-dot { width:6px; height:6px; border-radius:50%; }
+        .gps.off .gps-dot { background:var(--text-muted); }
+        .gps.on .gps-dot { background:var(--lime); animation:pulse 2s ease-in-out infinite; }
+        /* 뱃지 */
+        .badge { display:inline-flex; align-items:center; gap:4px; padding:5px 11px; border-radius:18px; font-size:11px; font-weight:600; }
+        .badge.az { background:var(--azure-light); color:var(--azure-dark); }
+        .badge.lm { background:var(--lime-light); color:var(--lime-dark); }
+        /* 탭 */
+        .tabs { display:flex; gap:22px; }
+        .tab { padding:5px 0; border:none; background:none; font-size:12px; font-weight:500; font-family:inherit; color:var(--text-muted); cursor:pointer; position:relative; }
+        .tab.on { color:var(--text-primary); font-weight:600; }
+        .tab.on::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:2px; background:var(--lime); border-radius:2px; }
+        /* 프로그레스 */
+        .prog { width:100%; max-width:360px; }
+        .prog-top { display:flex; justify-content:space-between; margin-bottom:6px; }
+        .prog-top span { font-size:11px; color:var(--text-muted); }
+        .prog-top strong { font-size:11px; color:var(--lime-dark); }
+        .prog-track { height:4px; background:rgba(197,217,0,.12); border-radius:4px; overflow:hidden; }
+        .prog-bar { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--lime),var(--azure)); }
+        /* 토스트 */
+        .toast { display:inline-block; background:rgba(26,43,60,.88); color:white; padding:9px 20px; border-radius:22px; font-size:12px; font-weight:500; }
+        /* 그라데이션 */
+        .g-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+        .g-card { border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .g-swatch { height:70px; display:flex; align-items:flex-end; padding:10px 14px; }
+        .g-swatch span { font-size:11px; font-weight:600; color:white; text-shadow:0 1px 3px rgba(0,0,0,.3); }
+        .g-info { padding:10px 14px; background:white; }
+        .g-name { font-size:13px; font-weight:700; }
+        .g-use { font-size:10px; color:var(--text-muted); margin-top:2px; }
+        /* 간격 */
+        .sp-list { display:flex; flex-direction:column; gap:10px; }
+        .sp-row { display:flex; align-items:center; gap:14px; background:white; border-radius:10px; padding:10px 18px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+        .sp-bar { background:var(--azure); height:18px; border-radius:4px; min-width:4px; }
+        .sp-info { font-size:12px; }
+        .sp-info strong { color:var(--text-primary); }
+        .sp-info span { color:var(--text-muted); margin-left:6px; font-size:11px; }
+        /* 애니메이션 */
+        .a-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; }
+        .a-card { background:white; border-radius:14px; padding:22px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .a-card h4 { font-size:13px; font-weight:700; margin-bottom:3px; }
+        .a-card p { font-size:10px; color:var(--text-muted); margin-bottom:14px; line-height:1.5; }
+        .a-preview { height:50px; display:flex; align-items:center; justify-content:center; }
+        .a-dot { width:14px; height:14px; background:var(--lime); border-radius:50%; }
+        .a-dot.float { animation:float 3s ease-in-out infinite; }
+        .a-dot.pulse { animation:pulse 2s ease-in-out infinite; }
+        .a-box { width:50px; height:34px; background:var(--azure-light); border:1px solid var(--azure); border-radius:8px; }
+        .a-box.fadein { animation:fadeIn 1.5s ease-out infinite; }
+        .a-box.slide { animation:slideUp 2s ease-out infinite; }
+        .a-cloud { width:44px; height:22px; background:rgba(255,255,255,.8); border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,.05); animation:drift 4s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(197,217,0,.4)} 50%{box-shadow:0 0 0 10px rgba(197,217,0,0)} }
+        @keyframes fadeIn { 0%{opacity:0;transform:translateY(12px)} 30%{opacity:1;transform:translateY(0)} 70%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(12px)} }
+        @keyframes slideUp { 0%{transform:translateY(18px);opacity:0} 30%{transform:translateY(0);opacity:1} 70%{transform:translateY(0);opacity:1} 100%{transform:translateY(18px);opacity:0} }
+        @keyframes drift { 0%,100%{transform:translateX(0)} 50%{transform:translateX(18px)} }
+        /* 화면구조 */
+        .screen-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
+        .screen-card { background:white; border-radius:14px; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,.06); text-align:center; }
+        .screen-card .emoji { font-size:28px; margin-bottom:8px; }
+        .screen-card h4 { font-size:13px; font-weight:700; margin-bottom:4px; }
+        .screen-card p { font-size:10px; color:var(--text-muted); line-height:1.5; }
+        .screen-card.main { border:2px solid var(--lime); }
+        /* 뱃지 시스템 */
+        .badge-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+        .badge-card { background:white; border-radius:12px; padding:16px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+        .badge-card .emoji { font-size:24px; margin-bottom:6px; }
+        .badge-card h4 { font-size:12px; font-weight:700; margin-bottom:3px; }
+        .badge-card p { font-size:10px; color:var(--text-muted); }
+        /* 등급 */
+        .grade-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .grade-item { background:white; border-radius:10px; padding:10px 14px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.04); min-width:80px; }
+        .grade-item .emoji { font-size:20px; }
+        .grade-item .lv { font-size:10px; font-weight:700; color:var(--lime-dark); margin-top:2px; }
+        .grade-item .name { font-size:10px; color:var(--text-muted); }
+        /* 원칙 */
+        .p-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+        .p-card { background:white; border-radius:14px; padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.06); border-top:4px solid var(--lime); }
+        .p-card .num { font-size:28px; font-weight:800; color:var(--lime); margin-bottom:6px; }
+        .p-card h4 { font-size:15px; font-weight:700; margin-bottom:4px; }
+        .p-card p { font-size:12px; color:var(--text-secondary); line-height:1.6; }
+        /* 인터랙션 카드 */
+        .int-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+        .int-card { background:white; padding:14px; border-radius:10px; text-align:center; }
+        .int-card h5 { font-size:12px; font-weight:700; margin-bottom:3px; }
+        .int-card p { font-size:10px; color:var(--text-muted); }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-title"><span>멍이랑</span> 디자인 가이드</div>
+        <a href="#concept">디자인 컨셉</a>
+        <a href="#colors">컬러 팔레트</a>
+        <a href="#typo">타이포그래피</a>
+        <a href="#radius">라운딩 (둥글기)</a>
+        <a href="#glass">글래스모피즘</a>
+        <a href="#shadows">그림자 / 빛 효과</a>
+        <a href="#icons">아이콘</a>
+        <a href="#components">컴포넌트 모음</a>
+        <a href="#gradients">그라데이션</a>
+        <a href="#screens">화면 구조</a>
+        <a href="#badges">뱃지 & 게이미피케이션</a>
+        <a href="#spacing">간격 체계</a>
+        <a href="#animation">애니메이션</a>
+        <a href="#principles">디자인 원칙</a>
+    </nav>
+
+    <main class="main">
+
+        <!-- 컨셉 -->
+        <section class="sec" id="concept">
+            <div class="sec-head">
+                <div class="sec-num">CONCEPT</div>
+                <h2 class="sec-title">시원하고 청량한 맑은날의 산책</h2>
+                <p class="sec-desc">연두빛 라임과 하늘빛 아주르가 만나, 투명한 유리 위에 햇살이 번지는 느낌.<br>가볍고 맑은 공기 속에서 반려동물과 함께 걷는 상쾌한 순간을 담았습니다.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+                <span class="badge lm">#Refreshing 청량감</span>
+                <span class="badge az">#Vivid 생동감</span>
+                <span class="badge lm">#Transparent 투명감</span>
+                <span class="badge az">#Airy 개방감</span>
+            </div>
+            <div style="background:white;border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+                <h3 class="sub-title">앱 성격과 디자인 방향</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px;">
+                    <div style="padding:14px;border-radius:10px;background:var(--lime-light);"><strong style="font-size:12px;">GPS 산책 트래킹</strong><p style="font-size:11px;color:var(--text-muted);margin-top:4px;">지도 중심의 깔끔한 UI, 실시간 데이터 강조</p></div>
+                    <div style="padding:14px;border-radius:10px;background:var(--azure-light);"><strong style="font-size:12px;">게이미피케이션 (NRC 스타일)</strong><p style="font-size:11px;color:var(--text-muted);margin-top:4px;">뱃지, 프로그레스바, 랭킹의 시각적 재미</p></div>
+                    <div style="padding:14px;border-radius:10px;background:var(--lime-light);"><strong style="font-size:12px;">소셜 경쟁</strong><p style="font-size:11px;color:var(--text-muted);margin-top:4px;">리더보드, 챌린지의 직관적 비교</p></div>
+                    <div style="padding:14px;border-radius:10px;background:var(--azure-light);"><strong style="font-size:12px;">반려동물 중심</strong><p style="font-size:11px;color:var(--text-muted);margin-top:4px;">따뜻한 감성 + 이모지 활용</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 컬러 -->
+        <section class="sec" id="colors">
+            <div class="sec-head">
+                <div class="sec-num">01</div>
+                <h2 class="sec-title">컬러 팔레트</h2>
+                <p class="sec-desc">라임과 아주르 두 가지 브랜드 컬러를 중심으로, 청량하고 밝은 색상 체계입니다.</p>
+            </div>
+            <h3 class="sub-title">브랜드 컬러</h3>
+            <div class="c-grid">
+                <div class="c-card"><div class="c-swatch" style="background:#C5D900"><span class="c-hex dk">#C5D900</span></div><div class="c-info"><div class="c-name">Lime Punch</div><div class="c-use">주요 버튼, 산책 경로, GPS 활성</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#9FB300"><span class="c-hex">#9FB300</span></div><div class="c-info"><div class="c-name">Lime Dark</div><div class="c-use">텍스트 강조, 네비 활성</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#0099FF"><span class="c-hex">#0099FF</span></div><div class="c-info"><div class="c-name">Azure</div><div class="c-use">보조 강조, 거리 표시, 알림</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#0077CC"><span class="c-hex">#0077CC</span></div><div class="c-info"><div class="c-name">Azure Dark</div><div class="c-use">날씨 온도, 프리미엄 배너</div></div></div>
+            </div>
+            <h3 class="sub-title">텍스트 컬러</h3>
+            <div class="c-grid">
+                <div class="c-card"><div class="c-swatch" style="background:#1A2B3C"><span class="c-hex">#1A2B3C</span></div><div class="c-info"><div class="c-name">Text Primary</div><div class="c-use">제목, 본문, 중요 숫자</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#5C6F82"><span class="c-hex">#5C6F82</span></div><div class="c-info"><div class="c-name">Text Secondary</div><div class="c-use">부가 텍스트, 아이콘 기본</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#94A3B8"><span class="c-hex">#94A3B8</span></div><div class="c-info"><div class="c-name">Text Muted</div><div class="c-use">힌트, 라벨, 단위</div></div></div>
+            </div>
+            <h3 class="sub-title">배경 & 상황별 컬러</h3>
+            <div class="c-grid">
+                <div class="c-card"><div class="c-swatch" style="background:#F8FCFA;border-bottom:1px solid #eee"><span class="c-hex dk">#F8FCFA</span></div><div class="c-info"><div class="c-name">BG Base</div><div class="c-use">앱 전체 배경</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#EF4444"><span class="c-hex">#EF4444</span></div><div class="c-info"><div class="c-name">Danger</div><div class="c-use">정지 버튼, 에러</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#F59E0B"><span class="c-hex dk">#F59E0B</span></div><div class="c-info"><div class="c-name">Warning</div><div class="c-use">일시정지, 카페</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:#8B5CF6"><span class="c-hex">#8B5CF6</span></div><div class="c-info"><div class="c-name">Purple</div><div class="c-use">시간 챌린지</div></div></div>
+                <div class="c-card"><div class="c-swatch" style="background:linear-gradient(135deg,#D4A017 33%,#8A9BAE 33% 66%,#C8763E 66%)"><span class="c-hex">랭킹</span></div><div class="c-info"><div class="c-name">Gold / Silver / Bronze</div><div class="c-use">1~3위 랭킹 색상</div></div></div>
+            </div>
+        </section>
+
+        <!-- 타이포 -->
+        <section class="sec" id="typo">
+            <div class="sec-head">
+                <div class="sec-num">02</div>
+                <h2 class="sec-title">타이포그래피</h2>
+                <p class="sec-desc">서체: Pretendard Variable. 크기와 굵기로 정보의 중요도를 나타냅니다.</p>
+            </div>
+            <div class="t-list">
+                <div class="t-row"><div><div class="t-label">Display</div><div class="t-spec">52px / Light</div></div><div style="font-size:38px;font-weight:300;letter-spacing:3px;">00:12:34</div><div class="t-use">산책 타이머</div></div>
+                <div class="t-row"><div><div class="t-label">Hero</div><div class="t-spec">36px / Thin</div></div><div style="font-size:32px;font-weight:200;color:var(--azure-dark)">12°</div><div class="t-use">날씨 온도</div></div>
+                <div class="t-row"><div><div class="t-label">Heading 1</div><div class="t-spec">26px / Bold</div></div><div style="font-size:24px;font-weight:700">12.5<span style="font-size:11px;color:var(--text-muted)">km</span></div><div class="t-use">주간 통계</div></div>
+                <div class="t-row"><div><div class="t-label">Heading 2</div><div class="t-spec">22px / Bold</div></div><div style="font-size:20px;font-weight:700">산책 완료!</div><div class="t-use">결과 제목</div></div>
+                <div class="t-row"><div><div class="t-label">Logo</div><div class="t-spec">19px / Mixed</div></div><div style="font-size:18px;font-weight:300"><strong style="font-weight:700">멍이</strong>랑</div><div class="t-use">앱 로고</div></div>
+                <div class="t-row"><div><div class="t-label">Title</div><div class="t-spec">16px / SemiBold</div></div><div style="font-size:15px;font-weight:600">산책 시작하기</div><div class="t-use">섹션 제목, 버튼</div></div>
+                <div class="t-row"><div><div class="t-label">Body</div><div class="t-spec">14px / SemiBold</div></div><div style="font-size:13px;font-weight:600">보라매공원 반려동물 놀이터</div><div class="t-use">이름, 장소명</div></div>
+                <div class="t-row"><div><div class="t-label">Caption</div><div class="t-spec">12px / Regular</div></div><div style="font-size:11px;color:var(--text-muted)">주간 목표 20km</div><div class="t-use">라벨, 부가정보</div></div>
+                <div class="t-row"><div><div class="t-label">Small</div><div class="t-spec">11px / Regular</div></div><div style="font-size:10px;color:var(--text-muted)">골든 리트리버 · 3살</div><div class="t-use">품종, 상세정보</div></div>
+                <div class="t-row"><div><div class="t-label">Tiny</div><div class="t-spec">10px / Medium</div></div><div style="font-size:10px;font-weight:500;color:var(--text-muted)">홈 &nbsp;소셜 &nbsp;산책 &nbsp;랭킹 &nbsp;MY</div><div class="t-use">네비 라벨</div></div>
+            </div>
+        </section>
+
+        <!-- 라운딩 -->
+        <section class="sec" id="radius">
+            <div class="sec-head"><div class="sec-num">03</div><h2 class="sec-title">라운딩 (둥글기)</h2><p class="sec-desc">큰 카드일수록 더 둥글게, 작은 요소는 덜 둥글게 처리합니다.</p></div>
+            <div class="r-row">
+                <div class="r-item"><div class="r-box" style="width:110px;height:72px;border-radius:28px"></div><div class="r-val">28px</div><div class="r-name">XL - 모달, 패널</div></div>
+                <div class="r-item"><div class="r-box" style="width:100px;height:66px;border-radius:24px"></div><div class="r-val">24px</div><div class="r-name">LG - 주요 카드</div></div>
+                <div class="r-item"><div class="r-box" style="width:90px;height:60px;border-radius:20px"></div><div class="r-val">20px</div><div class="r-name">MD - 일반 카드</div></div>
+                <div class="r-item"><div class="r-box" style="width:80px;height:54px;border-radius:14px"></div><div class="r-val">14px</div><div class="r-name">SM - 작은 카드</div></div>
+                <div class="r-item"><div class="r-box" style="width:70px;height:48px;border-radius:10px"></div><div class="r-val">10px</div><div class="r-name">XS - 아이콘박스</div></div>
+                <div class="r-item"><div class="r-box" style="width:50px;height:50px;border-radius:50%"></div><div class="r-val">50%</div><div class="r-name">원형 - 아바타</div></div>
+            </div>
+        </section>
+
+        <!-- 글래스 -->
+        <section class="sec" id="glass">
+            <div class="sec-head"><div class="sec-num">04</div><h2 class="sec-title">글래스모피즘</h2><p class="sec-desc">반투명 유리 효과. 배경이 흐릿하게 비치면서 투명한 느낌을 줍니다. 이 앱의 핵심 디자인 언어!</p></div>
+            <div class="gl-area">
+                <div class="gl-card" style="background:rgba(255,255,255,.65);backdrop-filter:blur(20px);border:1px solid rgba(197,217,0,.12)"><h4>Glass (기본)</h4><p>투명도 65%, 블러 20px<br>일반 카드, 펫카드, 챌린지</p></div>
+                <div class="gl-card" style="background:rgba(255,255,255,.80);backdrop-filter:blur(20px);border:1px solid rgba(197,217,0,.12)"><h4>Glass Heavy (강한)</h4><p>투명도 80%, 블러 20px<br>헤더, 네비, 산책 패널</p></div>
+                <div class="gl-card" style="background:rgba(255,255,255,.70);backdrop-filter:blur(24px);border-bottom:1px solid rgba(197,217,0,.08)"><h4>Header Glass</h4><p>투명도 70%, 블러 24px<br>상단 헤더 전용</p></div>
+            </div>
+        </section>
+
+        <!-- 그림자 -->
+        <section class="sec" id="shadows">
+            <div class="sec-head"><div class="sec-num">05</div><h2 class="sec-title">그림자 / 빛 효과</h2><p class="sec-desc">어두운 그림자 대신 브랜드 컬러의 은은한 빛(Glow)으로 깊이감을 표현합니다.</p></div>
+            <div class="sh-grid">
+                <div class="sh-card" style="box-shadow:0 8px 32px rgba(197,217,0,.25)"><div class="sh-dot" style="background:var(--lime)"></div><div class="sh-name">Lime Glow</div><div class="sh-desc">산책 시작 버튼, 네비 중앙</div></div>
+                <div class="sh-card" style="box-shadow:0 4px 20px rgba(0,153,255,.20)"><div class="sh-dot" style="background:var(--azure)"></div><div class="sh-name">Azure Glow</div><div class="sh-desc">펫카드 호버</div></div>
+                <div class="sh-card" style="box-shadow:0 4px 20px rgba(239,68,68,.30)"><div class="sh-dot" style="background:#EF4444"></div><div class="sh-name">Danger Glow</div><div class="sh-desc">정지 버튼</div></div>
+                <div class="sh-card" style="box-shadow:0 8px 24px rgba(0,0,0,.04)"><div class="sh-dot" style="background:#E5E7EB;border-radius:10px"></div><div class="sh-name">Soft Shadow</div><div class="sh-desc">카드 호버 시</div></div>
+            </div>
+        </section>
+
+        <!-- 아이콘 -->
+        <section class="sec" id="icons">
+            <div class="sec-head"><div class="sec-num">06</div><h2 class="sec-title">아이콘</h2><p class="sec-desc">Lucide Icons - 선(stroke) 기반의 깔끔한 아이콘 라이브러리</p></div>
+            <h3 class="sub-title">크기 체계</h3>
+            <div class="i-sizes">
+                <div class="item"><i data-lucide="heart" style="width:16px;height:16px;stroke-width:1.8"></i><div class="lbl">16px</div><div class="desc">아주 작은</div></div>
+                <div class="item"><i data-lucide="heart" style="width:20px;height:20px;stroke-width:1.8"></i><div class="lbl">20px</div><div class="desc">기본</div></div>
+                <div class="item"><i data-lucide="heart" style="width:24px;height:24px;stroke-width:1.6"></i><div class="lbl">24px</div><div class="desc">네비, 버튼</div></div>
+                <div class="item"><i data-lucide="heart" style="width:28px;height:28px;stroke-width:1.5"></i><div class="lbl">28px</div><div class="desc">강조</div></div>
+                <div class="item"><i data-lucide="heart" style="width:32px;height:32px;stroke-width:1.4"></i><div class="lbl">32px</div><div class="desc">히어로</div></div>
+            </div>
+            <h3 class="sub-title">앱 아이콘 목록</h3>
+            <div class="i-grid">
+                <div class="i-item"><i data-lucide="home"></i><span>홈</span></div>
+                <div class="i-item"><i data-lucide="users"></i><span>소셜</span></div>
+                <div class="i-item"><i data-lucide="trophy"></i><span>랭킹</span></div>
+                <div class="i-item"><i data-lucide="user"></i><span>MY</span></div>
+                <div class="i-item"><i data-lucide="bell"></i><span>알림</span></div>
+                <div class="i-item"><i data-lucide="heart"></i><span>반려동물</span></div>
+                <div class="i-item"><i data-lucide="sun"></i><span>날씨</span></div>
+                <div class="i-item"><i data-lucide="bar-chart-2"></i><span>통계</span></div>
+                <div class="i-item"><i data-lucide="play"></i><span>재생</span></div>
+                <div class="i-item"><i data-lucide="pause"></i><span>일시정지</span></div>
+                <div class="i-item"><i data-lucide="square"></i><span>중지</span></div>
+                <div class="i-item"><i data-lucide="camera"></i><span>카메라</span></div>
+                <div class="i-item"><i data-lucide="target"></i><span>챌린지</span></div>
+                <div class="i-item"><i data-lucide="map-pin"></i><span>위치</span></div>
+                <div class="i-item"><i data-lucide="map"></i><span>거리</span></div>
+                <div class="i-item"><i data-lucide="clock"></i><span>시간</span></div>
+                <div class="i-item"><i data-lucide="flame"></i><span>칼로리</span></div>
+                <div class="i-item"><i data-lucide="compass"></i><span>탐험</span></div>
+                <div class="i-item"><i data-lucide="trees"></i><span>공원</span></div>
+                <div class="i-item"><i data-lucide="coffee"></i><span>카페</span></div>
+                <div class="i-item"><i data-lucide="heart-pulse"></i><span>병원</span></div>
+                <div class="i-item"><i data-lucide="crown"></i><span>프리미엄</span></div>
+                <div class="i-item"><i data-lucide="award"></i><span>뱃지</span></div>
+                <div class="i-item"><i data-lucide="plus"></i><span>추가</span></div>
+                <div class="i-item"><i data-lucide="locate"></i><span>내 위치</span></div>
+                <div class="i-item"><i data-lucide="crosshair"></i><span>따라가기</span></div>
+                <div class="i-item"><i data-lucide="arrow-right"></i><span>시작</span></div>
+                <div class="i-item"><i data-lucide="x"></i><span>닫기</span></div>
+                <div class="i-item"><i data-lucide="chevron-right"></i><span>더보기</span></div>
+                <div class="i-item"><i data-lucide="timer"></i><span>타이머</span></div>
+            </div>
+        </section>
+
+        <!-- 컴포넌트 -->
+        <section class="sec" id="components">
+            <div class="sec-head"><div class="sec-num">07</div><h2 class="sec-title">컴포넌트 모음</h2><p class="sec-desc">앱에서 반복적으로 사용되는 UI 요소들</p></div>
+            <h3 class="sub-title">버튼</h3>
+            <div class="demo">
+                <div class="demo-label">주요 버튼 (CTA)</div>
+                <div class="demo-row">
+                    <button class="btn-outline">산책 시작하기</button>
+                    <button class="btn-lime">GPS 산책 시작!</button>
+                    <button class="btn-azure">저장하기</button>
+                </div>
+                <div class="demo-label">원형 & 보조 버튼</div>
+                <div class="demo-row">
+                    <button class="btn-nav">🐾</button>
+                    <button class="btn-danger"><i data-lucide="square"></i></button>
+                    <button class="btn-glass"><i data-lucide="pause"></i></button>
+                    <button class="btn-glass"><i data-lucide="camera"></i></button>
+                    <button class="btn-ghost">닫기</button>
+                </div>
+            </div>
+            <h3 class="sub-title">GPS / 뱃지 / 탭</h3>
+            <div class="demo">
+                <div class="demo-label">GPS 상태</div>
+                <div class="demo-row">
+                    <div class="gps off"><span class="gps-dot"></span>GPS 대기</div>
+                    <span style="font-size:12px;color:var(--text-muted)">→</span>
+                    <div class="gps on"><span class="gps-dot"></span>GPS 활성</div>
+                </div>
+                <div class="demo-label">뱃지 / 칩</div>
+                <div class="demo-row">
+                    <span class="badge az">1km 달성</span>
+                    <span class="badge az">3km 달성</span>
+                    <span class="badge az">30분 산책</span>
+                    <span class="badge lm">#Refreshing</span>
+                </div>
+                <div class="demo-label">탭</div>
+                <div class="demo-row">
+                    <div class="tabs"><button class="tab on">주간</button><button class="tab">월간</button><button class="tab">전체</button></div>
+                </div>
+            </div>
+            <h3 class="sub-title">프로그레스 바 / 토스트</h3>
+            <div class="demo">
+                <div class="demo-label">프로그레스 바</div>
+                <div class="demo-row"><div class="prog"><div class="prog-top"><span>주간 목표 20km</span><strong>62%</strong></div><div class="prog-track"><div class="prog-bar" style="width:62%"></div></div></div></div>
+                <div class="demo-label">토스트 알림</div>
+                <div class="demo-row"><div class="toast">현재 위치를 찾았습니다</div></div>
+            </div>
+        </section>
+
+        <!-- 그라데이션 -->
+        <section class="sec" id="gradients">
+            <div class="sec-head"><div class="sec-num">08</div><h2 class="sec-title">그라데이션</h2><p class="sec-desc">두 가지 이상의 색이 자연스럽게 섞이는 효과</p></div>
+            <div class="g-grid">
+                <div class="g-card"><div class="g-swatch" style="background:linear-gradient(135deg,#C5D900,#9FB300)"><span>Lime CTA</span></div><div class="g-info"><div class="g-name">라임 CTA</div><div class="g-use">산책 시작 버튼, 네비 중앙</div></div></div>
+                <div class="g-card"><div class="g-swatch" style="background:linear-gradient(135deg,#0077CC,#0099FF 60%,#33BBFF)"><span>Azure Premium</span></div><div class="g-info"><div class="g-name">아주르 프리미엄</div><div class="g-use">프리미엄 배너</div></div></div>
+                <div class="g-card"><div class="g-swatch" style="background:linear-gradient(135deg,#EF4444,#DC2626)"><span>Danger</span></div><div class="g-info"><div class="g-name">위험 / 정지</div><div class="g-use">산책 정지 버튼</div></div></div>
+                <div class="g-card"><div class="g-swatch" style="background:linear-gradient(135deg,rgba(0,153,255,.15),rgba(0,153,255,.25) 40%,rgba(197,217,0,.15))"><span style="color:var(--text-primary)">Sky Weather</span></div><div class="g-info"><div class="g-name">하늘 날씨</div><div class="g-use">날씨 카드 배경</div></div></div>
+                <div class="g-card"><div class="g-swatch" style="background:linear-gradient(90deg,#C5D900,#0099FF)"><span>Progress</span></div><div class="g-info"><div class="g-name">프로그레스</div><div class="g-use">진행률 바</div></div></div>
+            </div>
+        </section>
+
+        <!-- 화면 구조 -->
+        <section class="sec" id="screens">
+            <div class="sec-head"><div class="sec-num">09</div><h2 class="sec-title">화면 구조 (13개 스크린)</h2><p class="sec-desc">PROPOSAL 기준 하단 탭 5개 + 서브 화면 8개 = 총 13개 스크린</p></div>
+            <h3 class="sub-title">하단 탭 (메인 5개)</h3>
+            <div class="screen-grid">
+                <div class="screen-card main"><div class="emoji">🏠</div><h4>홈</h4><p>날씨, 주간요약, 산책시작, 펫카드, 랭킹, 챌린지, 주변장소</p></div>
+                <div class="screen-card main"><div class="emoji">👥</div><h4>소셜</h4><p>리더보드 (일별/주간), 챌린지 (친구/앱 기본)</p></div>
+                <div class="screen-card main"><div class="emoji">🐾</div><h4>산책</h4><p>GPS 지도, 타이머, 거리/칼로리, 일시정지/정지</p></div>
+                <div class="screen-card main"><div class="emoji">🗺️</div><h4>지도</h4><p>주변 장소 탐색 (공원, 카페, 병원, 약국)</p></div>
+                <div class="screen-card main"><div class="emoji">👤</div><h4>MY</h4><p>펫 프로필, 산책기록, 뱃지, 등급, 칭호</p></div>
+            </div>
+            <h3 class="sub-title">서브 화면 (8개)</h3>
+            <div class="screen-grid">
+                <div class="screen-card"><div class="emoji">🏅</div><h4>뱃지 컬렉션</h4><p>6카테고리 그리드, 진행률</p></div>
+                <div class="screen-card"><div class="emoji">🗺️</div><h4>지도 상세</h4><p>전체 지도, 장소 핀</p></div>
+                <div class="screen-card"><div class="emoji">📊</div><h4>산책 상세</h4><p>경로, 통계, 속도 그래프</p></div>
+                <div class="screen-card"><div class="emoji">🔔</div><h4>알림</h4><p>뱃지, 리더보드, 리마인더</p></div>
+                <div class="screen-card"><div class="emoji">💎</div><h4>프리미엄</h4><p>혜택 비교, 결제</p></div>
+                <div class="screen-card"><div class="emoji">🚀</div><h4>온보딩</h4><p>소개, 로그인, 펫등록</p></div>
+                <div class="screen-card"><div class="emoji">⚙️</div><h4>설정</h4><p>알림, 구독, 계정</p></div>
+                <div class="screen-card"><div class="emoji">🔐</div><h4>로그인</h4><p>카카오/네이버/Apple</p></div>
+            </div>
+        </section>
+
+        <!-- 뱃지 & 게이미피케이션 -->
+        <section class="sec" id="badges">
+            <div class="sec-head"><div class="sec-num">10</div><h2 class="sec-title">뱃지 & 게이미피케이션</h2><p class="sec-desc">NRC 스타일의 뱃지, 등급, 칭호 시스템 디자인</p></div>
+            <h3 class="sub-title">뱃지 카테고리 (6개)</h3>
+            <div class="badge-grid">
+                <div class="badge-card"><div class="emoji">🏃</div><h4>거리 뱃지</h4><p>10km, 50km, 100km 클럽</p></div>
+                <div class="badge-card"><div class="emoji">🔥</div><h4>연속 뱃지</h4><p>7일, 30일 연속 산책</p></div>
+                <div class="badge-card"><div class="emoji">🧭</div><h4>탐험 뱃지</h4><p>공원 탐험가, 동네 탐험가</p></div>
+                <div class="badge-card"><div class="emoji">⏰</div><h4>시간 뱃지</h4><p>얼리버드, 올빼미</p></div>
+                <div class="badge-card"><div class="emoji">🏆</div><h4>스페셜 뱃지</h4><p>마라토너, 사진왕</p></div>
+                <div class="badge-card"><div class="emoji">🎄</div><h4>시즌 뱃지</h4><p>겨울왕국, 벚꽃산책</p></div>
+            </div>
+            <h3 class="sub-title">등급 시스템 (10단계)</h3>
+            <div class="grade-row">
+                <div class="grade-item"><div class="emoji">🐣</div><div class="lv">Lv.1</div><div class="name">첫걸음</div></div>
+                <div class="grade-item"><div class="emoji">🥾</div><div class="lv">Lv.2</div><div class="name">견습생</div></div>
+                <div class="grade-item"><div class="emoji">🐕</div><div class="lv">Lv.3</div><div class="name">동네산책러</div></div>
+                <div class="grade-item"><div class="emoji">🏃</div><div class="lv">Lv.4</div><div class="name">매니아</div></div>
+                <div class="grade-item"><div class="emoji">⭐</div><div class="lv">Lv.5</div><div class="name">전문가</div></div>
+                <div class="grade-item"><div class="emoji">🌟</div><div class="lv">Lv.6</div><div class="name">달인</div></div>
+                <div class="grade-item"><div class="emoji">💪</div><div class="lv">Lv.7</div><div class="name">영웅</div></div>
+                <div class="grade-item"><div class="emoji">🔥</div><div class="lv">Lv.8</div><div class="name">전설</div></div>
+                <div class="grade-item"><div class="emoji">👑</div><div class="lv">Lv.9</div><div class="name">챔피언</div></div>
+                <div class="grade-item"><div class="emoji">💎</div><div class="lv">Lv.10</div><div class="name">산책의신</div></div>
+            </div>
+            <h3 class="sub-title">챌린지 카드 색상</h3>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <div style="padding:14px 20px;border-radius:12px;background:var(--azure-light);display:flex;align-items:center;gap:8px;"><i data-lucide="map" style="width:18px;height:18px;color:var(--azure)"></i><span style="font-size:12px;font-weight:600;">거리 챌린지</span></div>
+                <div style="padding:14px 20px;border-radius:12px;background:rgba(239,68,68,.08);display:flex;align-items:center;gap:8px;"><i data-lucide="flame" style="width:18px;height:18px;color:#EF4444"></i><span style="font-size:12px;font-weight:600;">연속 챌린지</span></div>
+                <div style="padding:14px 20px;border-radius:12px;background:var(--lime-light);display:flex;align-items:center;gap:8px;"><i data-lucide="compass" style="width:18px;height:18px;color:var(--lime-dark)"></i><span style="font-size:12px;font-weight:600;">탐험 챌린지</span></div>
+                <div style="padding:14px 20px;border-radius:12px;background:rgba(139,92,246,.08);display:flex;align-items:center;gap:8px;"><i data-lucide="clock" style="width:18px;height:18px;color:#8B5CF6"></i><span style="font-size:12px;font-weight:600;">시간 챌린지</span></div>
+            </div>
+        </section>
+
+        <!-- 간격 -->
+        <section class="sec" id="spacing">
+            <div class="sec-head"><div class="sec-num">11</div><h2 class="sec-title">간격 체계</h2><p class="sec-desc">요소들 사이의 여백 규칙. 일관된 간격으로 깔끔한 화면을 유지합니다.</p></div>
+            <div class="sp-list">
+                <div class="sp-row"><div class="sp-bar" style="width:4px"></div><div class="sp-info"><strong>2~4px</strong> <span>XS - 텍스트 사이 미세 간격</span></div></div>
+                <div class="sp-row"><div class="sp-bar" style="width:12px"></div><div class="sp-info"><strong>6~8px</strong> <span>SM - 아이콘과 텍스트 사이</span></div></div>
+                <div class="sp-row"><div class="sp-bar" style="width:28px"></div><div class="sp-info"><strong>10~14px</strong> <span>MD - 카드 사이, 리스트 아이템</span></div></div>
+                <div class="sp-row"><div class="sp-bar" style="width:48px"></div><div class="sp-info"><strong>16~18px</strong> <span>LG - 섹션 좌우 여백, 카드 패딩</span></div></div>
+                <div class="sp-row"><div class="sp-bar" style="width:68px"></div><div class="sp-info"><strong>20~24px</strong> <span>XL - 큰 카드 안쪽 여백</span></div></div>
+                <div class="sp-row"><div class="sp-bar" style="width:88px"></div><div class="sp-info"><strong>28px</strong> <span>2XL - 섹션 제목 위 여백</span></div></div>
+            </div>
+            <h3 class="sub-title">앱 프레임</h3>
+            <div style="display:flex;justify-content:center;margin-top:12px;">
+                <div style="width:180px;border:2px dashed var(--azure);border-radius:18px;padding:14px;text-align:center;">
+                    <div style="font-size:10px;font-weight:700;color:var(--azure);margin-bottom:6px;">최대 너비 480px</div>
+                    <div style="background:var(--bg-base);border-radius:10px;padding:10px;font-size:10px;color:var(--text-muted);text-align:left;">좌우 여백 16px<br>헤더 높이 58px<br>하단 네비 76px</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 애니메이션 -->
+        <section class="sec" id="animation">
+            <div class="sec-head"><div class="sec-num">12</div><h2 class="sec-title">애니메이션</h2><p class="sec-desc">화면에 생동감을 주는 움직임 효과들</p></div>
+            <div class="a-grid">
+                <div class="a-card"><h4>Float (부유)</h4><p>위아래 떠다니는 효과<br>산책 시작 버튼, 네비 중앙</p><div class="a-preview"><div class="a-dot float"></div></div></div>
+                <div class="a-card"><h4>Pulse (맥박)</h4><p>빛이 퍼져나가는 효과<br>GPS 활성 인디케이터</p><div class="a-preview"><div class="a-dot pulse"></div></div></div>
+                <div class="a-card"><h4>Fade In Up (등장)</h4><p>아래에서 올라오며 나타남<br>페이지 첫 로딩 시 카드들</p><div class="a-preview"><div class="a-box fadein"></div></div></div>
+                <div class="a-card"><h4>Slide Up (올라옴)</h4><p>아래에서 올라오는 시트<br>산책 결과 모달</p><div class="a-preview"><div class="a-box slide"></div></div></div>
+                <div class="a-card"><h4>Cloud Drift (구름)</h4><p>좌우로 느리게 흘러감<br>날씨 카드 배경</p><div class="a-preview"><div class="a-cloud"></div></div></div>
+            </div>
+            <h3 class="sub-title">터치/마우스 반응</h3>
+            <div class="int-grid">
+                <div class="int-card"><h5>카드 호버</h5><p>위로 3px + 미세 그림자</p></div>
+                <div class="int-card"><h5>펫카드 호버</h5><p>103% 확대</p></div>
+                <div class="int-card"><h5>버튼 호버</h5><p>위로 2px + 빛 강화</p></div>
+                <div class="int-card"><h5>버튼 누름</h5><p>98% 줄어듦</p></div>
+                <div class="int-card"><h5>리스트 호버</h5><p>오른쪽 8px 밀림</p></div>
+            </div>
+        </section>
+
+        <!-- 디자인 원칙 -->
+        <section class="sec" id="principles">
+            <div class="sec-head"><div class="sec-num">13</div><h2 class="sec-title">디자인 원칙</h2><p class="sec-desc">멍이랑 앱 디자인의 5가지 핵심 원칙</p></div>
+            <div class="p-grid">
+                <div class="p-card"><div class="num">01</div><h4>투명감</h4><p>반투명 유리로 레이어 사이에 깊이감. 배경이 살짝 비치는 시원한 느낌.</p></div>
+                <div class="p-card"><div class="num">02</div><h4>청량감</h4><p>라임+아주르 조합, 밝은 배경. 맑은 날 산책의 상쾌함을 색으로 전달.</p></div>
+                <div class="p-card"><div class="num">03</div><h4>가벼움</h4><p>얇은 글씨, 최소한의 테두리, 넉넉한 여백. 무겁지 않고 시원한 화면.</p></div>
+                <div class="p-card"><div class="num">04</div><h4>생동감</h4><p>떠다니기, 맥박, 구름 등 자연스러운 움직임으로 활력을 줌.</p></div>
+                <div class="p-card"><div class="num">05</div><h4>일관성</h4><p>같은 색, 같은 둥글기, 같은 간격. 어디를 봐도 '멍이랑'다운 경험.</p></div>
+            </div>
+        </section>
+
+    </main>
+    <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
+</body>
+</html>

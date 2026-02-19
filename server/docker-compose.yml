@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: withbowwow-db
+    environment:
+      POSTGRES_USER: withbowwow
+      POSTGRES_PASSWORD: withbowwow1234
+      POSTGRES_DB: withbowwow
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: withbowwow-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:

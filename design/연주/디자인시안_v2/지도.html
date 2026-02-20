@@ -413,6 +413,10 @@
             max-width: var(--modal-width);
             padding: var(--modal-padding-x);
         }
+
+        .glass-icon { display: flex; align-items: center; justify-content: center; }
+        .glass-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .row-icon.glass-icon, .feature-icon.glass-icon, .stat-icon.glass-icon, .info-icon.glass-icon, .step-icon.glass-icon, .onboard-icon.glass-icon, .login-icon.glass-icon { background: transparent !important; border: none !important; padding: 2px; }
     </style>
 </head>
 <body>
@@ -424,17 +428,17 @@
                 <i data-lucide="paw-print"></i>
             </div>
             <span class="header-title">
-                <i data-lucide="map"></i>
+                <img src="../소스/글라스모피니즘 아이콘/소스1/변경_위치.svg" alt="위치" style="width:18px;height:18px;">
                 내 주변
             </span>
         </div>
         <div class="header-actions">
             <a href="알림.html" class="header-btn">
-                <i data-lucide="bell"></i>
+                <img src="../소스/글라스모피니즘 아이콘/소스1/변경_알림.svg" alt="알림" style="width:18px;height:18px;">
                 <span class="notification-dot"></span>
             </a>
             <a href="#" class="header-btn">
-                <i data-lucide="settings"></i>
+                <img src="../소스/글라스모피니즘 아이콘/소스1/변경_시스템.svg" alt="시스템" style="width:18px;height:18px;">
             </a>
         </div>
     </header>
@@ -511,7 +515,7 @@
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
         <div class="sheet-header">
-            <h3><i data-lucide="map-pin" style="width:17px;height:17px;color:var(--lime-dark);stroke-width:2;"></i> 주변 장소</h3>
+            <h3><img src="../소스/글라스모피니즘 아이콘/소스1/변경_위치.svg" alt="위치" style="width:17px;height:17px;"> 주변 장소</h3>
             <span class="result-count">6개 장소</span>
         </div>
 

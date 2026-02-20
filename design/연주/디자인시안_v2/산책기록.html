@@ -391,6 +391,14 @@
         .summary-section {
             animation: fadeInUp 0.5s ease forwards;
         }
+
+        .glass-icon { display: flex; align-items: center; justify-content: center; }
+        .glass-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .row-icon.glass-icon { background: transparent !important; border: none !important; padding: 2px; }
+        .challenge-icon-wrap.glass-icon { background: transparent !important; }
+        .badge-icon-wrap.glass-icon { background: transparent !important; border: none !important; }
+        .nearby-icon-circle.glass-icon { background: transparent !important; }
+        .stat-icon.glass-icon, .record-icon.glass-icon, .noti-icon.glass-icon { background: transparent !important; border: none !important; }
     </style>
 </head>
 <body>
@@ -407,7 +415,7 @@
     <div class="summary-section">
         <div class="summary-grid">
             <div class="stat-card">
-                <div class="stat-icon"><i data-lucide="map-pin"></i></div>
+                <div class="stat-icon glass-icon"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_위치.svg" alt="위치"></div>
                 <div class="stat-value">187</div>
                 <div class="stat-label">총 산책</div>
             </div>
@@ -417,12 +425,12 @@
                 <div class="stat-label">총 km</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i data-lucide="clock"></i></div>
+                <div class="stat-icon glass-icon"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_달력.svg" alt="달력"></div>
                 <div class="stat-value">94.2</div>
                 <div class="stat-label">총 시간</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i data-lucide="flame"></i></div>
+                <div class="stat-icon glass-icon"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_산책.svg" alt="산책"></div>
                 <div class="stat-value">17.2k</div>
                 <div class="stat-label">총 kcal</div>
             </div>

@@ -743,6 +743,9 @@
         .empty-state .icon { font-size: 48px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
         .empty-state .icon i { width: 48px; height: 48px; color: var(--text-muted); }
         .empty-state p { font-size: 14px; }
+        .glass-icon { display: flex; align-items: center; justify-content: center; }
+        .glass-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .row-icon.glass-icon, .menu-icon.glass-icon, .feature-icon.glass-icon, .stat-icon.glass-icon, .rank-icon.glass-icon, .premium-icon-box.glass-icon, .tab-icon.glass-icon { background: transparent !important; border: none !important; padding: 2px; }
     </style>
 </head>
 <body>
@@ -774,7 +777,7 @@
             <!-- Weekly Calendar -->
             <div class="calendar-section">
                 <div class="calendar-header">
-                    <h4><i data-lucide="calendar"></i> 주간 산책 현황</h4>
+                    <h4><img src="../소스/글라스모피니즘 아이콘/소스1/변경_달력.svg" alt="달력" style="width:20px;height:20px;vertical-align:middle;"> 주간 산책 현황</h4>
                     <span id="weekLabel">2월 3주차</span>
                 </div>
                 <div class="calendar-week" id="calendarWeek">
@@ -803,14 +806,14 @@
             </button>
 
             <!-- My Active Challenges (friend challenges) -->
-            <div class="section-title"><h3><i data-lucide="flame"></i> 내가 참가 중인 챌린지</h3></div>
+            <div class="section-title"><h3><img src="../소스/글라스모피니즘 아이콘/소스1/변경_산책.svg" alt="산책" style="width:22px;height:22px;vertical-align:middle;"> 내가 참가 중인 챌린지</h3></div>
 
             <div class="friend-challenge-list" id="friendChallengeList">
                 <!-- Populated by JS -->
             </div>
 
             <!-- Monthly Challenges -->
-            <div class="section-title"><h3><i data-lucide="trophy"></i> 이달의 챌린지</h3></div>
+            <div class="section-title"><h3><img src="../소스/글라스모피니즘 아이콘/소스1/변경_랭킹.svg" alt="랭킹" style="width:22px;height:22px;vertical-align:middle;"> 이달의 챌린지</h3></div>
 
             <div class="monthly-challenge-list" id="monthlyChallengeList">
                 <!-- Populated by JS -->
@@ -890,7 +893,7 @@
     <div class="modal-overlay" id="challengeCreateModal">
         <div class="modal-frame">
             <div class="modal-header">
-                <h3><i data-lucide="award"></i> 챌린지 만들기</h3>
+                <h3><img src="../소스/글라스모피니즘 아이콘/소스1/변경_뱃지.svg" alt="뱃지" style="width:22px;height:22px;vertical-align:middle;"> 챌린지 만들기</h3>
                 <button class="modal-close" onclick="closeModal('challengeCreateModal')"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
@@ -949,7 +952,7 @@
     <div class="modal-overlay" id="challengeDetailModal">
         <div class="modal-frame">
             <div class="modal-header">
-                <h3><i data-lucide="trophy"></i> 챌린지 상세</h3>
+                <h3><img src="../소스/글라스모피니즘 아이콘/소스1/변경_랭킹.svg" alt="랭킹" style="width:22px;height:22px;vertical-align:middle;"> 챌린지 상세</h3>
                 <button class="modal-close" onclick="closeModal('challengeDetailModal')"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" id="challengeDetailBody">
@@ -1238,7 +1241,7 @@
             html += '<div class="mc-info">';
             html += '<div class="mc-name">' + c.name + '</div>';
             html += '<div class="mc-goal">' + c.goal + '/\uC6D4</div>';
-            html += '<div class="mc-deadline"><i data-lucide="clock"></i> D-' + daysLeft + '</div>';
+            html += '<div class="mc-deadline"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_달력.svg" alt="달력" style="width:14px;height:14px;vertical-align:middle;"> D-' + daysLeft + '</div>';
             html += '</div>';
             html += '<button class="mc-join-btn ' + joinedClass + '" data-index="' + i + '" onclick="event.stopPropagation(); toggleJoinChallenge(this, ' + i + ')">' + joinedText + '</button>';
             html += '</div>';
@@ -1313,9 +1316,9 @@
             html += '<div class="fc-challenge-info">';
             html += '<div class="fc-challenge-name">' + c.name + '</div>';
             html += '<div class="fc-challenge-meta">' + c.goal + '/\uC6D4</div>';
-            html += '<div class="fc-challenge-deadline"><i data-lucide="clock"></i> D-' + daysLeft + '</div>';
+            html += '<div class="fc-challenge-deadline"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_달력.svg" alt="달력" style="width:14px;height:14px;vertical-align:middle;"> D-' + daysLeft + '</div>';
             html += '</div>';
-            html += '<div class="fc-challenge-people"><i data-lucide="users"></i> ' + c.participants.length + '\uBA85</div>';
+            html += '<div class="fc-challenge-people"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_내친구.svg" alt="내친구" style="width:14px;height:14px;vertical-align:middle;"> ' + c.participants.length + '\uBA85</div>';
             html += '</div>';
         });
         list.innerHTML = html;
@@ -1361,14 +1364,14 @@
         html += '<div class="challenge-detail-info">';
         html += '<div class="cd-title">' + challenge.icon + ' ' + challenge.name + '</div>';
         html += '<div class="cd-meta">';
-        html += '<span><i data-lucide="target"></i> \uBAA9\uD45C: ' + challenge.goal + '</span>';
-        html += '<span><i data-lucide="calendar"></i> \uAE30\uAC04: ' + startDate + ' ~ ' + endDate + '</span>';
-        html += '<span><i data-lucide="users"></i> \uCC38\uAC00\uC790: ' + (typeof challenge.participants === 'number' ? challenge.participants.toLocaleString() + '\uBA85' : challenge.participants + '\uBA85') + '</span>';
+        html += '<span><img src="../소스/글라스모피니즘 아이콘/소스1/변경_체크.svg" alt="체크" style="width:16px;height:16px;vertical-align:middle;"> \uBAA9\uD45C: ' + challenge.goal + '</span>';
+        html += '<span><img src="../소스/글라스모피니즘 아이콘/소스1/변경_달력.svg" alt="달력" style="width:16px;height:16px;vertical-align:middle;"> \uAE30\uAC04: ' + startDate + ' ~ ' + endDate + '</span>';
+        html += '<span><img src="../소스/글라스모피니즘 아이콘/소스1/변경_내친구.svg" alt="내친구" style="width:16px;height:16px;vertical-align:middle;"> \uCC38\uAC00\uC790: ' + (typeof challenge.participants === 'number' ? challenge.participants.toLocaleString() + '\uBA85' : challenge.participants + '\uBA85') + '</span>';
         html += '</div>';
-        html += '<div class="cd-remaining"><i data-lucide="clock"></i> D-' + daysLeft + '</div>';
+        html += '<div class="cd-remaining"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_달력.svg" alt="달력" style="width:14px;height:14px;vertical-align:middle;"> D-' + daysLeft + '</div>';
         html += '</div>';
 
-        html += '<div class="cd-leaderboard-title"><i data-lucide="trophy"></i> \uCC38\uAC00\uC790 \uB9AC\uB354\uBCF4\uB4DC</div>';
+        html += '<div class="cd-leaderboard-title"><img src="../소스/글라스모피니즘 아이콘/소스1/변경_랭킹.svg" alt="랭킹" style="width:20px;height:20px;vertical-align:middle;"> \uCC38\uAC00\uC790 \uB9AC\uB354\uBCF4\uB4DC</div>';
         html += '<div class="cd-leaderboard">';
         leaderboard.forEach(function(p, rank) {
             var rankClass = '';

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>랭킹 - 멍이랑 withbowwow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --nav-height: 72px;
+            --header-height: 56px;
+            --gold: #F59E0B;
+            --gold-bg: #FEF3C7;
+            --silver: #9CA3AF;
+            --silver-bg: #F3F4F6;
+            --bronze: #F97316;
+            --bronze-bg: #FED7AA;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-title { font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s; text-decoration: none; }
+        .header-btn:hover { background: var(--border); }
+        .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
+
+        /* ===== Content ===== */
+        .content { padding-bottom: calc(var(--nav-height) + 20px); }
+
+        /* ===== Segment Control ===== */
+        .segment-control {
+            margin: 16px 16px 0;
+            display: flex;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .segment-btn {
+            flex: 1; padding: 10px;
+            text-align: center;
+            font-size: 14px; font-weight: 600;
+            color: var(--text-secondary);
+            border: none; background: none;
+            border-radius: var(--radius-xs);
+            font-family: inherit; cursor: pointer;
+            transition: all 0.25s;
+        }
+        .segment-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+        }
+
+        /* ===== Filter ===== */
+        .filter-row {
+            margin: 12px 16px 0;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .filter-select {
+            flex: 1; padding: 10px 14px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-weight: 500;
+            font-family: inherit; color: var(--text);
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%236B7280' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .filter-select:focus { outline: none; border-color: var(--primary); }
+        .filter-tag {
+            padding: 8px 14px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* ===== My Rank Card ===== */
+        .my-rank-card {
+            margin: 16px 16px 0;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, var(--primary-light), #A7F3D0);
+            border-radius: var(--radius);
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: var(--shadow);
+            position: relative; overflow: hidden;
+        }
+        .my-rank-card::before {
+            content: '';
+            position: absolute; top: -20px; right: -20px;
+            width: 80px; height: 80px;
+            background: rgba(16,185,129,0.15);
+            border-radius: 50%;
+        }
+        .my-rank-num {
+            width: 48px; height: 48px;
+            background: var(--primary);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: white;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        }
+        .my-rank-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+        .my-rank-info { flex: 1; min-width: 0; }
+        .my-rank-name { font-size: 15px; font-weight: 700; }
+        .my-rank-pet { font-size: 12px; color: var(--primary-dark); margin-top: 2px; }
+        .my-rank-stats { text-align: right; }
+        .my-rank-distance { font-size: 22px; font-weight: 800; color: var(--primary-dark); }
+        .my-rank-distance .unit { font-size: 12px; font-weight: 600; }
+        .my-rank-change { font-size: 12px; font-weight: 600; color: var(--primary-dark); margin-top: 2px; }
+
+        /* ===== Top 3 Podium ===== */
+        .podium-section { padding: 20px 16px 0; }
+        .podium {
+            display: flex; align-items: flex-end; justify-content: center;
+            gap: 12px; padding-bottom: 8px;
+        }
+        .podium-item {
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .podium-item:hover { transform: translateY(-4px); }
+        .podium-avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; margin-bottom: 8px;
+            position: relative;
+        }
+        .podium-item.first .podium-avatar {
+            width: 72px; height: 72px; font-size: 36px;
+            background: linear-gradient(135deg, var(--gold-bg), #FDE68A);
+            border: 3px solid var(--gold);
+            box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+        }
+        .podium-item.second .podium-avatar {
+            background: var(--silver-bg);
+            border: 3px solid var(--silver);
+        }
+        .podium-item.third .podium-avatar {
+            background: var(--bronze-bg);
+            border: 3px solid var(--bronze);
+        }
+        .podium-crown {
+            position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+            font-size: 20px;
+        }
+        .podium-medal {
+            position: absolute; bottom: -4px; right: -4px;
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; color: white;
+            border: 2px solid var(--white);
+        }
+        .podium-item.first .podium-medal { background: var(--gold); }
+        .podium-item.second .podium-medal { background: var(--silver); }
+        .podium-item.third .podium-medal { background: var(--bronze); }
+        .podium-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; text-align: center; }
+        .podium-pet { font-size: 10px; color: var(--text-light); margin-bottom: 4px; }
+        .podium-dist { font-size: 14px; font-weight: 700; }
+        .podium-item.first .podium-dist { color: #D97706; }
+        .podium-item.second .podium-dist { color: var(--text-secondary); }
+        .podium-item.third .podium-dist { color: #C2410C; }
+        .podium-bar {
+            width: 80px; border-radius: 12px 12px 0 0;
+            display: flex; align-items: flex-start; justify-content: center;
+            padding-top: 10px; margin-top: 8px;
+        }
+        .podium-item.first .podium-bar { height: 80px; background: linear-gradient(to bottom, var(--gold-bg), rgba(254,243,199,0.3)); }
+        .podium-item.second .podium-bar { height: 60px; background: linear-gradient(to bottom, var(--silver-bg), rgba(243,244,246,0.3)); }
+        .podium-item.third .podium-bar { height: 45px; background: linear-gradient(to bottom, var(--bronze-bg), rgba(254,215,170,0.3)); }
+
+        /* ===== Ranking List ===== */
+        .ranking-card {
+            margin: 16px 16px 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .ranking-list-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .ranking-list-header h4 { font-size: 14px; font-weight: 700; }
+        .ranking-list-header span { font-size: 12px; color: var(--text-light); }
+        .ranking-list { padding: 0; }
+        .ranking-item {
+            display: flex; align-items: center;
+            padding: 14px 18px; gap: 14px;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(229,231,235,0.5);
+        }
+        .ranking-item:last-child { border-bottom: none; }
+        .ranking-item:hover { background: var(--bg); }
+        .rank-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
+            color: var(--text-secondary); background: var(--bg);
+        }
+        .rank-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary-light), var(--border));
+        }
+        .rank-info { flex: 1; min-width: 0; }
+        .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rank-pet { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .rank-distance { text-align: right; }
+        .rank-distance .dist { font-size: 15px; font-weight: 700; color: var(--text); }
+        .rank-distance .dist .unit { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+        .rank-distance .change { font-size: 11px; margin-top: 2px; }
+        .change-up { color: var(--primary); }
+        .change-down { color: var(--danger); }
+        .change-same { color: var(--text-light); }
+
+        /* ===== Hall of Fame ===== */
+        .hall-of-fame {
+            margin: 20px 16px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1E1B4B, #312E81);
+            border-radius: var(--radius);
+            text-align: center;
+            position: relative; overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .hall-of-fame::before {
+            content: '';
+            position: absolute; top: -30px; right: -30px;
+            width: 100px; height: 100px;
+            background: rgba(245,158,11,0.15);
+            border-radius: 50%;
+        }
+        .hall-of-fame::after {
+            content: '';
+            position: absolute; bottom: -20px; left: -20px;
+            width: 80px; height: 80px;
+            background: rgba(139,92,246,0.15);
+            border-radius: 50%;
+        }
+        .hof-badge { font-size: 40px; margin-bottom: 8px; }
+        .hof-label { font-size: 12px; font-weight: 600; color: #A5B4FC; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+        .hof-title { font-size: 20px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .hof-name { font-size: 15px; font-weight: 600; color: #FCD34D; margin-bottom: 8px; }
+        .hof-stats { display: flex; justify-content: center; gap: 24px; }
+        .hof-stat { text-align: center; }
+        .hof-stat .value { font-size: 16px; font-weight: 700; color: white; }
+        .hof-stat .label { font-size: 10px; color: #C4B5FD; margin-top: 2px; }
+
+        /* ===== Bottom Nav ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 8px 12px; border: none; background: none;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            position: relative; min-width: 52px;
+            text-decoration: none; color: inherit;
+        }
+        .nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
+        .nav-item:hover .nav-icon { transform: translateY(-2px); }
+        .nav-item.center-btn { position: relative; top: -14px; }
+        .nav-item.center-btn .nav-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.4);
+            color: white;
+        }
+        .nav-item.center-btn:hover .nav-icon { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(16,185,129,0.5); }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ===== Toast ===== */
+        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">🏆 랭킹</h1>
+        <div class="header-actions">
+            <button class="header-btn" aria-label="알림">
+                🔔<span class="notification-dot"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- Segment Control -->
+        <div class="segment-control animate-in">
+            <button class="segment-btn active" onclick="switchSegment(this)">주간</button>
+            <button class="segment-btn" onclick="switchSegment(this)">월간</button>
+            <button class="segment-btn" onclick="switchSegment(this)">전체</button>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-row animate-in">
+            <select class="filter-select" onchange="toast('지역: ' + this.value)">
+                <option>전체 지역</option>
+                <option>강남구</option>
+                <option>서초구</option>
+                <option>마포구</option>
+                <option>송파구</option>
+                <option>영등포구</option>
+                <option>동작구</option>
+                <option>관악구</option>
+                <option>용산구</option>
+            </select>
+            <span class="filter-tag">📊 2.3~2.9</span>
+        </div>
+
+        <!-- My Rank Card -->
+        <div class="my-rank-card animate-in">
+            <div class="my-rank-num">2</div>
+            <div class="my-rank-avatar">🐕</div>
+            <div class="my-rank-info">
+                <div class="my-rank-name">나 (초코 보호자)</div>
+                <div class="my-rank-pet">🐕 초코 · 골든 리트리버</div>
+            </div>
+            <div class="my-rank-stats">
+                <div class="my-rank-distance">38.1 <span class="unit">km</span></div>
+                <div class="my-rank-change">▲ 2단계 상승</div>
+            </div>
+        </div>
+
+        <!-- Top 3 Podium -->
+        <div class="podium-section animate-in">
+            <div class="podium">
+                <!-- 2nd -->
+                <div class="podium-item second">
+                    <div class="podium-avatar">
+                        🐕
+                        <span class="podium-medal">2</span>
+                    </div>
+                    <div class="podium-name">나 ⭐</div>
+                    <div class="podium-pet">초코</div>
+                    <div class="podium-dist">38.1km</div>
+                    <div class="podium-bar"></div>
+                </div>
+                <!-- 1st -->
+                <div class="podium-item first">
+                    <div class="podium-avatar">
+                        <span class="podium-crown">👑</span>
+                        🐕
+                        <span class="podium-medal">1</span>
+                    </div>
+                    <div class="podium-name">초코아빠</div>
+                    <div class="podium-pet">보리</div>
+                    <div class="podium-dist">45.2km</div>
+                    <div class="podium-bar"></div>
+                </div>
+                <!-- 3rd -->
+                <div class="podium-item third">
+                    <div class="podium-avatar">
+                        🐩
+                        <span class="podium-medal">3</span>
+                    </div>
+                    <div class="podium-name">달이맘</div>
+                    <div class="podium-pet">달이</div>
+                    <div class="podium-dist">32.7km</div>
+                    <div class="podium-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ranking List (4~10) -->
+        <div class="ranking-card animate-in">
+            <div class="ranking-list-header">
+                <h4>전체 순위</h4>
+                <span>참여 128명</span>
+            </div>
+            <div class="ranking-list">
+                <div class="ranking-item">
+                    <span class="rank-num">4</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A)">🐕</div>
+                    <div class="rank-info"><div class="rank-name">바둑이집사</div><div class="rank-pet">바둑이 · 진돗개</div></div>
+                    <div class="rank-distance"><div class="dist">28.4 <span class="unit">km</span></div><div class="change change-up">▲ 1</div></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">5</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4)">🐈</div>
+                    <div class="rank-info"><div class="rank-name">콩이엄마</div><div class="rank-pet">콩이 · 러시안블루</div></div>
+                    <div class="rank-distance"><div class="dist">21.9 <span class="unit">km</span></div><div class="change change-down">▼ 2</div></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">6</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#DBEAFE,#93C5FD)">🦮</div>
+                    <div class="rank-info"><div class="rank-name">모카러버</div><div class="rank-pet">모카 · 시바 이누</div></div>
+                    <div class="rank-distance"><div class="dist">19.3 <span class="unit">km</span></div><div class="change change-up">▲ 3</div></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">7</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#EDE9FE,#C4B5FD)">🐶</div>
+                    <div class="rank-info"><div class="rank-name">뽀삐아빠</div><div class="rank-pet">뽀삐 · 비숑 프리제</div></div>
+                    <div class="rank-distance"><div class="dist">17.8 <span class="unit">km</span></div><div class="change change-same">- 0</div></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">8</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#FEE2E2,#FCA5A5)">🐕‍🦺</div>
+                    <div class="rank-info"><div class="rank-name">해피맘</div><div class="rank-pet">해피 · 래브라도</div></div>
+                    <div class="rank-distance"><div class="dist">16.2 <span class="unit">km</span></div><div class="change change-up">▲ 1</div></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">9</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0)">🐕</div>
+                    <div class="rank-info"><div class="rank-name">초코엄마</div><div class="rank-pet">두부 · 말티즈</div></div>
+                    <div class="rank-distance"><div class="dist">14.5 <span class="unit">km</span></div><div class="change change-down">▼ 1</div></div>
+                </div>
+                <div class="ranking-item">
+                    <span class="rank-num">10</span>
+                    <div class="rank-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A)">🐩</div>
+                    <div class="rank-info"><div class="rank-name">루루집사</div><div class="rank-pet">루루 · 푸들</div></div>
+                    <div class="rank-distance"><div class="dist">12.1 <span class="unit">km</span></div><div class="change change-up">▲ 2</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hall of Fame -->
+        <div class="hall-of-fame animate-in">
+            <div class="hof-badge">👑</div>
+            <div class="hof-label">HALL OF FAME</div>
+            <div class="hof-title">이달의 산책왕</div>
+            <div class="hof-name">🐕 초코아빠 & 보리</div>
+            <div class="hof-stats">
+                <div class="hof-stat"><div class="value">187.3km</div><div class="label">총 거리</div></div>
+                <div class="hof-stat"><div class="value">28회</div><div class="label">산책 횟수</div></div>
+                <div class="hof-stat"><div class="value">32:15</div><div class="label">총 시간</div></div>
+            </div>
+        </div>
+
+        <div style="height: 24px;"></div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
+        <a href="소셜.html" class="nav-item"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item center-btn"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></a>
+        <a href="랭킹.html" class="nav-item active"><span class="nav-icon">🏆</span><span class="nav-label">랭킹</span></a>
+        <a href="마이페이지.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    // Segment switch
+    function switchSegment(btn) {
+        document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        toast('📊 ' + btn.textContent + ' 랭킹');
+    }
+
+    // Toast
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+    </script>
+</body>
+</html>

@@ -4,77 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>뱃지 컬렉션 - 멍이랑</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <style>
         :root {
-            --primary: #10B981;
-            --primary-dark: #059669;
-            --primary-light: #D1FAE5;
-            --secondary: #3B82F6;
-            --secondary-dark: #1D4ED8;
-            --accent: #F59E0B;
-            --accent-light: #FEF3C7;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --text-light: #9CA3AF;
-            --bg: #F9FAFB;
-            --white: #FFFFFF;
-            --border: #E5E7EB;
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10);
+            --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08);
+            --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12);
+            --glass-blur: blur(20px);
             --danger: #EF4444;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --radius-xs: 8px;
-            --nav-height: 72px;
-            --header-height: 56px;
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
+            --nav-height: 76px;
+            --header-height: 58px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            max-width: 480px;
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
             margin: 0 auto;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            padding-bottom: var(--nav-height);
         }
 
-        /* ===== Header ===== */
+        /* ===== Header (Glassmorphism) ===== */
         .header {
-            position: sticky; top: 0; z-index: 100;
-            background: var(--white);
-            padding: 0 16px;
-            display: flex; align-items: center; justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 0 var(--modal-padding-x);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             height: var(--header-height);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--glass-border);
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .back-btn {
-            width: 36px; height: 36px; border-radius: 50%; border: none;
-            background: var(--bg); font-size: 18px; cursor: pointer;
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            font-size: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s; text-decoration: none; color: var(--text);
+            transition: all 0.2s; text-decoration: none; color: var(--text-primary);
         }
-        .back-btn:hover { background: var(--border); }
-        .header-title { font-size: 17px; font-weight: 700; }
-        .header-right { font-size: 13px; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 4px 12px; border-radius: 20px; }
+        .back-btn:hover { background: var(--lime-light); }
+        .back-btn i { width: 20px; height: 20px; stroke-width: 2.2; }
+        .header-title {
+            font-size: 17px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .header-title i { color: var(--lime-dark); width: 20px; height: 20px; }
+        .header-right {
+            font-size: 13px; font-weight: 600;
+            color: var(--lime-dark);
+            background: var(--lime-light);
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
 
         /* ===== Content ===== */
         .content { padding: 0 0 32px; }
 
         /* ===== Stats Hero ===== */
         .stats-hero {
-            background: linear-gradient(135deg, #059669 0%, #10B981 50%, #34D399 100%);
-            margin: 16px;
-            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--lime-dark) 0%, var(--lime) 50%, #D4E600 100%);
+            margin: 16px var(--modal-padding-x);
+            border-radius: var(--radius-xl);
             padding: 28px 24px;
-            color: white;
+            color: var(--text-primary);
             position: relative;
             overflow: hidden;
         }
@@ -82,14 +108,14 @@
             content: '';
             position: absolute; top: -40px; right: -40px;
             width: 140px; height: 140px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
             border-radius: 50%;
         }
         .stats-hero::after {
             content: '';
             position: absolute; bottom: -30px; left: -20px;
             width: 100px; height: 100px;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.08);
             border-radius: 50%;
         }
         .stats-hero-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 24px; }
@@ -97,65 +123,81 @@
             width: 110px; height: 110px; position: relative; flex-shrink: 0;
         }
         .stats-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-        .stats-ring .ring-bg { fill: none; stroke: rgba(255,255,255,0.2); stroke-width: 8; }
+        .stats-ring .ring-bg { fill: none; stroke: rgba(255,255,255,0.35); stroke-width: 8; }
         .stats-ring .ring-fill { fill: none; stroke: white; stroke-width: 8; stroke-linecap: round; stroke-dasharray: 283; stroke-dashoffset: 204; transition: stroke-dashoffset 1.5s ease; }
         .stats-ring-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
             text-align: center;
         }
-        .stats-ring-text .num { font-size: 32px; font-weight: 800; line-height: 1; }
-        .stats-ring-text .pct { font-size: 11px; font-weight: 500; opacity: 0.8; }
+        .stats-ring-text .num { font-size: 32px; font-weight: 800; line-height: 1; color: #fff; }
+        .stats-ring-text .pct { font-size: 11px; font-weight: 500; opacity: 0.85; color: #fff; }
         .stats-info { flex: 1; }
-        .stats-info h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-        .stats-info p { font-size: 13px; opacity: 0.85; line-height: 1.5; }
+        .stats-info h2 {
+            font-size: 20px; font-weight: 800; margin-bottom: 4px;
+            color: #fff;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .stats-info h2 i { width: 22px; height: 22px; }
+        .stats-info p { font-size: 13px; opacity: 0.9; line-height: 1.5; color: rgba(255,255,255,0.9); }
         .stats-detail {
             display: flex; gap: 16px; margin-top: 12px;
         }
         .stats-detail-item { text-align: center; }
-        .stats-detail-item .val { font-size: 18px; font-weight: 700; }
-        .stats-detail-item .lbl { font-size: 10px; opacity: 0.75; margin-top: 2px; }
+        .stats-detail-item .val { font-size: 18px; font-weight: 700; color: #fff; }
+        .stats-detail-item .lbl { font-size: 10px; opacity: 0.8; margin-top: 2px; color: rgba(255,255,255,0.85); }
 
         /* ===== Category Filter ===== */
         .category-filter {
-            display: flex; gap: 8px; padding: 0 16px;
+            display: flex; gap: 8px; padding: 0 var(--modal-padding-x);
             overflow-x: auto; scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
         .category-filter::-webkit-scrollbar { display: none; }
         .cat-btn {
             flex-shrink: 0;
-            padding: 8px 16px;
-            border-radius: 24px;
-            border: 1.5px solid var(--border);
-            background: var(--white);
+            padding: 8px 18px;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             font-size: 13px; font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
             font-family: inherit;
-            transition: all 0.2s;
+            transition: all 0.25s;
             white-space: nowrap;
+            display: flex; align-items: center; gap: 5px;
         }
-        .cat-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .cat-btn i { width: 15px; height: 15px; }
+        .cat-btn:hover { border-color: var(--lime); color: var(--lime-dark); }
         .cat-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+            background: var(--lime);
+            border-color: var(--lime);
+            color: var(--text-primary);
         }
 
         /* ===== Section Title ===== */
         .section-title {
-            padding: 24px 16px 12px;
+            padding: 24px var(--modal-padding-x) 12px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .section-title h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .section-title .count { font-size: 13px; color: var(--text-light); font-weight: 500; }
+        .section-title h3 {
+            font-size: 17px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-primary);
+        }
+        .section-title h3 i { width: 20px; height: 20px; color: var(--lime-dark); }
+        .section-title .count { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
         /* ===== Almost There (soon) ===== */
         .soon-card {
-            margin: 0 16px 12px;
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-            border-radius: var(--radius);
+            margin: 0 var(--modal-padding-x) 12px;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--lime-glow);
+            border-radius: var(--radius-lg);
             padding: 20px;
             position: relative;
             overflow: hidden;
@@ -167,62 +209,94 @@
             content: '';
             position: absolute; top: -20px; right: -20px;
             width: 80px; height: 80px;
-            background: rgba(245,158,11,0.15); border-radius: 50%;
+            background: var(--lime-glow); border-radius: 50%;
         }
         .soon-card-inner { position: relative; z-index: 1; }
         .soon-label {
-            display: inline-block;
-            background: rgba(245,158,11,0.25); color: #92400E;
+            display: inline-flex; align-items: center; gap: 4px;
+            background: var(--lime-light); color: var(--lime-dark);
             font-size: 11px; font-weight: 700;
             padding: 3px 10px; border-radius: 20px;
             margin-bottom: 10px;
+            border: 1px solid var(--glass-border);
         }
+        .soon-label i { width: 13px; height: 13px; }
         .soon-main { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
-        .soon-icon { font-size: 40px; }
+        .soon-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            background: var(--lime-light);
+            border: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .soon-icon i { width: 26px; height: 26px; color: var(--lime-dark); }
         .soon-info { flex: 1; }
-        .soon-info h4 { font-size: 16px; font-weight: 700; color: #78350F; }
-        .soon-info p { font-size: 12px; color: #92400E; margin-top: 2px; }
-        .soon-progress { height: 8px; background: rgba(245,158,11,0.2); border-radius: 8px; overflow: hidden; }
-        .soon-progress-fill { height: 100%; background: linear-gradient(90deg, #F59E0B, #EAB308); border-radius: 8px; }
+        .soon-info h4 { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .soon-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .soon-progress { height: 8px; background: var(--lime-light); border-radius: 8px; overflow: hidden; }
+        .soon-progress-fill { height: 100%; background: linear-gradient(90deg, var(--lime), var(--azure)); border-radius: 8px; }
         .soon-footer { display: flex; justify-content: space-between; margin-top: 8px; }
-        .soon-footer span { font-size: 12px; font-weight: 600; color: #92400E; }
+        .soon-footer span { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+        /* soon-card variant: streak */
+        .soon-card.variant-streak { border-color: rgba(239,68,68,0.15); }
+        .soon-card.variant-streak::before { background: rgba(239,68,68,0.12); }
+        .soon-card.variant-streak .soon-label {
+            background: rgba(239,68,68,0.08); color: #DC2626;
+            border-color: rgba(239,68,68,0.12);
+        }
+        .soon-card.variant-streak .soon-icon {
+            background: rgba(239,68,68,0.08);
+            border-color: rgba(239,68,68,0.12);
+        }
+        .soon-card.variant-streak .soon-icon i { color: #DC2626; }
+        .soon-card.variant-streak .soon-progress { background: rgba(239,68,68,0.10); }
+        .soon-card.variant-streak .soon-progress-fill { background: linear-gradient(90deg, #EF4444, #DC2626); }
+        .soon-card.variant-streak .soon-footer span { color: #991B1B; }
 
         /* ===== In Progress Card ===== */
-        .progress-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+        .progress-list { padding: 0 var(--modal-padding-x); display: flex; flex-direction: column; gap: 10px; }
         .progress-card {
-            background: var(--white);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
             padding: 16px 18px;
             display: flex; align-items: center; gap: 14px;
-            box-shadow: var(--shadow-sm);
             cursor: pointer;
             transition: all 0.2s;
         }
-        .progress-card:hover { box-shadow: var(--shadow); transform: translateX(4px); }
+        .progress-card:hover { transform: translateX(4px); border-color: var(--lime-glow); }
         .progress-icon {
             width: 48px; height: 48px;
-            border-radius: 14px;
+            border-radius: var(--radius-sm);
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
             flex-shrink: 0;
-            opacity: 0.7;
             position: relative;
         }
-        .progress-icon.distance { background: #DBEAFE; }
-        .progress-icon.streak { background: #FEE2E2; }
-        .progress-icon.explore { background: #FEF3C7; }
-        .progress-icon.time { background: #EDE9FE; }
-        .progress-icon.special { background: #FCE7F3; }
+        .progress-icon i { width: 24px; height: 24px; }
+        .progress-icon.distance { background: var(--azure-light); }
+        .progress-icon.distance i { color: var(--azure); }
+        .progress-icon.streak { background: rgba(239,68,68,0.08); }
+        .progress-icon.streak i { color: #EF4444; }
+        .progress-icon.explore { background: var(--lime-light); }
+        .progress-icon.explore i { color: var(--lime-dark); }
+        .progress-icon.time { background: rgba(139,92,246,0.08); }
+        .progress-icon.time i { color: #8B5CF6; }
+        .progress-icon.special { background: rgba(236,72,153,0.08); }
+        .progress-icon.special i { color: #EC4899; }
         .progress-card-info { flex: 1; min-width: 0; }
-        .progress-card-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .progress-card-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
         .progress-bar-wrap { display: flex; align-items: center; gap: 10px; }
-        .progress-bar { flex: 1; height: 6px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+        .progress-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden; }
         .progress-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
-        .progress-bar-fill.green { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
+        .progress-bar-fill.gradient { background: linear-gradient(90deg, var(--lime), var(--azure)); }
         .progress-bar-fill.red { background: linear-gradient(90deg, #EF4444, #DC2626); }
-        .progress-bar-fill.amber { background: linear-gradient(90deg, #F59E0B, #D97706); }
+        .progress-bar-fill.amber { background: linear-gradient(90deg, var(--lime), var(--lime-dark)); }
         .progress-bar-fill.purple { background: linear-gradient(90deg, #8B5CF6, #7C3AED); }
-        .progress-bar-fill.blue { background: linear-gradient(90deg, #3B82F6, #1D4ED8); }
+        .progress-bar-fill.blue { background: linear-gradient(90deg, var(--azure), var(--azure-dark)); }
         .progress-bar-fill.pink { background: linear-gradient(90deg, #EC4899, #DB2777); }
         .progress-pct { font-size: 12px; font-weight: 700; color: var(--text-secondary); white-space: nowrap; min-width: 50px; text-align: right; }
 
@@ -231,64 +305,84 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            padding: 0 16px;
+            padding: 0 var(--modal-padding-x);
         }
         .badge-item {
-            background: var(--white);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
             padding: 18px 8px 14px;
             text-align: center;
-            box-shadow: var(--shadow-sm);
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
             overflow: hidden;
         }
-        .badge-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .badge-item:hover { transform: translateY(-4px); border-color: var(--lime-glow); }
 
         /* Earned state */
         .badge-item.earned {
-            background: var(--white);
-            box-shadow: 0 2px 12px rgba(16,185,129,0.15), var(--shadow-sm);
+            background: var(--glass-bg-heavy);
+            border-color: var(--lime-glow);
         }
         .badge-item.earned::before {
             content: '';
             position: absolute; top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(90deg, var(--lime), var(--azure));
         }
-        .badge-item.earned .badge-icon {
-            filter: none;
+        .badge-item.earned .badge-icon-wrap {
             animation: badgeGlow 3s infinite alternate;
         }
 
         /* Locked state */
         .badge-item.locked {
-            background: #F3F4F6;
-            box-shadow: none;
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
         }
-        .badge-item.locked .badge-icon { filter: grayscale(1); opacity: 0.4; }
-        .badge-item.locked .badge-name { color: var(--text-light); }
+        .badge-item.locked .badge-icon-wrap { filter: grayscale(1); opacity: 0.35; }
+        .badge-item.locked .badge-name { color: var(--text-muted); }
         .badge-lock {
             position: absolute; top: 8px; right: 8px;
-            font-size: 12px; opacity: 0.5;
         }
+        .badge-lock i { width: 14px; height: 14px; color: var(--text-muted); opacity: 0.5; }
 
-        .badge-icon { font-size: 36px; margin-bottom: 8px; display: block; line-height: 1.2; }
-        .badge-name { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
-        .badge-date { font-size: 10px; color: var(--text-light); margin-top: 4px; }
-        .badge-hint { font-size: 10px; color: var(--text-light); margin-top: 4px; font-style: italic; }
+        .badge-icon-wrap {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-xs);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 8px;
+            background: var(--lime-light);
+            border: 1px solid var(--glass-border);
+        }
+        .badge-icon-wrap i { width: 24px; height: 24px; color: var(--lime-dark); }
+        .badge-icon-wrap.azure { background: var(--azure-light); border-color: rgba(0,153,255,0.12); }
+        .badge-icon-wrap.azure i { color: var(--azure); }
+        .badge-icon-wrap.red { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.10); }
+        .badge-icon-wrap.red i { color: #EF4444; }
+        .badge-icon-wrap.purple { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.10); }
+        .badge-icon-wrap.purple i { color: #8B5CF6; }
+        .badge-icon-wrap.amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.10); }
+        .badge-icon-wrap.amber i { color: #F59E0B; }
+        .badge-icon-wrap.pink { background: rgba(236,72,153,0.08); border-color: rgba(236,72,153,0.10); }
+        .badge-icon-wrap.pink i { color: #EC4899; }
+
+        .badge-name { font-size: 12px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+        .badge-date { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .badge-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
 
         @keyframes badgeGlow {
-            0% { text-shadow: 0 0 4px rgba(16,185,129,0.2); }
-            100% { text-shadow: 0 0 12px rgba(16,185,129,0.5); }
+            0% { box-shadow: 0 0 4px var(--lime-light); }
+            100% { box-shadow: 0 0 14px var(--lime-glow); }
         }
 
         /* ===== Season Banner ===== */
         .season-banner {
-            margin: 24px 16px 0;
-            background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 50%, #3B82F6 100%);
-            border-radius: var(--radius);
+            margin: 24px var(--modal-padding-x) 0;
+            background: linear-gradient(135deg, #0A2540 0%, var(--azure-dark) 50%, var(--azure) 100%);
+            border-radius: var(--radius-lg);
             padding: 22px 20px;
             color: white;
             position: relative;
@@ -298,22 +392,139 @@
         }
         .season-banner:hover { transform: translateY(-2px); }
         .season-banner::before {
-            content: '❄️'; font-size: 60px; opacity: 0.1;
-            position: absolute; top: -10px; right: 10px;
+            content: '';
+            position: absolute; top: -10px; right: 20px;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
         }
+        .season-banner-icon {
+            position: absolute; top: 12px; right: 16px; opacity: 0.15;
+        }
+        .season-banner-icon i { width: 54px; height: 54px; color: #fff; }
         .season-banner-inner { position: relative; z-index: 1; }
         .season-tag {
-            display: inline-block;
+            display: inline-flex; align-items: center; gap: 4px;
             background: rgba(255,255,255,0.2);
             font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
             margin-bottom: 10px;
         }
-        .season-banner h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .season-tag i { width: 14px; height: 14px; }
+        .season-banner h3 {
+            font-size: 18px; font-weight: 700; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .season-banner h3 i { width: 20px; height: 20px; }
         .season-banner p { font-size: 13px; opacity: 0.8; margin-bottom: 14px; }
         .season-progress { display: flex; align-items: center; gap: 12px; }
         .season-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; }
-        .season-bar-fill { height: 100%; background: white; border-radius: 6px; }
+        .season-bar-fill { height: 100%; background: linear-gradient(90deg, var(--lime), #fff); border-radius: 6px; }
         .season-pct { font-size: 13px; font-weight: 700; }
+
+        /* ===== Badge Detail Modal (Glassmorphism) ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-frame {
+            width: 100%; max-width: var(--modal-width);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 32px var(--modal-padding-x) 24px;
+            text-align: center;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.92) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 36px; height: 36px; border-radius: 50%;
+            border: none; background: rgba(0,0,0,0.05);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: rgba(0,0,0,0.10); }
+        .modal-close i { width: 20px; height: 20px; color: var(--text-secondary); }
+        .modal-badge-icon {
+            width: 72px; height: 72px;
+            border-radius: var(--radius-md);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            background: var(--lime-light);
+            border: 2px solid var(--lime-glow);
+        }
+        .modal-badge-icon i { width: 36px; height: 36px; color: var(--lime-dark); }
+        .modal-badge-icon.locked-icon {
+            background: rgba(0,0,0,0.04);
+            border-color: rgba(0,0,0,0.06);
+        }
+        .modal-badge-icon.locked-icon i { color: var(--text-muted); }
+        .modal-badge-name { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+        .modal-badge-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+        .modal-badge-date {
+            font-size: 12px; color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .modal-badge-date i { width: 14px; height: 14px; }
+        .modal-progress-section { margin-top: 16px; }
+        .modal-progress-bar { height: 8px; background: rgba(0,0,0,0.04); border-radius: 8px; overflow: hidden; margin-top: 8px; }
+        .modal-progress-fill { height: 100%; background: linear-gradient(90deg, var(--lime), var(--azure)); border-radius: 8px; }
+        .modal-progress-text { font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-top: 6px; }
+
+        /* ===== Bottom Nav (Glassmorphism) ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: var(--modal-width);
+            height: var(--nav-height);
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 8px;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            text-decoration: none; color: var(--text-muted);
+            font-size: 10px; font-weight: 500;
+            padding: 6px 12px;
+            border-radius: var(--radius-xs);
+            transition: all 0.2s;
+            cursor: pointer;
+            background: none; border: none; font-family: inherit;
+        }
+        .nav-item i { width: 22px; height: 22px; }
+        .nav-item.active { color: var(--lime-dark); }
+        .nav-item:hover { color: var(--lime-dark); }
+
+        .nav-center {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            display: flex; align-items: center; justify-content: center;
+            border: 4px solid var(--bg-white);
+            margin-top: -22px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 4px 16px var(--lime-glow);
+        }
+        .nav-center:hover { transform: scale(1.08); }
 
         /* ===== Animation ===== */
         .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
@@ -329,7 +540,8 @@
         @media (max-width: 360px) {
             .stats-ring { width: 90px; height: 90px; }
             .stats-ring-text .num { font-size: 26px; }
-            .badge-icon { font-size: 30px; }
+            .badge-icon-wrap { width: 38px; height: 38px; }
+            .badge-icon-wrap i { width: 20px; height: 20px; }
         }
     </style>
 </head>
@@ -338,8 +550,12 @@
     <!-- Header -->
     <header class="header">
         <div class="header-left">
-            <a href="마이페이지.html" class="back-btn" aria-label="뒤로가기">←</a>
-            <span class="header-title">🏅 뱃지 컬렉션</span>
+            <a href="마이페이지.html" class="back-btn" aria-label="뒤로가기">
+                <i data-lucide="chevron-left"></i>
+            </a>
+            <span class="header-title">
+                <i data-lucide="award"></i> 뱃지 컬렉션
+            </span>
         </div>
         <div class="header-right">12 / 43</div>
     </header>
@@ -361,7 +577,7 @@
                     </div>
                 </div>
                 <div class="stats-info">
-                    <h2>뱃지 수집가 🐾</h2>
+                    <h2>뱃지 수집가 <i data-lucide="paw-print"></i></h2>
                     <p>12개의 뱃지를 획득했어요!<br>다음 뱃지까지 조금만 더!</p>
                     <div class="stats-detail">
                         <div class="stats-detail-item">
@@ -384,21 +600,21 @@
         <!-- Category Filter -->
         <div class="category-filter animate-in" style="margin-top: 4px;">
             <button class="cat-btn active" onclick="filterCat(this)">전체</button>
-            <button class="cat-btn" onclick="filterCat(this)">🏃 거리</button>
-            <button class="cat-btn" onclick="filterCat(this)">🔥 연속</button>
-            <button class="cat-btn" onclick="filterCat(this)">🧭 탐험</button>
-            <button class="cat-btn" onclick="filterCat(this)">⏱ 시간</button>
-            <button class="cat-btn" onclick="filterCat(this)">🌟 스페셜</button>
-            <button class="cat-btn" onclick="filterCat(this)">🏆 시즌</button>
+            <button class="cat-btn" onclick="filterCat(this)"><i data-lucide="map-pin"></i> 거리</button>
+            <button class="cat-btn" onclick="filterCat(this)"><i data-lucide="flame"></i> 연속</button>
+            <button class="cat-btn" onclick="filterCat(this)"><i data-lucide="compass"></i> 탐험</button>
+            <button class="cat-btn" onclick="filterCat(this)"><i data-lucide="clock"></i> 시간</button>
+            <button class="cat-btn" onclick="filterCat(this)"><i data-lucide="star"></i> 스페셜</button>
+            <button class="cat-btn" onclick="filterCat(this)"><i data-lucide="trophy"></i> 시즌</button>
         </div>
 
         <!-- Almost There! -->
-        <div class="section-title"><h3>🔥 곧 획득!</h3></div>
+        <div class="section-title"><h3><i data-lucide="flame"></i> 곧 획득!</h3></div>
         <div class="soon-card animate-in">
             <div class="soon-card-inner">
-                <span class="soon-label">🎯 거의 다 왔어요!</span>
+                <span class="soon-label"><i data-lucide="target"></i> 거의 다 왔어요!</span>
                 <div class="soon-main">
-                    <span class="soon-icon">🏃</span>
+                    <div class="soon-icon"><i data-lucide="map-pin"></i></div>
                     <div class="soon-info">
                         <h4>50km 마라토너</h4>
                         <p>누적 50km를 걸으면 획득!</p>
@@ -413,41 +629,41 @@
                 </div>
             </div>
         </div>
-        <div class="soon-card animate-in" style="background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);">
+        <div class="soon-card variant-streak animate-in">
             <div class="soon-card-inner">
-                <span class="soon-label" style="background: rgba(239,68,68,0.15); color: #991B1B;">🔥 연속 산책 도전!</span>
+                <span class="soon-label"><i data-lucide="flame"></i> 연속 산책 도전!</span>
                 <div class="soon-main">
-                    <span class="soon-icon">🔥</span>
+                    <div class="soon-icon"><i data-lucide="flame"></i></div>
                     <div class="soon-info">
                         <h4>14일 전사</h4>
                         <p>14일 연속 산책하면 획득!</p>
                     </div>
                 </div>
                 <div class="soon-progress">
-                    <div class="soon-progress-fill" style="width: 78%; background: linear-gradient(90deg, #EF4444, #DC2626);"></div>
+                    <div class="soon-progress-fill" style="width: 78%"></div>
                 </div>
                 <div class="soon-footer">
-                    <span style="color: #991B1B;">11 / 14일</span>
-                    <span style="color: #991B1B;">78%</span>
+                    <span>11 / 14일</span>
+                    <span>78%</span>
                 </div>
             </div>
         </div>
 
         <!-- In Progress -->
-        <div class="section-title"><h3>🚀 진행 중</h3><span class="count">5개</span></div>
+        <div class="section-title"><h3><i data-lucide="rocket"></i> 진행 중</h3><span class="count">5개</span></div>
         <div class="progress-list">
             <div class="progress-card animate-in">
-                <div class="progress-icon distance">🏃</div>
+                <div class="progress-icon distance"><i data-lucide="map-pin"></i></div>
                 <div class="progress-card-info">
                     <h4>50km 마라토너</h4>
                     <div class="progress-bar-wrap">
-                        <div class="progress-bar"><div class="progress-bar-fill green" style="width:76%"></div></div>
+                        <div class="progress-bar"><div class="progress-bar-fill gradient" style="width:76%"></div></div>
                         <span class="progress-pct">38.1/50km</span>
                     </div>
                 </div>
             </div>
             <div class="progress-card animate-in">
-                <div class="progress-icon streak">🔥</div>
+                <div class="progress-icon streak"><i data-lucide="flame"></i></div>
                 <div class="progress-card-info">
                     <h4>14일 전사</h4>
                     <div class="progress-bar-wrap">
@@ -457,7 +673,7 @@
                 </div>
             </div>
             <div class="progress-card animate-in">
-                <div class="progress-icon explore">🧭</div>
+                <div class="progress-icon explore"><i data-lucide="compass"></i></div>
                 <div class="progress-card-info">
                     <h4>동네 탐험가</h4>
                     <div class="progress-bar-wrap">
@@ -467,7 +683,7 @@
                 </div>
             </div>
             <div class="progress-card animate-in">
-                <div class="progress-icon time">⏱</div>
+                <div class="progress-icon time"><i data-lucide="clock"></i></div>
                 <div class="progress-card-info">
                     <h4>10시간 산책왕</h4>
                     <div class="progress-bar-wrap">
@@ -477,7 +693,7 @@
                 </div>
             </div>
             <div class="progress-card animate-in">
-                <div class="progress-icon special" style="background: #FCE7F3;">📸</div>
+                <div class="progress-icon special"><i data-lucide="camera"></i></div>
                 <div class="progress-card-info">
                     <h4>포토그래퍼</h4>
                     <div class="progress-bar-wrap">
@@ -489,65 +705,65 @@
         </div>
 
         <!-- Earned Badges -->
-        <div class="section-title"><h3>✨ 획득한 뱃지</h3><span class="count">12개</span></div>
+        <div class="section-title"><h3><i data-lucide="sparkles"></i> 획득한 뱃지</h3><span class="count">12개</span></div>
         <div class="badge-grid">
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🐾</span>
+            <div class="badge-item earned animate-in" onclick="openModal('첫 발자국', '첫 번째 산책을 완료하면 획득할 수 있는 뱃지입니다.', '2026.01.15', 'paw-print', '')">
+                <div class="badge-icon-wrap"><i data-lucide="paw-print"></i></div>
                 <div class="badge-name">첫 발자국</div>
                 <div class="badge-date">2026.01.15</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🥉</span>
+            <div class="badge-item earned animate-in" onclick="openModal('1km 워커', '누적 1km를 걸으면 획득할 수 있는 뱃지입니다.', '2026.01.15', 'award', 'azure')">
+                <div class="badge-icon-wrap azure"><i data-lucide="award"></i></div>
                 <div class="badge-name">1km 워커</div>
                 <div class="badge-date">2026.01.15</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🥈</span>
+            <div class="badge-item earned animate-in" onclick="openModal('5km 워커', '누적 5km를 걸으면 획득할 수 있는 뱃지입니다.', '2026.01.18', 'award', 'azure')">
+                <div class="badge-icon-wrap azure"><i data-lucide="award"></i></div>
                 <div class="badge-name">5km 워커</div>
                 <div class="badge-date">2026.01.18</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🥇</span>
+            <div class="badge-item earned animate-in" onclick="openModal('10km 러너', '누적 10km를 걸으면 획득할 수 있는 뱃지입니다.', '2026.01.22', 'trophy', 'amber')">
+                <div class="badge-icon-wrap amber"><i data-lucide="trophy"></i></div>
                 <div class="badge-name">10km 러너</div>
                 <div class="badge-date">2026.01.22</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🔥</span>
+            <div class="badge-item earned animate-in" onclick="openModal('3일 연속', '3일 연속 산책을 달성하면 획득할 수 있는 뱃지입니다.', '2026.01.17', 'flame', 'red')">
+                <div class="badge-icon-wrap red"><i data-lucide="flame"></i></div>
                 <div class="badge-name">3일 연속</div>
                 <div class="badge-date">2026.01.17</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">💪</span>
+            <div class="badge-item earned animate-in" onclick="openModal('7일 연속', '7일 연속 산책을 달성하면 획득할 수 있는 뱃지입니다.', '2026.01.21', 'flame', 'red')">
+                <div class="badge-icon-wrap red"><i data-lucide="flame"></i></div>
                 <div class="badge-name">7일 연속</div>
                 <div class="badge-date">2026.01.21</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">⏱</span>
+            <div class="badge-item earned animate-in" onclick="openModal('1시간 산책', '한 번에 1시간 이상 산책하면 획득할 수 있는 뱃지입니다.', '2026.01.20', 'clock', 'purple')">
+                <div class="badge-icon-wrap purple"><i data-lucide="clock"></i></div>
                 <div class="badge-name">1시간 산책</div>
                 <div class="badge-date">2026.01.20</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">⏳</span>
+            <div class="badge-item earned animate-in" onclick="openModal('5시간 누적', '누적 5시간 산책을 달성하면 획득할 수 있는 뱃지입니다.', '2026.01.28', 'hourglass', 'purple')">
+                <div class="badge-icon-wrap purple"><i data-lucide="hourglass"></i></div>
                 <div class="badge-name">5시간 누적</div>
                 <div class="badge-date">2026.01.28</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🌅</span>
+            <div class="badge-item earned animate-in" onclick="openModal('얼리버드', '오전 6시 이전에 산책을 시작하면 획득할 수 있는 뱃지입니다.', '2026.01.19', 'sunrise', 'amber')">
+                <div class="badge-icon-wrap amber"><i data-lucide="sunrise"></i></div>
                 <div class="badge-name">얼리버드</div>
                 <div class="badge-date">2026.01.19</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🦉</span>
+            <div class="badge-item earned animate-in" onclick="openModal('올빼미', '밤 10시 이후에 산책을 완료하면 획득할 수 있는 뱃지입니다.', '2026.02.01', 'moon', 'purple')">
+                <div class="badge-icon-wrap purple"><i data-lucide="moon"></i></div>
                 <div class="badge-name">올빼미</div>
                 <div class="badge-date">2026.02.01</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🧭</span>
+            <div class="badge-item earned animate-in" onclick="openModal('첫 탐험 (3곳)', '3곳의 새로운 장소를 방문하면 획득할 수 있는 뱃지입니다.', '2026.02.03', 'compass', '')">
+                <div class="badge-icon-wrap"><i data-lucide="compass"></i></div>
                 <div class="badge-name">첫 탐험 (3곳)</div>
                 <div class="badge-date">2026.02.03</div>
             </div>
-            <div class="badge-item earned animate-in">
-                <span class="badge-icon">🎆</span>
+            <div class="badge-item earned animate-in" onclick="openModal('새해 산책', '새해 첫날에 산책을 완료하면 획득할 수 있는 특별 뱃지입니다.', '2026.01.01', 'sparkles', 'amber')">
+                <div class="badge-icon-wrap amber"><i data-lucide="sparkles"></i></div>
                 <div class="badge-name">새해 산책</div>
                 <div class="badge-date">2026.01.01</div>
             </div>
@@ -555,9 +771,10 @@
 
         <!-- Season Banner -->
         <div class="season-banner animate-in">
+            <div class="season-banner-icon"><i data-lucide="snowflake"></i></div>
             <div class="season-banner-inner">
-                <span class="season-tag">🏆 시즌 한정</span>
-                <h3>❄️ 겨울왕국 시즌 뱃지</h3>
+                <span class="season-tag"><i data-lucide="trophy"></i> 시즌 한정</span>
+                <h3><i data-lucide="snowflake"></i> 겨울왕국 시즌 뱃지</h3>
                 <p>2025.12.01 ~ 2026.02.28 기간 한정!</p>
                 <div class="season-progress">
                     <div class="season-bar"><div class="season-bar-fill" style="width:25%"></div></div>
@@ -567,167 +784,167 @@
         </div>
 
         <!-- Locked Badges -->
-        <div class="section-title"><h3>🔒 미획득 뱃지</h3><span class="count">26개</span></div>
+        <div class="section-title"><h3><i data-lucide="lock"></i> 미획득 뱃지</h3><span class="count">26개</span></div>
         <div class="badge-grid">
             <!-- Distance -->
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🏃</span>
+            <div class="badge-item locked" onclick="openLockedModal('50km 마라토너', '누적 50km 걷기', 'map-pin', 76, '38.1/50km')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="map-pin"></i></div>
                 <div class="badge-name">50km 마라토너</div>
                 <div class="badge-hint">누적 50km 걷기</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🏅</span>
+            <div class="badge-item locked" onclick="openLockedModal('100km 챔피언', '누적 100km 걷기', 'award', 38, '38.1/100km')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="award"></i></div>
                 <div class="badge-name">100km 챔피언</div>
                 <div class="badge-hint">누적 100km 걷기</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">💎</span>
+            <div class="badge-item locked" onclick="openLockedModal('500km 레전드', '???', 'gem', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="gem"></i></div>
                 <div class="badge-name">500km 레전드</div>
                 <div class="badge-hint">???</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">👑</span>
+            <div class="badge-item locked" onclick="openLockedModal('1000km 신화', '???', 'crown', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap amber"><i data-lucide="crown"></i></div>
                 <div class="badge-name">1000km 신화</div>
                 <div class="badge-hint">???</div>
             </div>
             <!-- Streak -->
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🔥</span>
+            <div class="badge-item locked" onclick="openLockedModal('14일 전사', '14일 연속 산책', 'flame', 78, '11/14일')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap red"><i data-lucide="flame"></i></div>
                 <div class="badge-name">14일 전사</div>
                 <div class="badge-hint">14일 연속 산책</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">⚔️</span>
+            <div class="badge-item locked" onclick="openLockedModal('30일 전사', '30일 연속 산책', 'flame', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap red"><i data-lucide="flame"></i></div>
                 <div class="badge-name">30일 전사</div>
                 <div class="badge-hint">30일 연속 산책</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🛡️</span>
+            <div class="badge-item locked" onclick="openLockedModal('60일 수호자', '???', 'shield', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap red"><i data-lucide="shield"></i></div>
                 <div class="badge-name">60일 수호자</div>
                 <div class="badge-hint">???</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🌟</span>
+            <div class="badge-item locked" onclick="openLockedModal('100일 전설', '???', 'star', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap amber"><i data-lucide="star"></i></div>
                 <div class="badge-name">100일 전설</div>
                 <div class="badge-hint">???</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🏆</span>
+            <div class="badge-item locked" onclick="openLockedModal('365일 신화', '???', 'trophy', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap amber"><i data-lucide="trophy"></i></div>
                 <div class="badge-name">365일 신화</div>
                 <div class="badge-hint">???</div>
             </div>
             <!-- Explore -->
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🗺️</span>
+            <div class="badge-item locked" onclick="openLockedModal('탐험가 (5곳)', '5곳 방문', 'map', 60, '3/5곳')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap"><i data-lucide="map"></i></div>
                 <div class="badge-name">탐험가 (5곳)</div>
                 <div class="badge-hint">5곳 방문</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🌍</span>
+            <div class="badge-item locked" onclick="openLockedModal('모험가 (10곳)', '???', 'globe', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap"><i data-lucide="globe"></i></div>
                 <div class="badge-name">모험가 (10곳)</div>
                 <div class="badge-hint">???</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🚀</span>
+            <div class="badge-item locked" onclick="openLockedModal('대모험가 (20곳)', '???', 'rocket', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="rocket"></i></div>
                 <div class="badge-name">대모험가 (20곳)</div>
                 <div class="badge-hint">???</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🌌</span>
+            <div class="badge-item locked" onclick="openLockedModal('세계여행가 (50곳)', '???', 'orbit', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap purple"><i data-lucide="orbit"></i></div>
                 <div class="badge-name">세계여행가 (50곳)</div>
                 <div class="badge-hint">???</div>
             </div>
             <!-- Time -->
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">⏰</span>
+            <div class="badge-item locked" onclick="openLockedModal('10시간 산책왕', '누적 10시간', 'clock', 68, '6.8/10시간')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap purple"><i data-lucide="clock"></i></div>
                 <div class="badge-name">10시간 산책왕</div>
                 <div class="badge-hint">누적 10시간</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">⌛</span>
+            <div class="badge-item locked" onclick="openLockedModal('50시간 마스터', '???', 'hourglass', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap purple"><i data-lucide="hourglass"></i></div>
                 <div class="badge-name">50시간 마스터</div>
                 <div class="badge-hint">???</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🕰️</span>
+            <div class="badge-item locked" onclick="openLockedModal('100시간 레전드', '???', 'timer', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap purple"><i data-lucide="timer"></i></div>
                 <div class="badge-name">100시간 레전드</div>
                 <div class="badge-hint">???</div>
             </div>
             <!-- Special -->
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🌧️</span>
+            <div class="badge-item locked" onclick="openLockedModal('비 산책', '비 오는 날 산책', 'cloud-rain', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="cloud-rain"></i></div>
                 <div class="badge-name">비 산책</div>
                 <div class="badge-hint">비 오는 날 산책</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">❄️</span>
+            <div class="badge-item locked" onclick="openLockedModal('눈 산책', '눈 오는 날 산책', 'snowflake', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="snowflake"></i></div>
                 <div class="badge-name">눈 산책</div>
                 <div class="badge-hint">눈 오는 날 산책</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🎂</span>
+            <div class="badge-item locked" onclick="openLockedModal('생일 산책', '생일에 산책하기', 'cake', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap pink"><i data-lucide="cake"></i></div>
                 <div class="badge-name">생일 산책</div>
                 <div class="badge-hint">생일에 산책하기</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">📸</span>
+            <div class="badge-item locked" onclick="openLockedModal('포토그래퍼', '사진 10장 찍기', 'camera', 40, '4/10장')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap pink"><i data-lucide="camera"></i></div>
                 <div class="badge-name">포토그래퍼</div>
                 <div class="badge-hint">사진 10장 찍기</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">👫</span>
+            <div class="badge-item locked" onclick="openLockedModal('함께 걷기', '친구와 산책하기', 'users', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="users"></i></div>
                 <div class="badge-name">함께 걷기</div>
                 <div class="badge-hint">친구와 산책하기</div>
             </div>
             <!-- Season -->
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🌸</span>
+            <div class="badge-item locked" onclick="openLockedModal('봄꽃길', '봄 시즌 한정', 'flower-2', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap pink"><i data-lucide="flower-2"></i></div>
                 <div class="badge-name">봄꽃길</div>
                 <div class="badge-hint">봄 시즌 한정</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🏖️</span>
+            <div class="badge-item locked" onclick="openLockedModal('여름바다', '여름 시즌 한정', 'sun', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap amber"><i data-lucide="sun"></i></div>
                 <div class="badge-name">여름바다</div>
                 <div class="badge-hint">여름 시즌 한정</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🍂</span>
+            <div class="badge-item locked" onclick="openLockedModal('가을단풍', '가을 시즌 한정', 'leaf', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap amber"><i data-lucide="leaf"></i></div>
                 <div class="badge-name">가을단풍</div>
                 <div class="badge-hint">가을 시즌 한정</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">⛄</span>
+            <div class="badge-item locked" onclick="openLockedModal('겨울왕국', '겨울 시즌 진행 중!', 'snowflake', 25, '1/4')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap azure"><i data-lucide="snowflake"></i></div>
                 <div class="badge-name">겨울왕국</div>
                 <div class="badge-hint">겨울 시즌 진행 중!</div>
             </div>
-            <div class="badge-item locked">
-                <span class="badge-lock">🔒</span>
-                <span class="badge-icon">🎄</span>
+            <div class="badge-item locked" onclick="openLockedModal('크리스마스', '???', 'gift', 0, '')">
+                <span class="badge-lock"><i data-lucide="lock"></i></span>
+                <div class="badge-icon-wrap red"><i data-lucide="gift"></i></div>
                 <div class="badge-name">크리스마스</div>
                 <div class="badge-hint">???</div>
             </div>
@@ -736,7 +953,44 @@
         <div style="height: 32px;"></div>
     </main>
 
+    <!-- Badge Detail Modal -->
+    <div class="modal-overlay" id="badgeModal" onclick="closeModal(event)">
+        <div class="modal-frame" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModalDirect()"><i data-lucide="x"></i></button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="홈.html" class="nav-item">
+            <i data-lucide="home"></i>
+            <span>홈</span>
+        </a>
+        <a href="산책.html" class="nav-item">
+            <i data-lucide="map"></i>
+            <span>산책</span>
+        </a>
+        <a href="산책.html" class="nav-center" aria-label="산책 시작">
+            🐾
+        </a>
+        <a href="커뮤니티.html" class="nav-item">
+            <i data-lucide="message-circle"></i>
+            <span>커뮤니티</span>
+        </a>
+        <a href="마이페이지.html" class="nav-item active">
+            <i data-lucide="user"></i>
+            <span>마이</span>
+        </a>
+    </nav>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script>
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+
     // Category filter
     function filterCat(btn) {
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -744,14 +998,14 @@
     }
 
     // URL parameter handling: auto-activate category from ?cat=
-    const catMap = { '거리': '🏃 거리', '연속': '🔥 연속', '탐험': '🧭 탐험', '시간': '⏱ 시간', '스페셜': '🌟 스페셜', '시즌': '🏆 시즌' };
+    const catMap = { '거리': '거리', '연속': '연속', '탐험': '탐험', '시간': '시간', '스페셜': '스페셜', '시즌': '시즌' };
     const urlParams = new URLSearchParams(window.location.search);
     const catParam = urlParams.get('cat');
     if (catParam && catMap[catParam]) {
         const target = catMap[catParam];
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.classList.remove('active');
-            if (btn.textContent.trim() === target) {
+            if (btn.textContent.trim().includes(target)) {
                 btn.classList.add('active');
             }
         });
@@ -767,6 +1021,85 @@
             }
         }, 300);
     });
+
+    // Badge detail modal (earned)
+    function openModal(name, desc, date, icon, colorClass) {
+        const modal = document.getElementById('badgeModal');
+        const content = document.getElementById('modalContent');
+        const iconColorClass = colorClass ? ' ' + colorClass : '';
+        content.innerHTML = `
+            <div class="modal-badge-icon${iconColorClass ? '' : ''}" style="${iconColorClass ? '' : ''}">
+                <i data-lucide="${icon}"></i>
+            </div>
+            <div class="modal-badge-name">${name}</div>
+            <div class="modal-badge-desc">${desc}</div>
+            <div class="modal-badge-date">
+                <i data-lucide="calendar"></i> ${date} 획득
+            </div>
+        `;
+        // Apply color class to modal icon
+        const modalIcon = content.querySelector('.modal-badge-icon');
+        if (colorClass === 'azure') {
+            modalIcon.style.background = 'var(--azure-light)';
+            modalIcon.style.borderColor = 'var(--azure-glow)';
+            modalIcon.querySelector('i').style.color = 'var(--azure)';
+        } else if (colorClass === 'red') {
+            modalIcon.style.background = 'rgba(239,68,68,0.08)';
+            modalIcon.style.borderColor = 'rgba(239,68,68,0.20)';
+            modalIcon.querySelector('i').style.color = '#EF4444';
+        } else if (colorClass === 'purple') {
+            modalIcon.style.background = 'rgba(139,92,246,0.08)';
+            modalIcon.style.borderColor = 'rgba(139,92,246,0.20)';
+            modalIcon.querySelector('i').style.color = '#8B5CF6';
+        } else if (colorClass === 'amber') {
+            modalIcon.style.background = 'rgba(245,158,11,0.08)';
+            modalIcon.style.borderColor = 'rgba(245,158,11,0.20)';
+            modalIcon.querySelector('i').style.color = '#F59E0B';
+        } else if (colorClass === 'pink') {
+            modalIcon.style.background = 'rgba(236,72,153,0.08)';
+            modalIcon.style.borderColor = 'rgba(236,72,153,0.20)';
+            modalIcon.querySelector('i').style.color = '#EC4899';
+        }
+        modal.classList.add('show');
+        lucide.createIcons();
+    }
+
+    // Badge detail modal (locked / in-progress)
+    function openLockedModal(name, hint, icon, progress, progressText) {
+        const modal = document.getElementById('badgeModal');
+        const content = document.getElementById('modalContent');
+        let progressHTML = '';
+        if (progress > 0) {
+            progressHTML = `
+                <div class="modal-progress-section">
+                    <div class="modal-progress-bar">
+                        <div class="modal-progress-fill" style="width:${progress}%"></div>
+                    </div>
+                    <div class="modal-progress-text">${progressText} (${progress}%)</div>
+                </div>
+            `;
+        }
+        content.innerHTML = `
+            <div class="modal-badge-icon locked-icon">
+                <i data-lucide="${icon}"></i>
+            </div>
+            <div class="modal-badge-name">${name}</div>
+            <div class="modal-badge-desc">${hint === '???' ? '조건이 아직 공개되지 않았어요!' : hint}</div>
+            ${progressHTML}
+        `;
+        modal.classList.add('show');
+        lucide.createIcons();
+    }
+
+    // Close modal
+    function closeModal(event) {
+        if (event.target === event.currentTarget) {
+            document.getElementById('badgeModal').classList.remove('show');
+        }
+    }
+    function closeModalDirect() {
+        document.getElementById('badgeModal').classList.remove('show');
+    }
     </script>
 </body>
 </html>

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>산책 기록 - 멍이랑 withbowwow</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <style>
+        :root {
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10);
+            --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08);
+            --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12);
+            --glass-blur: blur(20px);
+            --danger: #EF4444;
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
+            --nav-height: 76px;
+            --header-height: 58px;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header (Glassmorphism) ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 0 var(--modal-padding-x);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--lime-glow), transparent);
+        }
+        .header-back {
+            position: absolute;
+            left: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-xs);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .header-back i {
+            width: 22px;
+            height: 22px;
+        }
+        .header-back:hover {
+            background: var(--lime-light);
+        }
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* ===== Summary Stats (Glass Cards) ===== */
+        .summary-section {
+            padding: 16px var(--modal-padding-x) 8px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 10px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            background: var(--glass-bg-heavy);
+            border-color: var(--lime-glow);
+        }
+        .stat-icon {
+            width: 28px;
+            height: 28px;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--lime-light);
+            border-radius: 8px;
+        }
+        .stat-icon i {
+            width: 16px;
+            height: 16px;
+            color: var(--lime-dark);
+        }
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        .stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===== Filter Tabs ===== */
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 12px var(--modal-padding-x);
+            background: transparent;
+            position: sticky;
+            top: var(--header-height);
+            z-index: 99;
+        }
+        .filter-tabs::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(248,252,250,0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: -1;
+        }
+        .filter-tab {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.25s ease;
+            letter-spacing: -0.01em;
+        }
+        .filter-tab.active {
+            color: var(--text-primary);
+            background: var(--lime-light);
+            border-color: var(--lime);
+            font-weight: 700;
+        }
+        .filter-tab:hover:not(.active) {
+            color: var(--text-secondary);
+            background: var(--glass-bg-heavy);
+            border-color: var(--lime-glow);
+        }
+
+        /* ===== Content ===== */
+        .content {
+            padding-bottom: 40px;
+        }
+
+        /* ===== Date Group ===== */
+        .date-group {
+            padding: 0 var(--modal-padding-x);
+        }
+        .date-header {
+            padding: 20px 0 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.01em;
+        }
+        .date-header i {
+            width: 14px;
+            height: 14px;
+            color: var(--lime-dark);
+        }
+        .date-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--glass-border), transparent);
+            margin-left: 4px;
+        }
+
+        /* ===== Walk Card (Glassmorphism) ===== */
+        .walk-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .walk-card:hover {
+            background: var(--glass-bg-heavy);
+            border-color: var(--lime-glow);
+            transform: translateY(-2px);
+        }
+        .walk-card:active {
+            transform: translateY(0);
+        }
+
+        /* Mini Map */
+        .mini-map {
+            width: 58px;
+            height: 58px;
+            border-radius: var(--radius-xs);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--lime);
+        }
+        .mini-map svg {
+            width: 38px;
+            height: 38px;
+        }
+
+        /* Card Info */
+        .card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-time {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+            letter-spacing: -0.02em;
+        }
+        .card-pet {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card-pet i {
+            width: 13px;
+            height: 13px;
+            color: var(--lime-dark);
+        }
+        .card-stats {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-stats .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .card-stats .stat-item i {
+            width: 12px;
+            height: 12px;
+            color: var(--text-muted);
+        }
+        .card-stats strong {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .card-stats .divider {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* Chevron */
+        .card-chevron {
+            flex-shrink: 0;
+            margin-left: 4px;
+            color: var(--text-muted);
+            transition: color 0.2s, transform 0.2s;
+        }
+        .card-chevron i {
+            width: 18px;
+            height: 18px;
+        }
+        .walk-card:hover .card-chevron {
+            color: var(--lime-dark);
+            transform: translateX(2px);
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        .animate-in:nth-child(1) { animation-delay: 0.03s; }
+        .animate-in:nth-child(2) { animation-delay: 0.06s; }
+        .animate-in:nth-child(3) { animation-delay: 0.09s; }
+        .animate-in:nth-child(4) { animation-delay: 0.12s; }
+        .animate-in:nth-child(5) { animation-delay: 0.15s; }
+        .animate-in:nth-child(6) { animation-delay: 0.18s; }
+        .animate-in:nth-child(7) { animation-delay: 0.21s; }
+        .animate-in:nth-child(8) { animation-delay: 0.24s; }
+        .animate-in:nth-child(9) { animation-delay: 0.27s; }
+        .animate-in:nth-child(10) { animation-delay: 0.30s; }
+        .animate-in:nth-child(11) { animation-delay: 0.33s; }
+        .animate-in:nth-child(12) { animation-delay: 0.36s; }
+
+        .date-group.animate-group {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        .date-group.animate-group:nth-of-type(1) { animation-delay: 0.05s; }
+        .date-group.animate-group:nth-of-type(2) { animation-delay: 0.1s; }
+        .date-group.animate-group:nth-of-type(3) { animation-delay: 0.15s; }
+        .date-group.animate-group:nth-of-type(4) { animation-delay: 0.2s; }
+        .date-group.animate-group:nth-of-type(5) { animation-delay: 0.25s; }
+        .date-group.animate-group:nth-of-type(6) { animation-delay: 0.3s; }
+        .date-group.animate-group:nth-of-type(7) { animation-delay: 0.35s; }
+        .date-group.animate-group:nth-of-type(8) { animation-delay: 0.4s; }
+
+        .summary-section {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header (Glassmorphism) -->
+    <header class="header">
+        <a href="마이페이지.html" class="header-back">
+            <i data-lucide="arrow-left"></i>
+        </a>
+        <div class="header-title">산책 기록</div>
+    </header>
+
+    <!-- Summary Stats (Glass Cards with Lucide Icons) -->
+    <div class="summary-section">
+        <div class="summary-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="map-pin"></i></div>
+                <div class="stat-value">187</div>
+                <div class="stat-label">총 산책</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="route"></i></div>
+                <div class="stat-value">312.4</div>
+                <div class="stat-label">총 km</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="clock"></i></div>
+                <div class="stat-value">94.2</div>
+                <div class="stat-label">총 시간</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="flame"></i></div>
+                <div class="stat-value">17.2k</div>
+                <div class="stat-label">총 kcal</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs (Lime Active State) -->
+    <div class="filter-tabs">
+        <button class="filter-tab active" onclick="switchFilter(this)">주간</button>
+        <button class="filter-tab" onclick="switchFilter(this)">월간</button>
+        <button class="filter-tab" onclick="switchFilter(this)">연간</button>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+
+        <!-- 2월 19일 (수) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 19일 (수)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: var(--lime-light);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 32 L12 14 L22 20 L34 6" stroke="var(--lime)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="32" r="3" fill="var(--lime)"/>
+                        <circle cx="34" cy="6" r="3" fill="var(--lime-dark)"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 3:21</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>3.21km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>42분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 186kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 2월 18일 (화) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 18일 (화)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: var(--azure-light);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M8 30 L20 8 L32 24" stroke="var(--azure)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8" cy="30" r="3" fill="var(--azure)"/>
+                        <circle cx="32" cy="24" r="3" fill="var(--azure-dark)"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 6:15</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>2.87km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>35분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 158kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(245,158,11,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 28 Q20 6 34 18" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="6" cy="28" r="3" fill="#F59E0B"/>
+                        <circle cx="34" cy="18" r="3" fill="#D97706"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오전 8:30</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>1.52km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>20분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 84kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 2월 17일 (월) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 17일 (월)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(139,92,246,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M4 34 L14 10 L26 22 L36 6" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="4" cy="34" r="3" fill="#8B5CF6"/>
+                        <circle cx="36" cy="6" r="3" fill="#6D28D9"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 5:45</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>4.32km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>55분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 237kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 2월 16일 (일) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 16일 (일)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(236,72,153,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M8 26 Q18 8 32 20 Q26 34 12 28" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="8" cy="26" r="3" fill="#EC4899"/>
+                        <circle cx="12" cy="28" r="3" fill="#BE185D"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 2:10</div>
+                    <div class="card-pet"><i data-lucide="cat"></i> 나비</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>1.85km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>24분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 102kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: var(--lime-light);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 30 L18 10 L30 26 L36 14" stroke="var(--lime)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="30" r="3" fill="var(--lime)"/>
+                        <circle cx="36" cy="14" r="3" fill="var(--lime-dark)"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오전 9:00</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>3.15km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>40분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 173kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 2월 15일 (토) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 15일 (토)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: var(--azure-light);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 24 L16 8 L28 20 L36 10" stroke="var(--azure)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="24" r="3" fill="var(--azure)"/>
+                        <circle cx="36" cy="10" r="3" fill="var(--azure-dark)"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 4:30</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>2.67km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>33분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 147kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 2월 14일 (금) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 14일 (금)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(239,68,68,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M4 28 L14 6 L24 18 L36 4" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="4" cy="28" r="3" fill="var(--danger)"/>
+                        <circle cx="36" cy="4" r="3" fill="#B91C1C"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 6:00</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>3.89km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>48분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 214kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(245,158,11,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M8 32 Q20 10 34 22" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="8" cy="32" r="3" fill="#F59E0B"/>
+                        <circle cx="34" cy="22" r="3" fill="#D97706"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오전 7:15</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>1.23km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>16분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 68kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 2월 13일 (목) -->
+        <div class="date-group animate-group">
+            <div class="date-header"><i data-lucide="calendar"></i> 2월 13일 (목)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(236,72,153,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 30 L16 12 L26 24 L34 8" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="30" r="3" fill="#EC4899"/>
+                        <circle cx="34" cy="8" r="3" fill="#BE185D"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 5:30</div>
+                    <div class="card-pet"><i data-lucide="cat"></i> 나비</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>2.11km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>27분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 116kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: rgba(139,92,246,0.08);">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M4 26 Q14 4 24 16 Q30 28 36 12" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="4" cy="26" r="3" fill="#8B5CF6"/>
+                        <circle cx="36" cy="12" r="3" fill="#6D28D9"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 3:00</div>
+                    <div class="card-pet"><i data-lucide="dog"></i> 초코</div>
+                    <div class="card-stats">
+                        <span class="stat-item"><i data-lucide="route"></i> <strong>3.54km</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="clock"></i> <strong>44분</strong></span>
+                        <span class="divider"></span>
+                        <span class="stat-item"><i data-lucide="flame"></i> 195kcal</span>
+                    </div>
+                </div>
+                <div class="card-chevron"><i data-lucide="chevron-right"></i></div>
+            </a>
+        </div>
+
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+
+        // Filter tab switching (original functionality preserved)
+        function switchFilter(btn) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

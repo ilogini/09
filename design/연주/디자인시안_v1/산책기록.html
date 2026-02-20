@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>산책 기록 - 멍이랑 withbowwow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: center;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-back {
+            position: absolute; left: 12px;
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            background: transparent; font-size: 22px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text); text-decoration: none;
+            transition: background 0.2s;
+        }
+        .header-back:hover { background: var(--bg); }
+        .header-title {
+            font-size: 18px; font-weight: 700;
+        }
+
+        /* ===== Content ===== */
+        .content {
+            padding-bottom: 40px;
+        }
+
+        /* ===== Summary Stats ===== */
+        .summary-bar {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 16px 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px; font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .summary-bar span {
+            color: var(--text-light);
+        }
+
+        /* ===== Filter Tabs ===== */
+        .filter-tabs {
+            display: flex;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: var(--header-height); z-index: 99;
+        }
+        .filter-tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 14px; font-weight: 600;
+            color: var(--text-light);
+            background: none; border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .filter-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .filter-tab:hover {
+            color: var(--primary);
+        }
+
+        /* ===== Date Group ===== */
+        .date-group {
+            padding: 0 16px;
+        }
+        .date-header {
+            padding: 20px 0 10px;
+            font-size: 14px; font-weight: 700;
+            color: var(--text-secondary);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .date-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin-left: 8px;
+        }
+
+        /* ===== Walk Card ===== */
+        .walk-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 16px;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .walk-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        .walk-card:active {
+            transform: translateY(0);
+        }
+
+        /* Mini Map */
+        .mini-map {
+            width: 60px; height: 60px;
+            border-radius: var(--radius-xs);
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .mini-map svg {
+            width: 40px; height: 40px;
+        }
+
+        /* Card Info */
+        .card-info {
+            flex: 1; min-width: 0;
+        }
+        .card-time {
+            font-size: 15px; font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+        .card-pet {
+            font-size: 12px; font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .card-stats {
+            font-size: 13px; font-weight: 500;
+            color: var(--text-light);
+        }
+        .card-stats strong {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* Chevron */
+        .card-chevron {
+            font-size: 20px;
+            color: var(--text-light);
+            flex-shrink: 0;
+            margin-left: 4px;
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        .animate-in:nth-child(1) { animation-delay: 0.03s; }
+        .animate-in:nth-child(2) { animation-delay: 0.06s; }
+        .animate-in:nth-child(3) { animation-delay: 0.09s; }
+        .animate-in:nth-child(4) { animation-delay: 0.12s; }
+        .animate-in:nth-child(5) { animation-delay: 0.15s; }
+        .animate-in:nth-child(6) { animation-delay: 0.18s; }
+        .animate-in:nth-child(7) { animation-delay: 0.21s; }
+        .animate-in:nth-child(8) { animation-delay: 0.24s; }
+        .animate-in:nth-child(9) { animation-delay: 0.27s; }
+        .animate-in:nth-child(10) { animation-delay: 0.30s; }
+        .animate-in:nth-child(11) { animation-delay: 0.33s; }
+        .animate-in:nth-child(12) { animation-delay: 0.36s; }
+
+        .date-group.animate-group {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        .date-group.animate-group:nth-of-type(1) { animation-delay: 0.05s; }
+        .date-group.animate-group:nth-of-type(2) { animation-delay: 0.1s; }
+        .date-group.animate-group:nth-of-type(3) { animation-delay: 0.15s; }
+        .date-group.animate-group:nth-of-type(4) { animation-delay: 0.2s; }
+        .date-group.animate-group:nth-of-type(5) { animation-delay: 0.25s; }
+        .date-group.animate-group:nth-of-type(6) { animation-delay: 0.3s; }
+        .date-group.animate-group:nth-of-type(7) { animation-delay: 0.35s; }
+        .date-group.animate-group:nth-of-type(8) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="마이페이지.html" class="header-back">&#8592;</a>
+        <div class="header-title">산책 기록</div>
+    </header>
+
+    <!-- Summary -->
+    <div class="summary-bar">
+        총 187회 <span>&#183;</span> 312.4km
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+        <button class="filter-tab active" onclick="switchFilter(this)">주간</button>
+        <button class="filter-tab" onclick="switchFilter(this)">월간</button>
+        <button class="filter-tab" onclick="switchFilter(this)">연간</button>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+
+        <!-- 2월 19일 (수) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 19일 (수)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #D1FAE5;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 32 L12 14 L22 20 L34 6" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="32" r="3" fill="#10B981"/>
+                        <circle cx="34" cy="6" r="3" fill="#059669"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 3:21</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>3.21km</strong> &#183; <strong>42분</strong> &#183; 186kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+        <!-- 2월 18일 (화) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 18일 (화)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #DBEAFE;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M8 30 L20 8 L32 24" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8" cy="30" r="3" fill="#3B82F6"/>
+                        <circle cx="32" cy="24" r="3" fill="#1D4ED8"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 6:15</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>2.87km</strong> &#183; <strong>35분</strong> &#183; 158kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #FEF3C7;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 28 Q20 6 34 18" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="6" cy="28" r="3" fill="#F59E0B"/>
+                        <circle cx="34" cy="18" r="3" fill="#D97706"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오전 8:30</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>1.52km</strong> &#183; <strong>20분</strong> &#183; 84kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+        <!-- 2월 17일 (월) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 17일 (월)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #EDE9FE;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M4 34 L14 10 L26 22 L36 6" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="4" cy="34" r="3" fill="#8B5CF6"/>
+                        <circle cx="36" cy="6" r="3" fill="#6D28D9"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 5:45</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>4.32km</strong> &#183; <strong>55분</strong> &#183; 237kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+        <!-- 2월 16일 (일) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 16일 (일)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #FCE7F3;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M8 26 Q18 8 32 20 Q26 34 12 28" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="8" cy="26" r="3" fill="#EC4899"/>
+                        <circle cx="12" cy="28" r="3" fill="#BE185D"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 2:10</div>
+                    <div class="card-pet">&#x1F431; 나비</div>
+                    <div class="card-stats"><strong>1.85km</strong> &#183; <strong>24분</strong> &#183; 102kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #D1FAE5;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 30 L18 10 L30 26 L36 14" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="30" r="3" fill="#10B981"/>
+                        <circle cx="36" cy="14" r="3" fill="#059669"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오전 9:00</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>3.15km</strong> &#183; <strong>40분</strong> &#183; 173kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+        <!-- 2월 15일 (토) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 15일 (토)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #DBEAFE;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 24 L16 8 L28 20 L36 10" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="24" r="3" fill="#3B82F6"/>
+                        <circle cx="36" cy="10" r="3" fill="#1D4ED8"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 4:30</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>2.67km</strong> &#183; <strong>33분</strong> &#183; 147kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+        <!-- 2월 14일 (금) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 14일 (금)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #FEE2E2;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M4 28 L14 6 L24 18 L36 4" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="4" cy="28" r="3" fill="#EF4444"/>
+                        <circle cx="36" cy="4" r="3" fill="#B91C1C"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 6:00</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>3.89km</strong> &#183; <strong>48분</strong> &#183; 214kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #FEF3C7;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M8 32 Q20 10 34 22" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="8" cy="32" r="3" fill="#F59E0B"/>
+                        <circle cx="34" cy="22" r="3" fill="#D97706"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오전 7:15</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>1.23km</strong> &#183; <strong>16분</strong> &#183; 68kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+        <!-- 2월 13일 (목) -->
+        <div class="date-group animate-group">
+            <div class="date-header">2월 13일 (목)</div>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #FCE7F3;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M6 30 L16 12 L26 24 L34 8" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="6" cy="30" r="3" fill="#EC4899"/>
+                        <circle cx="34" cy="8" r="3" fill="#BE185D"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 5:30</div>
+                    <div class="card-pet">&#x1F431; 나비</div>
+                    <div class="card-stats"><strong>2.11km</strong> &#183; <strong>27분</strong> &#183; 116kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+            <a href="산책상세.html" class="walk-card animate-in">
+                <div class="mini-map" style="background: #EDE9FE;">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <path d="M4 26 Q14 4 24 16 Q30 28 36 12" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="4" cy="26" r="3" fill="#8B5CF6"/>
+                        <circle cx="36" cy="12" r="3" fill="#6D28D9"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-time">오후 3:00</div>
+                    <div class="card-pet">&#x1F436; 초코</div>
+                    <div class="card-stats"><strong>3.54km</strong> &#183; <strong>44분</strong> &#183; 195kcal</div>
+                </div>
+                <div class="card-chevron">&#8250;</div>
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        function switchFilter(btn) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

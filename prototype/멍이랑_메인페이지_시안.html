@@ -4,461 +4,805 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>멍이랑 withbowwow - 반려동물 산책 앱</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Leaflet.js (무료, API 키 불필요) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
+        /* ===== 컨셉3: 시원하고 청량한 맑은날의 산책 ===== */
+        /* Design System v2 적용 */
+
         :root {
-            --primary: #10B981;
-            --primary-dark: #059669;
-            --primary-light: #D1FAE5;
-            --secondary: #3B82F6;
-            --secondary-dark: #1D4ED8;
-            --accent: #F59E0B;
-            --accent-light: #FEF3C7;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --text-light: #9CA3AF;
-            --bg: #F9FAFB;
-            --white: #FFFFFF;
-            --border: #E5E7EB;
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197, 217, 0, 0.10);
+            --lime-glow: rgba(197, 217, 0, 0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0, 153, 255, 0.08);
+            --azure-glow: rgba(0, 153, 255, 0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-heavy: rgba(255, 255, 255, 0.80);
+            --glass-border: rgba(197, 217, 0, 0.12);
+            --glass-blur: blur(20px);
             --danger: #EF4444;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --radius-xs: 8px;
-            --nav-height: 72px;
-            --header-height: 56px;
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            --nav-height: 76px;
+            --header-height: 58px;
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== Header ===== */
+        .lucide { width: 20px; height: 20px; stroke-width: 1.8; }
+        .lucide-sm { width: 16px; height: 16px; stroke-width: 1.8; }
+        .lucide-lg { width: 24px; height: 24px; stroke-width: 1.6; }
+
+        /* ===== Header — glass ===== */
         .header {
             position: sticky; top: 0; z-index: 100;
-            background: var(--white);
-            padding: 12px 20px;
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 0 20px;
             display: flex; align-items: center; justify-content: space-between;
             height: var(--header-height);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(197,217,0,0.08);
         }
-        .header-logo { display: flex; align-items: center; gap: 8px; }
-        .header-logo .paw-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .header-logo span { font-size: 20px; font-weight: 800; color: var(--text); }
-        .header-logo span em { font-style: normal; color: var(--primary); }
-        .header-actions { display: flex; gap: 8px; }
-        .header-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s; }
-        .header-btn:hover { background: var(--border); }
-        .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
-
-        /* ===== GPS Badge (internal use only) ===== */
-        @keyframes gpsPulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{opacity:0.7;box-shadow:0 0 0 4px rgba(16,185,129,0)} }
+        .header-logo { display: flex; align-items: center; gap: 6px; }
+        .header-logo-text { font-size: 19px; font-weight: 300; letter-spacing: -0.3px; color: var(--text-primary); }
+        .header-logo-text strong { font-weight: 700; }
+        .header-logo-dot {
+            width: 7px; height: 7px; background: var(--lime); border-radius: 50%;
+            display: inline-block; margin-left: 1px;
+            box-shadow: 0 0 8px var(--lime-glow);
+        }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .gps-pill {
+            display: flex; align-items: center; gap: 5px;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+            background: rgba(248,252,250,0.8);
+            color: var(--text-muted);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        .gps-pill.on { background: var(--lime-light); color: var(--lime-dark); border-color: rgba(197,217,0,0.2); }
+        .gps-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); transition: all 0.3s; }
+        .gps-pill.on .gps-indicator { background: var(--lime); animation: limePulse 2s ease-in-out infinite; }
+        @keyframes limePulse { 0%,100%{box-shadow:0 0 0 0 rgba(197,217,0,0.4)} 50%{box-shadow:0 0 0 6px rgba(197,217,0,0)} }
+        .header-icon-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: none; background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-secondary);
+            transition: all 0.2s; position: relative;
+            text-decoration: none;
+        }
+        .header-icon-btn:hover { background: var(--lime-light); color: var(--text-primary); }
+        .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--azure); border-radius: 50%; border: 1.5px solid white; }
 
         /* ===== Main Content ===== */
-        .content { padding-bottom: calc(var(--nav-height) + 20px); }
+        .content { padding-bottom: calc(var(--nav-height) + 24px); }
 
-        /* ===== Weather ===== */
-        .weather-bar { background: linear-gradient(135deg, #EEF2FF 0%, #DBEAFE 100%); margin: 16px 16px 0; padding: 14px 18px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; }
-        .weather-info { display: flex; align-items: center; gap: 10px; }
-        .weather-icon { font-size: 28px; }
-        .weather-text h4 { font-size: 14px; font-weight: 600; }
-        .weather-text p { font-size: 12px; color: var(--secondary-dark); margin-top: 2px; }
-        .weather-temp { font-size: 24px; font-weight: 700; color: var(--secondary-dark); }
+        /* ===== Weather — sky gradient glass ===== */
+        .weather-card {
+            margin: 12px 16px 0; padding: 20px 22px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, rgba(0,153,255,0.06) 0%, rgba(0,153,255,0.12) 40%, rgba(197,217,0,0.06) 100%);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0,153,255,0.08);
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .weather-card::before {
+            content: ''; position: absolute; top: -20px; right: 30px;
+            width: 80px; height: 40px; background: rgba(255,255,255,0.35);
+            border-radius: 50%; animation: cloudDrift 8s ease-in-out infinite;
+        }
+        .weather-card::after {
+            content: ''; position: absolute; top: -10px; right: 60px;
+            width: 55px; height: 30px; background: rgba(255,255,255,0.25);
+            border-radius: 50%; animation: cloudDrift 12s ease-in-out infinite reverse;
+        }
+        @keyframes cloudDrift { 0%,100%{transform:translateX(0)} 50%{transform:translateX(12px)} }
+        .weather-left { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+        .weather-icon-wrap {
+            width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
+            color: var(--azure);
+        }
+        .weather-icon-wrap .lucide { width: 32px; height: 32px; stroke-width: 1.4; }
+        .weather-text h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .weather-text p { font-size: 12px; color: var(--azure-dark); margin-top: 3px; }
+        .weather-temp {
+            font-size: 36px; font-weight: 200; color: var(--azure-dark);
+            position: relative; z-index: 1; letter-spacing: -1px;
+        }
+        .weather-temp sup { font-size: 18px; font-weight: 300; }
 
-        /* ===== Weekly Card ===== */
-        .weekly-card { margin: 16px; background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+        /* ===== Weekly Summary — glass card ===== */
+        .weekly-card {
+            margin: 14px 16px 0; padding: 22px 24px;
+            border-radius: var(--radius-lg);
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+        }
         .weekly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .weekly-header h3 { font-size: 16px; font-weight: 700; }
-        .weekly-header .period { font-size: 12px; color: var(--text-light); background: var(--bg); padding: 4px 10px; border-radius: 20px; }
-        .weekly-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
-        .stat-item { text-align: center; }
-        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1.2; }
-        .stat-value .unit { font-size: 14px; font-weight: 600; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-        .progress-section { margin-top: 4px; }
-        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .progress-header span { font-size: 13px; color: var(--text-secondary); }
-        .progress-header strong { font-size: 13px; color: var(--primary); }
-        .progress-bar { height: 10px; background: var(--primary-light); border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 10px; transition: width 1s ease; position: relative; }
-        .progress-fill::after { content:''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background: var(--white); border: 3px solid var(--primary); border-radius: 50%; box-shadow: var(--shadow-sm); }
+        .weekly-header h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .weekly-header h3 .lucide { color: var(--azure); }
+        .weekly-period { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+        .weekly-stats { display: flex; align-items: center; justify-content: space-around; margin-bottom: 22px; }
+        .weekly-stat-item { text-align: center; flex: 1; }
+        .weekly-stat-item .value { font-size: 26px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+        .weekly-stat-item .value .unit { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-left: 1px; }
+        .weekly-stat-item .label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .stat-divider { width: 1px; height: 36px; background: rgba(197,217,0,0.15); flex-shrink: 0; }
+        .progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .progress-label span { font-size: 12px; color: var(--text-muted); }
+        .progress-label strong { font-size: 12px; color: var(--lime-dark); font-weight: 600; }
+        .progress-track { height: 4px; background: rgba(197,217,0,0.12); border-radius: 4px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--lime), var(--azure)); border-radius: 4px; transition: width 1.2s cubic-bezier(0.22,1,0.36,1); }
 
-        /* ===== Walk Start (used in walk screen) ===== */
-        .walk-start-btn { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius); font-size: 18px; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 24px rgba(16,185,129,0.35); transition: all 0.3s; position: relative; overflow: hidden; }
-        .walk-start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16,185,129,0.45); }
-        .walk-start-btn:active { transform: translateY(0); }
+        /* ===== Walk Start — glass outline ===== */
+        .walk-start-area { margin: 18px 16px 0; }
+        .walk-start-btn {
+            width: 100%; padding: 18px 24px;
+            background: transparent; border: 2px solid var(--lime);
+            border-radius: var(--radius-lg); color: var(--text-primary);
+            font-size: 16px; font-weight: 600; font-family: inherit;
+            cursor: pointer; display: flex; align-items: center; gap: 16px;
+            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+            position: relative; overflow: hidden;
+            animation: floatBtn 3s ease-in-out infinite;
+        }
+        @keyframes floatBtn { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+        .walk-start-btn:hover {
+            background: var(--lime); color: var(--text-primary);
+            box-shadow: 0 8px 32px var(--lime-glow); animation: none; transform: translateY(-2px);
+        }
+        .walk-start-btn:active { transform: translateY(0) scale(0.98); }
+        .walk-start-icon {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--lime-light); display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.3s;
+        }
+        .walk-start-btn:hover .walk-start-icon { background: rgba(255,255,255,0.5); }
+        .walk-start-icon .lucide { color: var(--lime-dark); width: 20px; height: 20px; }
+        .walk-start-text { text-align: left; flex: 1; }
+        .walk-start-text .main { font-size: 16px; font-weight: 600; }
+        .walk-start-text .sub { font-size: 12px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+        .walk-start-arrow { color: var(--text-muted); transition: all 0.3s; }
+        .walk-start-btn:hover .walk-start-arrow { color: var(--text-primary); transform: translateX(4px); }
 
         /* ===== Section Title ===== */
-        .section-title { padding: 24px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
-        .section-title h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .section-title .more { font-size: 13px; color: var(--text-light); text-decoration: none; cursor: pointer; }
-        .section-title .more:hover { color: var(--primary); }
+        .section-title {
+            padding: 28px 20px 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .section-title h3 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .section-title h3 .lucide { color: var(--azure); }
+        .section-title .more-link {
+            font-size: 12px; color: var(--text-muted); font-weight: 500;
+            text-decoration: none; cursor: pointer; transition: color 0.2s;
+        }
+        .section-title .more-link:hover { color: var(--lime-dark); }
 
-        /* ===== Pet Select Screen ===== */
+        /* ===== Challenge — horizontal glass ===== */
+        .challenge-scroll {
+            padding: 0 16px; display: flex; gap: 12px;
+            overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+        }
+        .challenge-scroll::-webkit-scrollbar { display: none; }
+        .challenge-card {
+            min-width: 190px; flex-shrink: 0; padding: 18px;
+            border-radius: var(--radius-md);
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            scroll-snap-align: start; cursor: pointer;
+            transition: all 0.25s ease; text-decoration: none; color: inherit; display: block;
+        }
+        .challenge-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .challenge-icon-wrap {
+            width: 40px; height: 40px; border-radius: var(--radius-xs);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+        }
+        .challenge-icon-wrap.distance { background: var(--azure-light); color: var(--azure); }
+        .challenge-icon-wrap.streak { background: rgba(239,68,68,0.08); color: #EF4444; }
+        .challenge-icon-wrap.explore { background: var(--lime-light); color: var(--lime-dark); }
+        .challenge-icon-wrap.time { background: rgba(139,92,246,0.08); color: #8B5CF6; }
+        .challenge-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+        .challenge-card .desc { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+        .challenge-prog { display: flex; align-items: center; gap: 8px; }
+        .challenge-prog .track { flex: 1; height: 3px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
+        .challenge-prog .fill { height: 100%; border-radius: 3px; }
+        .fill-lime { background: linear-gradient(90deg, var(--lime), var(--azure)); }
+        .fill-red { background: #EF4444; }
+        .fill-amber { background: #F59E0B; }
+        .fill-purple { background: #8B5CF6; }
+        .challenge-prog .pct { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+
+        /* ===== Nearby ===== */
+        .nearby-map-container { margin: 0 16px; height: 170px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--glass-border); }
+        .nearby-map-container .leaflet-control-attribution { font-size: 8px !important; opacity: 0.4; }
+        .nearby-list { padding: 10px 16px 0; display: flex; flex-direction: column; gap: 2px; }
+        .nearby-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 4px;
+            cursor: pointer; transition: all 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .nearby-item:last-child { border-bottom: none; }
+        .nearby-item:hover { padding-left: 8px; }
+        .nearby-icon-circle {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .nearby-icon-circle.park { background: rgba(197,217,0,0.08); color: var(--lime-dark); }
+        .nearby-icon-circle.cafe { background: rgba(245,158,11,0.08); color: #D97706; }
+        .nearby-icon-circle.hospital { background: var(--azure-light); color: var(--azure); }
+        .nearby-info { flex: 1; min-width: 0; }
+        .nearby-name { font-size: 14px; font-weight: 600; }
+        .nearby-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .nearby-dist { font-size: 13px; font-weight: 600; color: var(--azure); white-space: nowrap; }
+
+        /* ===== Recent Walks ===== */
+        .recent-walks { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+        .walk-history-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--glass-bg); backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none; color: inherit;
+        }
+        .walk-history-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+        .walk-mini-route {
+            width: 48px; height: 48px; border-radius: var(--radius-xs);
+            background: var(--lime-light); display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--lime-dark);
+        }
+        .walk-item-info { flex: 1; min-width: 0; }
+        .walk-item-date { font-size: 11px; color: var(--text-muted); }
+        .walk-item-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
+        .walk-item-meta { display: flex; gap: 12px; margin-top: 4px; }
+        .walk-item-meta span { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 3px; }
+        .walk-item-meta span strong { color: var(--text-primary); font-weight: 600; }
+        .walk-item-meta .lucide { width: 12px; height: 12px; stroke-width: 2; }
+
+        /* ===== Ad Banner ===== */
+        .ad-banner {
+            margin: 16px 16px 0; padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, rgba(197,217,0,0.06), rgba(0,153,255,0.04));
+            border: 1px solid rgba(197,217,0,0.08);
+            display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative;
+        }
+        .ad-tag {
+            position: absolute; top: 6px; right: 8px;
+            font-size: 9px; font-weight: 600; color: var(--text-muted);
+            background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 3px;
+        }
+        .ad-banner .ad-icon { font-size: 28px; }
+        .ad-banner .ad-text h4 { font-size: 13px; font-weight: 600; }
+        .ad-banner .ad-text p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== Premium Banner — azure gradient ===== */
+        .premium-banner {
+            margin: 20px 16px 0; padding: 18px 20px;
+            background: linear-gradient(135deg, var(--azure-dark) 0%, var(--azure) 60%, #33BBFF 100%);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; gap: 14px;
+            cursor: pointer; transition: transform 0.2s;
+            position: relative; overflow: hidden; text-decoration: none;
+        }
+        .premium-banner::before {
+            content: ''; position: absolute; top: -30px; right: -10px;
+            width: 100px; height: 100px; background: rgba(255,255,255,0.08); border-radius: 50%;
+        }
+        .premium-banner::after {
+            content: ''; position: absolute; bottom: -20px; right: 40px;
+            width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 50%;
+        }
+        .premium-banner:hover { transform: translateY(-2px); }
+        .premium-icon-box {
+            width: 42px; height: 42px; border-radius: var(--radius-xs);
+            background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white;
+        }
+        .premium-text { flex: 1; position: relative; z-index: 1; }
+        .premium-text h4 { font-size: 14px; font-weight: 700; color: white; }
+        .premium-text p { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+        .premium-price-box { text-align: right; position: relative; z-index: 1; }
+        .premium-price-box .price { font-size: 16px; font-weight: 700; color: var(--lime); }
+        .premium-price-box .period { font-size: 10px; color: rgba(255,255,255,0.6); }
+
+        /* ===== Bottom Nav — glass ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(197,217,0,0.08);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 4px; padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 3px; padding: 8px 14px; border: none; background: none;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            position: relative; min-width: 52px; text-decoration: none;
+        }
+        .nav-item .nav-icon-wrap {
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-item .nav-icon-wrap .lucide { width: 22px; height: 22px; stroke-width: 1.6; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+        .nav-item.active .nav-icon-wrap { color: var(--lime-dark); }
+        .nav-item.active .nav-label { color: var(--lime-dark); font-weight: 600; }
+        .nav-item.active::after {
+            content: ''; position: absolute; bottom: 4px;
+            width: 4px; height: 4px; background: var(--lime); border-radius: 50%;
+        }
+        .nav-item.center-btn { position: relative; top: -16px; }
+        .nav-item.center-btn .nav-icon-wrap {
+            width: 54px; height: 54px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border-radius: 50%; color: white;
+            box-shadow: 0 4px 20px var(--lime-glow);
+            animation: navFloat 3s ease-in-out infinite;
+            font-size: 24px;
+        }
+        .nav-item.center-btn .nav-icon-wrap .lucide { width: 24px; height: 24px; stroke-width: 2; }
+        .nav-item.center-btn:hover .nav-icon-wrap { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(197,217,0,0.4); }
+        @keyframes navFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+        .nav-item.center-btn .nav-label { color: var(--lime-dark); font-weight: 600; margin-top: 6px; }
+
+        /* ===== Modal / Popup 공통 규격 ===== */
+        .modal-frame {
+            position: fixed; inset: 0;
+            max-width: var(--modal-width); margin: 0 auto;
+        }
+
+        /* ===== Pet Selection Screen ===== */
         .pet-select-screen {
-            display: none; position: fixed; inset: 0; z-index: 290;
-            background: var(--white); max-width: 480px; margin: 0 auto;
+            display: none; z-index: 290;
+            background: var(--bg-base);
             flex-direction: column;
         }
         .pet-select-screen.active { display: flex; }
         .pet-select-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            padding: 14px var(--modal-padding-x);
+            background: rgba(255,255,255,0.70); backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(197,217,0,0.08);
         }
-        .pet-select-header h3 { font-size: 18px; font-weight: 700; }
-        .pet-select-close { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .pet-select-body { flex: 1; padding: 24px 16px; overflow-y: auto; }
-        .pet-select-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; text-align: center; }
+        .pet-select-header h3 { font-size: 16px; font-weight: 600; }
+        .pet-select-close {
+            width: 34px; height: 34px; border-radius: 50%; border: none;
+            background: rgba(0,0,0,0.04); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); transition: all 0.2s;
+        }
+        .pet-select-close:hover { background: rgba(0,0,0,0.08); }
+        .pet-select-body { flex: 1; padding: 24px var(--modal-padding-x); overflow-y: auto; }
+        .pet-select-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; text-align: center; }
         .pet-select-list { display: flex; flex-direction: column; gap: 12px; }
         .pet-select-card {
             display: flex; align-items: center; gap: 14px;
-            padding: 16px; background: var(--bg);
-            border-radius: var(--radius-sm); border: 2px solid transparent;
+            padding: 16px; background: var(--glass-bg); backdrop-filter: blur(12px);
+            border-radius: var(--radius-md); border: 2px solid transparent;
             cursor: pointer; transition: all 0.2s;
         }
-        .pet-select-card.selected { border-color: var(--primary); background: var(--primary-light); }
-        .pet-select-card:hover { border-color: var(--primary); }
-        .pet-select-avatar { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
-        .pet-select-avatar.dog { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-        .pet-select-avatar.cat { background: linear-gradient(135deg, #FCE7F3, #F9A8D4); }
+        .pet-select-card.selected { border-color: var(--lime); background: var(--lime-light); }
+        .pet-select-card:hover { border-color: var(--lime); }
+        .pet-select-avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; flex-shrink: 0;
+            border: 2px solid rgba(197,217,0,0.2);
+        }
         .pet-select-info { flex: 1; }
-        .pet-select-name { font-size: 16px; font-weight: 700; }
-        .pet-select-breed { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-        .pet-select-check { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--white); transition: all 0.2s; flex-shrink: 0; }
-        .pet-select-card.selected .pet-select-check { background: var(--primary); border-color: var(--primary); }
-        .pet-select-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
-        .pet-select-start { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.35); transition: all 0.2s; }
-        .pet-select-start:hover { transform: translateY(-2px); }
+        .pet-select-name { font-size: 15px; font-weight: 600; }
+        .pet-select-breed { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .pet-select-check {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: white; transition: all 0.2s; flex-shrink: 0;
+        }
+        .pet-select-card.selected .pet-select-check { background: var(--lime); border-color: var(--lime); }
+        .pet-select-footer { padding: 16px var(--modal-padding-x); border-top: 1px solid rgba(197,217,0,0.08); }
+        .pet-select-start {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border: none; border-radius: var(--radius-md);
+            font-size: 16px; font-weight: 600; font-family: inherit;
+            color: var(--text-primary); cursor: pointer;
+            box-shadow: 0 6px 24px var(--lime-glow); transition: all 0.2s;
+        }
+        .pet-select-start:hover { transform: translateY(-1px); }
         .pet-select-start:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* ===== Challenge ===== */
-        .challenge-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        .challenge-scroll::-webkit-scrollbar { display: none; }
-        .challenge-item { min-width: 200px; background: var(--white); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow); scroll-snap-align: start; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; text-decoration: none; color: inherit; display: block; }
-        .challenge-item:hover { transform: translateY(-2px); }
-        .challenge-badge { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; }
-        .challenge-badge.distance { background: #DBEAFE; }
-        .challenge-badge.streak { background: #FEE2E2; }
-        .challenge-badge.explore { background: #FEF3C7; }
-        .challenge-badge.speed { background: #EDE9FE; }
-        .challenge-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-        .challenge-item p { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
-        .challenge-progress { display: flex; align-items: center; gap: 8px; }
-        .challenge-progress .bar { flex: 1; height: 6px; background: var(--bg); border-radius: 6px; overflow: hidden; }
-        .challenge-progress .bar-fill { height: 100%; border-radius: 6px; }
-        .bar-fill.green { background: var(--primary); }
-        .bar-fill.red { background: var(--danger); }
-        .bar-fill.amber { background: var(--accent); }
-        .bar-fill.purple { background: #8B5CF6; }
-        .challenge-progress span { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
-
-        /* Walk Map Grayscale (NRC minimal style) */
-        #walkMap .leaflet-tile-pane { filter: grayscale(100%) brightness(1.1) contrast(0.9); }
-
-        /* ===== Nearby ===== */
-        .nearby-map-box { margin: 0 16px; height: 180px; border-radius: var(--radius); overflow: hidden; }
-        .nearby-map-box .leaflet-control-attribution { font-size: 8px !important; opacity: 0.5; }
-        .nearby-list { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
-        .nearby-item { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s; }
-        .nearby-item:hover { box-shadow: var(--shadow); transform: translateX(4px); }
-        .nearby-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-        .nearby-icon.park { background: #D1FAE5; }
-        .nearby-icon.cafe { background: #FEF3C7; }
-        .nearby-icon.hospital { background: #DBEAFE; }
-        .nearby-info { flex: 1; min-width: 0; }
-        .nearby-name { font-size: 14px; font-weight: 600; }
-        .nearby-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
-        .nearby-dist { font-size: 13px; font-weight: 600; color: var(--secondary); white-space: nowrap; }
-
-        /* ===== Ad / Premium ===== */
-        .ad-banner { margin: 20px 16px 0; padding: 14px 18px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative; }
-        .ad-badge { font-size: 10px; font-weight: 600; color: var(--accent); background: rgba(245,158,11,0.15); padding: 2px 6px; border-radius: 4px; position: absolute; top: 8px; right: 8px; }
-        .ad-banner .ad-icon { font-size: 32px; }
-        .ad-banner .ad-text h4 { font-size: 13px; font-weight: 700; color: #92400E; }
-        .ad-banner .ad-text p { font-size: 11px; color: #A16207; margin-top: 2px; }
-
-        .recent-walks { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
-        .walk-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s; }
-        .walk-item:hover { box-shadow: var(--shadow); }
-        .walk-route-mini { width: 52px; height: 52px; border-radius: 12px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .walk-route-mini svg { width: 32px; height: 32px; }
-        .walk-info { flex: 1; min-width: 0; }
-        .walk-date { font-size: 12px; color: var(--text-light); }
-        .walk-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
-        .walk-meta { display: flex; gap: 12px; margin-top: 4px; }
-        .walk-meta span { font-size: 12px; color: var(--text-secondary); }
-        .walk-meta span strong { color: var(--text); }
-
-        .premium-banner { margin: 20px 16px 0; padding: 16px 18px; background: linear-gradient(135deg, #1E1B4B, #312E81); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.2s; }
-        .premium-banner:hover { transform: translateY(-2px); }
-        .premium-badge { width: 44px; height: 44px; background: linear-gradient(135deg, #F59E0B, #EAB308); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .premium-text h4 { font-size: 14px; font-weight: 700; color: white; }
-        .premium-text p { font-size: 12px; color: #A5B4FC; margin-top: 2px; }
-        .premium-price { margin-left: auto; text-align: right; }
-        .premium-price .price { font-size: 16px; font-weight: 700; color: #FCD34D; }
-        .premium-price .period { font-size: 11px; color: #A5B4FC; }
-
-        /* ===== Bottom Nav ===== */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: var(--nav-height); background: var(--white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 200; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; border: none; background: none; cursor: pointer; font-family: inherit; transition: all 0.2s; position: relative; min-width: 52px; }
-        .nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
-        .nav-item { text-decoration: none; }
-        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
-        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
-        .nav-item:hover .nav-icon { transform: translateY(-2px); }
-        .nav-item.center-btn { position: relative; top: -14px; }
-        .nav-item.center-btn .nav-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 16px rgba(16,185,129,0.4); color: white; }
-        .nav-item.center-btn:hover .nav-icon { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(16,185,129,0.5); }
-
-        /* ===== Walk Screen (Full-screen overlay) ===== */
+        /* ===== Walk Screen ===== */
         .walk-screen {
-            display: none;
-            position: fixed; inset: 0; z-index: 300;
-            background: var(--bg);
-            max-width: 480px; margin: 0 auto;
+            display: none; z-index: 300;
+            background: var(--bg-base);
             flex-direction: column;
         }
         .walk-screen.active { display: flex; }
-
-        .walk-screen-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 16px;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0; z-index: 10;
-        }
-        .walk-screen-header h3 { font-size: 15px; font-weight: 700; }
-        .walk-close-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* Walk Map */
         .walk-map-area { flex: 1; position: relative; min-height: 0; }
         #walkMap { width: 100%; height: 100%; z-index: 1; }
         .leaflet-control-zoom { display: none !important; }
-
-        .walk-map-controls {
-            position: absolute; top: 12px; right: 12px; z-index: 10;
-            display: flex; flex-direction: column; gap: 6px;
-        }
-        .wmap-btn {
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
-            border: none; border-radius: 10px; box-shadow: var(--shadow);
-            font-size: 17px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-        }
-        .wmap-btn:active { transform: scale(0.92); }
-        .wmap-btn.on { background: var(--primary); color: white; }
-
         .walk-dist-chip {
-            position: absolute; bottom: 12px; left: 12px; z-index: 10;
+            position: absolute; bottom: 14px; left: 14px; z-index: 10;
             display: flex; align-items: center; gap: 10px;
-            background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
-            border-radius: 12px; padding: 10px 16px; box-shadow: var(--shadow);
+            background: var(--glass-bg-heavy); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); padding: 10px 16px;
         }
-        .walk-dist-chip .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: gpsPulse 1s infinite; }
-        .walk-dist-chip .dist-num { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
-        .walk-dist-chip .dist-unit { font-size: 11px; color: var(--text-secondary); }
+        .walk-dist-chip .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); animation: limePulse 1.5s infinite; }
+        .walk-dist-chip .dist-num { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+        .walk-dist-chip .dist-unit { font-size: 11px; color: var(--text-muted); }
 
-        /* Walk Stats Panel */
         .walk-stats-panel {
-            background: var(--white);
-            border-radius: 20px 20px 0 0;
-            padding: 16px 20px 28px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-            flex-shrink: 0; z-index: 10;
+            background: var(--glass-bg-heavy); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: 18px var(--modal-padding-x) 30px;
+            border-top: 1px solid var(--glass-border); flex-shrink: 0; z-index: 10;
         }
-
-        .walk-pet-label { text-align: center; font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 4px; }
-        .walk-pause-label { text-align: center; font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 4px; display: none; }
+        .walk-pet-label { text-align: center; font-size: 13px; font-weight: 500; color: var(--lime-dark); margin-bottom: 4px; }
+        .walk-pause-label { text-align: center; font-size: 13px; font-weight: 600; color: #F59E0B; margin-bottom: 4px; display: none; }
         .walk-pause-label.on { display: block; }
-
         .walk-timer {
-            text-align: center; font-size: 48px; font-weight: 800;
-            color: var(--text); letter-spacing: 2px;
-            margin-bottom: 12px; font-variant-numeric: tabular-nums;
+            text-align: center; font-size: 52px; font-weight: 300;
+            color: var(--text-primary); letter-spacing: 3px;
+            margin-bottom: 14px; font-variant-numeric: tabular-nums;
         }
-        .walk-stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
-        .walk-stat { text-align: center; background: var(--bg); border-radius: var(--radius-sm); padding: 12px 6px; }
-        .walk-stat .value { font-size: 20px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
-        .walk-stat .value .unit { font-size: 10px; font-weight: 500; color: var(--text-secondary); }
-        .walk-stat .label { font-size: 10px; color: var(--text-light); margin-top: 3px; }
+        .walk-stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 18px; }
+        .walk-stat-card {
+            text-align: center; padding: 14px 8px;
+            border-radius: var(--radius-sm);
+            background: rgba(197,217,0,0.06); border: 1px solid rgba(197,217,0,0.08);
+        }
+        .walk-stat-card .val { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+        .walk-stat-card .val .unit { font-size: 10px; font-weight: 500; color: var(--text-muted); }
+        .walk-stat-card .lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .walk-stat-card .lbl .lucide { width: 12px; height: 12px; }
 
-        .walk-controls { display: flex; align-items: center; justify-content: center; gap: 20px; }
-        .walk-ctrl-btn { border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s; }
+        .walk-controls { display: flex; align-items: center; justify-content: center; gap: 22px; }
+        .walk-go-btn {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border: none; border-radius: var(--radius-md);
+            color: var(--text-primary); font-size: 16px; font-weight: 600; font-family: inherit;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 6px 24px var(--lime-glow); transition: all 0.2s;
+        }
+        .walk-go-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px var(--lime-glow); }
+        .walk-ctrl-btn {
+            border: none; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-family: inherit; transition: all 0.2s;
+        }
         .walk-ctrl-btn:active { transform: scale(0.92); }
-        .walk-ctrl-btn.pause { width: 50px; height: 50px; background: var(--bg); font-size: 19px; }
-        .walk-ctrl-btn.stop { width: 66px; height: 66px; background: linear-gradient(135deg, var(--danger), #DC2626); color: white; font-size: 24px; box-shadow: 0 4px 16px rgba(239,68,68,0.4); }
-        .walk-ctrl-btn.camera { width: 50px; height: 50px; background: var(--bg); font-size: 19px; }
+        .walk-ctrl-btn.pause {
+            width: 48px; height: 48px;
+            background: var(--glass-bg); backdrop-filter: blur(8px);
+            border: 1.5px solid var(--glass-border); color: var(--text-secondary);
+        }
+        .walk-ctrl-btn.pause .lucide { width: 20px; height: 20px; }
+        .walk-ctrl-btn.stop {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--danger), #DC2626);
+            color: white; box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+        }
+        .walk-ctrl-btn.stop .lucide { width: 24px; height: 24px; }
+        .walk-ctrl-btn.camera {
+            width: 48px; height: 48px;
+            background: var(--glass-bg); backdrop-filter: blur(8px);
+            border: 1.5px solid var(--glass-border); color: var(--text-secondary);
+        }
+        .walk-ctrl-btn.camera .lucide { width: 20px; height: 20px; }
 
-        /* ===== Result Modal ===== */
-        .result-modal { display: none; position: fixed; inset: 0; z-index: 400; background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center; max-width: 480px; margin: 0 auto; }
-        .result-modal.active { display: flex; }
-        .result-content { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px 24px 36px; animation: slideUp 0.3s ease; }
+        /* ===== Result Modal — glass ===== */
+        .result-overlay {
+            display: none; z-index: 400;
+            background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+            align-items: flex-end; justify-content: center;
+        }
+        .result-overlay.active { display: flex; }
+        .result-card {
+            background: var(--glass-bg-heavy); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%; max-height: 90vh; overflow-y: auto;
+            padding: 28px var(--modal-padding-x) 36px;
+            animation: slideUp 0.35s cubic-bezier(0.22,1,0.36,1);
+            position: relative;
+        }
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-        .result-header { text-align: center; margin-bottom: 20px; }
-        .result-header .emoji { font-size: 48px; margin-bottom: 8px; }
-        .result-header h2 { font-size: 22px; font-weight: 800; }
-        .result-header p { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
-        .result-map-preview { width: 100%; height: 160px; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 18px; background: var(--bg); }
-        .result-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
-        .result-stat { background: var(--bg); border-radius: var(--radius-xs); padding: 14px; text-align: center; }
-        .result-stat .icon { font-size: 18px; margin-bottom: 4px; }
-        .result-stat .value { font-size: 20px; font-weight: 700; color: var(--text); }
-        .result-stat .label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .confetti-container { position: absolute; top: 0; left: 0; right: 0; height: 120px; overflow: hidden; pointer-events: none; }
+        .confetti-dot { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: confettiFall 2s ease-in forwards; }
+        @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(120px) rotate(360deg);opacity:0} }
+        .result-header { text-align: center; margin-bottom: 20px; position: relative; z-index: 1; }
+        .result-celebration { font-size: 48px; margin-bottom: 8px; }
+        .result-header h2 { font-size: 22px; font-weight: 700; }
+        .result-header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .result-map-area {
+            width: 100%; height: 150px; border-radius: var(--radius-md);
+            overflow: hidden; margin-bottom: 18px;
+            background: rgba(197,217,0,0.04); border: 1px solid var(--glass-border);
+        }
+        .result-stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
+        .result-stat-item { text-align: center; padding: 16px 8px; border-radius: var(--radius-sm); background: rgba(0,0,0,0.02); }
+        .result-stat-item .stat-icon { margin-bottom: 6px; color: var(--azure); display: flex; align-items: center; justify-content: center; }
+        .result-stat-item .stat-icon .lucide { width: 18px; height: 18px; }
+        .result-stat-item .stat-value { font-size: 22px; font-weight: 700; }
+        .result-stat-item .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
         .result-badges { margin-bottom: 18px; }
-        .result-badges h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .result-badges h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
         .badge-list { display: flex; gap: 8px; flex-wrap: wrap; }
-        .badge-item { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; background: var(--accent-light); font-size: 12px; font-weight: 600; color: #92400E; }
+        .badge-chip {
+            display: flex; align-items: center; gap: 4px;
+            padding: 6px 12px; border-radius: 20px;
+            background: var(--azure-light); font-size: 12px; font-weight: 600; color: var(--azure-dark);
+        }
         .result-actions { display: flex; gap: 12px; }
-        .result-btn { flex: 1; padding: 14px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: all 0.2s; }
-        .result-btn.share { background: var(--bg); color: var(--text); }
-        .result-btn.save { background: var(--primary); color: white; }
+        .result-btn {
+            flex: 1; padding: 14px; border: none;
+            border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+            font-family: inherit; cursor: pointer; transition: all 0.2s;
+        }
+        .result-btn.close-btn { background: rgba(0,0,0,0.04); color: var(--text-secondary); }
+        .result-btn.save-btn { background: var(--azure); color: white; border-radius: var(--radius-md); }
         .result-btn:hover { transform: translateY(-1px); }
 
         /* ===== Toast ===== */
-        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el {
+            position: fixed; bottom: 92px; left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(26,43,60,0.88); backdrop-filter: blur(12px);
+            color: white; padding: 10px 22px; border-radius: 24px;
+            font-size: 13px; font-weight: 500; z-index: 500;
+            opacity: 0; transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+            pointer-events: none; white-space: nowrap; max-width: 90%;
+        }
         .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ===== Animation ===== */
-        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        .animate-in:nth-child(1) { animation-delay: 0.05s; }
-        .animate-in:nth-child(2) { animation-delay: 0.1s; }
-        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        /* ===== Animations ===== */
+        .fade-in { animation: fadeInUp 0.5s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        .fade-in:nth-child(1) { animation-delay: 0.05s; }
+        .fade-in:nth-child(2) { animation-delay: 0.1s; }
+        .fade-in:nth-child(3) { animation-delay: 0.15s; }
 
         @media (max-width: 360px) {
-            .weekly-stats .stat-value { font-size: 24px; }
-            .walk-timer { font-size: 40px; }
+            .weekly-stat-item .value { font-size: 22px; }
+            .walk-timer { font-size: 44px; }
+            .weather-temp { font-size: 30px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- ========== Header ========== -->
     <header class="header">
         <div class="header-logo">
-            <div class="paw-icon">🐾</div>
-            <span>멍이<em>랑</em></span>
+            <span class="header-logo-text"><strong>멍이</strong>랑</span>
+            <span class="header-logo-dot"></span>
         </div>
-        <div class="header-actions">
-            <a class="header-btn" href="알림.html" aria-label="알림">
-                🔔<span class="notification-dot"></span>
-            </a>
-            <a class="header-btn" href="설정.html" aria-label="설정">
-                ⚙️
+        <div class="header-right">
+            <div class="gps-pill" id="gpsBadge">
+                <span class="gps-indicator"></span>
+                <span id="gpsLabel">GPS 대기</span>
+            </div>
+            <a class="header-icon-btn" href="알림.html" aria-label="알림">
+                <i data-lucide="bell"></i>
+                <span class="notif-dot"></span>
             </a>
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- ========== Main Content ========== -->
     <main class="content">
+
         <!-- Weather -->
-        <div class="weather-bar animate-in">
-            <div class="weather-info">
-                <span class="weather-icon">☀️</span>
+        <div class="weather-card fade-in">
+            <div class="weather-left">
+                <div class="weather-icon-wrap"><i data-lucide="sun"></i></div>
                 <div class="weather-text">
                     <h4>산책하기 좋은 날이에요!</h4>
                     <p>미세먼지 좋음 · 습도 45%</p>
                 </div>
             </div>
-            <div class="weather-temp">12°</div>
+            <div class="weather-temp">12<sup>°</sup></div>
         </div>
 
         <!-- Weekly Summary -->
-        <div class="weekly-card animate-in">
+        <div class="weekly-card fade-in">
             <div class="weekly-header">
-                <h3>📊 이번 주 산책</h3>
-                <span class="period">2.3 ~ 2.9</span>
+                <h3><i data-lucide="bar-chart-2"></i> 이번 주 산책</h3>
+                <span class="weekly-period">2.3 ~ 2.9</span>
             </div>
             <div class="weekly-stats">
-                <div class="stat-item"><div class="stat-value">12.5<span class="unit">km</span></div><div class="stat-label">총 거리</div></div>
-                <div class="stat-item"><div class="stat-value">5<span class="unit">회</span></div><div class="stat-label">산책 횟수</div></div>
-                <div class="stat-item"><div class="stat-value">2:15</div><div class="stat-label">총 시간</div></div>
+                <div class="weekly-stat-item"><div class="value">12.5<span class="unit">km</span></div><div class="label">총 거리</div></div>
+                <div class="stat-divider"></div>
+                <div class="weekly-stat-item"><div class="value">5<span class="unit">회</span></div><div class="label">산책 횟수</div></div>
+                <div class="stat-divider"></div>
+                <div class="weekly-stat-item"><div class="value">2:15</div><div class="label">총 시간</div></div>
+            </div>
+            <div>
+                <div class="progress-label"><span>주간 목표 20km</span><strong>62%</strong></div>
+                <div class="progress-track"><div class="progress-bar" style="width: 62%"></div></div>
             </div>
         </div>
 
-        <!-- Recent Walks (moved up) -->
-        <div class="section-title"><h3>🕐 최근 산책</h3><a class="more" href="산책기록.html">전체보기 →</a></div>
+        <!-- Walk Start -->
+        <div class="walk-start-area fade-in">
+            <button class="walk-start-btn" onclick="openWalkScreen()">
+                <span class="walk-start-icon"><i data-lucide="arrow-right"></i></span>
+                <div class="walk-start-text">
+                    <div class="main">산책 시작하기</div>
+                    <div class="sub">햇살 한 모금, 풀내음 한 조각</div>
+                </div>
+                <span class="walk-start-arrow"><i data-lucide="chevron-right"></i></span>
+            </button>
+        </div>
+
+        <!-- Recent Walks -->
+        <div class="section-title"><h3><i data-lucide="clock"></i> 최근 산책</h3><a class="more-link" href="산책기록.html">전체보기</a></div>
         <div class="recent-walks">
-            <a class="walk-item" href="산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 L10 14 L18 18 L26 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="26" r="3" fill="#10B981"/><circle cx="26" cy="6" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">오늘 오전 7:30</div><div class="walk-title">보라매공원 코스 🐕 초코</div><div class="walk-meta"><span>📏 <strong>3.2km</strong></span><span>⏱ <strong>42분</strong></span><span>🔥 <strong>165kcal</strong></span></div></div></a>
-            <a class="walk-item" href="산책상세.html" style="text-decoration:none;color:inherit"><div class="walk-route-mini"><svg viewBox="0 0 32 32" fill="none"><path d="M8 24 L16 8 L24 20" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="24" r="3" fill="#10B981"/><circle cx="24" cy="20" r="3" fill="#059669"/></svg></div><div class="walk-info"><div class="walk-date">어제 오후 6:15</div><div class="walk-title">한강 산책로 🐕 초코</div><div class="walk-meta"><span>📏 <strong>4.7km</strong></span><span>⏱ <strong>58분</strong></span><span>🔥 <strong>231kcal</strong></span></div></div></a>
+            <a class="walk-history-item" href="산책상세.html">
+                <div class="walk-mini-route"><i data-lucide="map"></i></div>
+                <div class="walk-item-info">
+                    <div class="walk-item-date">오늘 오전 7:30</div>
+                    <div class="walk-item-title">보라매공원 코스 · 초코</div>
+                    <div class="walk-item-meta">
+                        <span><i data-lucide="map-pin"></i> <strong>3.2km</strong></span>
+                        <span><i data-lucide="clock"></i> <strong>42분</strong></span>
+                        <span><i data-lucide="flame"></i> <strong>165kcal</strong></span>
+                    </div>
+                </div>
+            </a>
+            <a class="walk-history-item" href="산책상세.html">
+                <div class="walk-mini-route"><i data-lucide="map"></i></div>
+                <div class="walk-item-info">
+                    <div class="walk-item-date">어제 오후 6:15</div>
+                    <div class="walk-item-title">한강 산책로 · 초코</div>
+                    <div class="walk-item-meta">
+                        <span><i data-lucide="map-pin"></i> <strong>4.7km</strong></span>
+                        <span><i data-lucide="clock"></i> <strong>58분</strong></span>
+                        <span><i data-lucide="flame"></i> <strong>231kcal</strong></span>
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- Challenges -->
-        <div class="section-title"><h3>🏅 진행 중인 뱃지</h3><a class="more" href="뱃지.html">전체보기 →</a></div>
+        <div class="section-title"><h3><i data-lucide="target"></i> 진행 중인 챌린지</h3><a class="more-link" href="뱃지.html">전체보기</a></div>
         <div class="challenge-scroll">
-            <a class="challenge-item" href="뱃지.html"><div class="challenge-badge distance">🏃</div><h4>50km 마라토너</h4><p>누적 50km 걷기</p><div class="challenge-progress"><div class="bar"><div class="bar-fill green" style="width:76%"></div></div><span>38/50km</span></div></a>
-            <a class="challenge-item" href="뱃지.html"><div class="challenge-badge streak">🔥</div><h4>7일 연속 뱃지</h4><p>7일 연속 산책 달성</p><div class="challenge-progress"><div class="bar"><div class="bar-fill red" style="width:71%"></div></div><span>5/7일</span></div></a>
-            <a class="challenge-item" href="뱃지.html"><div class="challenge-badge explore">🧭</div><h4>동네 탐험가</h4><p>다른 장소 5곳 방문</p><div class="challenge-progress"><div class="bar"><div class="bar-fill amber" style="width:40%"></div></div><span>2/5곳</span></div></a>
-            <a class="challenge-item" href="뱃지.html"><div class="challenge-badge speed">⏱</div><h4>10시간 마니아</h4><p>누적 산책 10시간</p><div class="challenge-progress"><div class="bar"><div class="bar-fill purple" style="width:90%"></div></div><span>9/10시간</span></div></a>
+            <a class="challenge-card" href="뱃지.html">
+                <div class="challenge-icon-wrap distance"><i data-lucide="map"></i></div>
+                <h4>주간 50km 달성</h4><p class="desc">이번 주 총 50km 걷기</p>
+                <div class="challenge-prog"><div class="track"><div class="fill fill-lime" style="width:76%"></div></div><span class="pct">38/50km</span></div>
+            </a>
+            <a class="challenge-card" href="뱃지.html">
+                <div class="challenge-icon-wrap streak"><i data-lucide="flame"></i></div>
+                <h4>7일 연속 산책</h4><p class="desc">매일 1회 이상 산책</p>
+                <div class="challenge-prog"><div class="track"><div class="fill fill-red" style="width:71%"></div></div><span class="pct">5/7일</span></div>
+            </a>
+            <a class="challenge-card" href="뱃지.html">
+                <div class="challenge-icon-wrap explore"><i data-lucide="compass"></i></div>
+                <h4>공원 탐험가</h4><p class="desc">다른 공원 5곳 방문</p>
+                <div class="challenge-prog"><div class="track"><div class="fill fill-amber" style="width:40%"></div></div><span class="pct">2/5곳</span></div>
+            </a>
+            <a class="challenge-card" href="뱃지.html">
+                <div class="challenge-icon-wrap time"><i data-lucide="clock"></i></div>
+                <h4>꾸준한 산책러</h4><p class="desc">총 산책시간 10시간</p>
+                <div class="challenge-prog"><div class="track"><div class="fill fill-purple" style="width:85%"></div></div><span class="pct">8.5/10h</span></div>
+            </a>
         </div>
 
-        <!-- Nearby (Real Map) -->
-        <div class="section-title"><h3>📍 내 주변</h3><a class="more" href="지도.html">지도보기 →</a></div>
-        <div class="nearby-map-box" id="nearbyMap"></div>
+        <!-- Nearby -->
+        <div class="section-title"><h3><i data-lucide="map-pin"></i> 내 주변</h3><a class="more-link" href="지도.html">지도보기</a></div>
+        <div class="nearby-map-container" id="nearbyMap"></div>
         <div class="nearby-list">
-            <div class="nearby-item"><div class="nearby-icon park">🌳</div><div class="nearby-info"><div class="nearby-name">보라매공원 반려동물 놀이터</div><div class="nearby-detail">반려동물 전용 · 무료 입장</div></div><div class="nearby-dist">450m</div></div>
-            <div class="nearby-item"><div class="nearby-icon cafe">☕</div><div class="nearby-info"><div class="nearby-name">멍멍카페</div><div class="nearby-detail">반려동물 동반 카페 · 대형견 OK</div></div><div class="nearby-dist">800m</div></div>
-            <div class="nearby-item"><div class="nearby-icon hospital">🏥</div><div class="nearby-info"><div class="nearby-name">해피 동물병원</div><div class="nearby-detail">24시 진료 · 평점 4.8</div></div><div class="nearby-dist">1.2km</div></div>
+            <div class="nearby-item">
+                <div class="nearby-icon-circle park"><i data-lucide="trees"></i></div>
+                <div class="nearby-info"><div class="nearby-name">보라매공원 반려동물 놀이터</div><div class="nearby-detail">반려동물 전용 · 무료 입장</div></div>
+                <div class="nearby-dist">450m</div>
+            </div>
+            <div class="nearby-item">
+                <div class="nearby-icon-circle cafe"><i data-lucide="coffee"></i></div>
+                <div class="nearby-info"><div class="nearby-name">멍멍카페</div><div class="nearby-detail">반려동물 동반 카페 · 대형견 OK</div></div>
+                <div class="nearby-dist">800m</div>
+            </div>
+            <div class="nearby-item">
+                <div class="nearby-icon-circle hospital"><i data-lucide="heart-pulse"></i></div>
+                <div class="nearby-info"><div class="nearby-name">해피 동물병원</div><div class="nearby-detail">24시 진료 · 평점 4.8</div></div>
+                <div class="nearby-dist">1.2km</div>
+            </div>
         </div>
 
         <!-- Ad -->
-        <div class="ad-banner"><span class="ad-badge">AD</span><span class="ad-icon">🦴</span><div class="ad-text"><h4>프리미엄 강아지 간식 20% 할인!</h4><p>산책 후 맛있는 간식 어때요?</p></div></div>
+        <div class="ad-banner"><span class="ad-tag">AD</span><span class="ad-icon">🦴</span><div class="ad-text"><h4>프리미엄 강아지 간식 20% 할인!</h4><p>산책 후 맛있는 간식 어때요?</p></div></div>
 
         <!-- Premium -->
-        <a class="premium-banner" href="프리미엄.html" style="text-decoration:none"><div class="premium-badge">👑</div><div class="premium-text"><h4>멍이랑 프리미엄</h4><p>광고 제거 + 상세 통계 + 프리미엄 뱃지</p></div><div class="premium-price"><div class="price">₩3,900</div><div class="period">/월</div></div></a>
-        <div style="height:24px"></div>
+        <a class="premium-banner" href="프리미엄.html">
+            <div class="premium-icon-box"><i data-lucide="crown"></i></div>
+            <div class="premium-text"><h4>멍이랑 프리미엄</h4><p>광고 제거 + 상세 통계 + 무제한 챌린지</p></div>
+            <div class="premium-price-box"><div class="price">₩3,900</div><div class="period">/월</div></div>
+        </a>
+
+        <div style="height: 24px"></div>
     </main>
 
-    <!-- Bottom Nav -->
+    <!-- ========== Bottom Nav ========== -->
     <nav class="bottom-nav">
-        <a class="nav-item active" href="#"><span class="nav-icon">🏠</span><span class="nav-label">홈</span></a>
-        <a class="nav-item" href="소셜.html"><span class="nav-icon">👥</span><span class="nav-label">소셜</span></a>
-        <button class="nav-item center-btn" onclick="openWalkScreen()"><span class="nav-icon">🐾</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></button>
-        <a class="nav-item" href="지도.html"><span class="nav-icon">🗺️</span><span class="nav-label">지도</span></a>
-        <a class="nav-item" href="마이페이지.html"><span class="nav-icon">👤</span><span class="nav-label">MY</span></a>
+        <a class="nav-item active" href="#">
+            <span class="nav-icon-wrap"><i data-lucide="home"></i></span>
+            <span class="nav-label">홈</span>
+        </a>
+        <a class="nav-item" href="소셜.html">
+            <span class="nav-icon-wrap"><i data-lucide="users"></i></span>
+            <span class="nav-label">소셜</span>
+        </a>
+        <button class="nav-item center-btn" onclick="openWalkScreen()">
+            <span class="nav-icon-wrap">🐾</span>
+            <span class="nav-label">산책</span>
+        </button>
+        <a class="nav-item" href="지도.html">
+            <span class="nav-icon-wrap"><i data-lucide="trophy"></i></span>
+            <span class="nav-label">랭킹</span>
+        </a>
+        <a class="nav-item" href="마이페이지.html">
+            <span class="nav-icon-wrap"><i data-lucide="user"></i></span>
+            <span class="nav-label">MY</span>
+        </a>
     </nav>
 
-    <!-- ===== Pet Selection Screen ===== -->
-    <div class="pet-select-screen" id="petSelectScreen">
+    <!-- ========== Pet Selection ========== -->
+    <div class="pet-select-screen modal-frame" id="petSelectScreen">
         <div class="pet-select-header">
-            <button class="pet-select-close" onclick="closePetSelect()">✕</button>
+            <button class="pet-select-close" onclick="closePetSelect()"><i data-lucide="x"></i></button>
             <h3>함께 산책할 반려동물</h3>
-            <div style="width:36px"></div>
+            <div style="width:34px"></div>
         </div>
         <div class="pet-select-body">
-            <p class="pet-select-subtitle">산책할 반려동물을 선택해주세요 (복수 선택 가능)</p>
+            <p class="pet-select-subtitle">산책할 반려동물을 선택해주세요</p>
             <div class="pet-select-list">
                 <div class="pet-select-card selected" onclick="togglePetCard(this)" data-pet="초코">
-                    <div class="pet-select-avatar dog">🐕</div>
-                    <div class="pet-select-info">
-                        <div class="pet-select-name">초코</div>
-                        <div class="pet-select-breed">골든 리트리버 · 3살</div>
-                    </div>
+                    <div class="pet-select-avatar">🐕</div>
+                    <div class="pet-select-info"><div class="pet-select-name">초코</div><div class="pet-select-breed">골든 리트리버 · 3살</div></div>
                     <div class="pet-select-check">✓</div>
                 </div>
                 <div class="pet-select-card" onclick="togglePetCard(this)" data-pet="나비">
-                    <div class="pet-select-avatar cat">🐈</div>
-                    <div class="pet-select-info">
-                        <div class="pet-select-name">나비</div>
-                        <div class="pet-select-breed">코리안 숏헤어 · 2살</div>
-                    </div>
+                    <div class="pet-select-avatar">🐈</div>
+                    <div class="pet-select-info"><div class="pet-select-name">나비</div><div class="pet-select-breed">코리안 숏헤어 · 2살</div></div>
                     <div class="pet-select-check">✓</div>
                 </div>
             </div>
@@ -468,8 +812,8 @@
         </div>
     </div>
 
-    <!-- ===== Walk Screen (Full-screen with REAL MAP) ===== -->
-    <div class="walk-screen" id="walkScreen">
+    <!-- ========== Walk Screen ========== -->
+    <div class="walk-screen modal-frame" id="walkScreen">
         <div class="walk-map-area">
             <div id="walkMap"></div>
             <div class="walk-dist-chip" id="walkDistChip" style="display:none">
@@ -478,49 +822,47 @@
                 <span class="dist-unit">km</span>
             </div>
         </div>
-
         <div class="walk-stats-panel">
-            <div class="walk-pet-label" id="walkPetLabel">🐕 초코와 산책</div>
-            <div class="walk-pause-label" id="walkPauseLabel">⏸ 일시정지</div>
+            <div class="walk-pet-label" id="walkPetLabel">초코와 산책</div>
+            <div class="walk-pause-label" id="walkPauseLabel">일시정지</div>
             <div class="walk-timer" id="walkTimer">00:00:00</div>
             <div class="walk-stats-grid">
-                <div class="walk-stat"><div class="value"><span id="wDist">0.00</span> <span class="unit">km</span></div><div class="label">거리</div></div>
-                <div class="walk-stat"><div class="value"><span id="wCal">0</span> <span class="unit">kcal</span></div><div class="label">칼로리</div></div>
+                <div class="walk-stat-card"><div class="val"><span id="wDist">0.00</span> <span class="unit">km</span></div><div class="lbl"><i data-lucide="map-pin"></i> 거리</div></div>
+                <div class="walk-stat-card"><div class="val"><span id="wCal">0</span> <span class="unit">kcal</span></div><div class="lbl"><i data-lucide="flame"></i> 칼로리</div></div>
             </div>
             <div class="walk-controls" id="preStartControls">
-                <button class="walk-start-btn" onclick="beginTracking()" style="width:100%;padding:16px;font-size:16px;box-shadow:0 6px 20px rgba(16,185,129,0.35)">
-                    🐾 GPS 산책 시작!
-                </button>
+                <button class="walk-go-btn" onclick="beginTracking()"><i data-lucide="play"></i> GPS 산책 시작!</button>
             </div>
             <div class="walk-controls" id="walkingControls" style="display:none">
-                <button class="walk-ctrl-btn pause" id="pauseBtn" onclick="togglePause()">⏸</button>
-                <button class="walk-ctrl-btn stop" onclick="stopWalk()">⏹</button>
-                <button class="walk-ctrl-btn camera" onclick="toast('📷 사진 촬영!')">📷</button>
+                <button class="walk-ctrl-btn pause" id="pauseBtn" onclick="togglePause()"><i data-lucide="pause"></i></button>
+                <button class="walk-ctrl-btn stop" onclick="stopWalk()"><i data-lucide="square"></i></button>
+                <button class="walk-ctrl-btn camera" onclick="toast('사진 촬영!')"><i data-lucide="camera"></i></button>
             </div>
         </div>
     </div>
 
-    <!-- Result Modal -->
-    <div class="result-modal" id="resultModal">
-        <div class="result-content">
+    <!-- ========== Result Modal ========== -->
+    <div class="result-overlay modal-frame" id="resultModal">
+        <div class="result-card">
+            <div class="confetti-container" id="confettiContainer"></div>
             <div class="result-header">
-                <div class="emoji">🎉</div>
+                <div class="result-celebration">🎉</div>
                 <h2>산책 완료!</h2>
                 <p id="resultPetMsg">초코와 즐거운 산책이었어요</p>
             </div>
-            <div class="result-map-preview" id="resultMapEl"></div>
-            <div class="result-stats">
-                <div class="result-stat"><div class="icon">📏</div><div class="value" id="rDist">0 km</div><div class="label">거리</div></div>
-                <div class="result-stat"><div class="icon">⏱</div><div class="value" id="rTime">0:00</div><div class="label">시간</div></div>
-                <div class="result-stat"><div class="icon">🔥</div><div class="value" id="rCal">0 kcal</div><div class="label">칼로리</div></div>
+            <div class="result-map-area" id="resultMapEl"></div>
+            <div class="result-stats-row">
+                <div class="result-stat-item"><div class="stat-icon"><i data-lucide="map"></i></div><div class="stat-value" id="rDist">0 km</div><div class="stat-label">거리</div></div>
+                <div class="result-stat-item"><div class="stat-icon"><i data-lucide="timer"></i></div><div class="stat-value" id="rTime">0:00</div><div class="stat-label">시간</div></div>
+                <div class="result-stat-item"><div class="stat-icon"><i data-lucide="flame"></i></div><div class="stat-value" id="rCal">0 kcal</div><div class="stat-label">칼로리</div></div>
             </div>
             <div class="result-badges" id="resBadges" style="display:none">
-                <h4>🏅 획득한 배지</h4>
+                <h4><i data-lucide="award"></i> 획득한 배지</h4>
                 <div class="badge-list" id="badgeList"></div>
             </div>
             <div class="result-actions">
-                <button class="result-btn share" onclick="closeResult()">닫기</button>
-                <button class="result-btn save" onclick="saveAndClose()">✅ 저장하기</button>
+                <button class="result-btn close-btn" onclick="closeResult()">닫기</button>
+                <button class="result-btn save-btn" onclick="saveAndClose()">저장하기</button>
             </div>
         </div>
     </div>
@@ -530,31 +872,22 @@
 
     <script>
     // ============================================================
-    //  멍이랑 (withbowwow) - OpenStreetMap + Leaflet.js
+    //  멍이랑 (withbowwow) — Design System v2 적용
+    //  Lucide Icons + Leaflet.js + OpenStreetMap
     // ============================================================
 
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+
     // --- State ---
-    let curPos = null;
-    let curAcc = null;
+    let curPos = null, curAcc = null;
     let selectedPets = ['초코'];
-    let nearbyMapObj = null;
-    let nearbyMarker = null;
-    let wMap = null;
-    let wMarker = null;
-    let wAccCircle = null;
-    let wPolyline = null;
-    let wStartMarker = null;
+    let nearbyMapObj = null, nearbyMarker = null;
+    let wMap = null, wMarker = null, wAccCircle = null, wPolyline = null, wStartMarker = null;
     let resMapObj = null;
+    let walking = false, paused = false, secs = 0, dist = 0, route = [], tickId = null, gpsWatchId = null;
 
-    let walking = false;
-    let paused = false;
-    let secs = 0;
-    let dist = 0;
-    let route = [];
-    let tickId = null;
-    let gpsWatchId = null;
-
-    // --- Haversine ---
     function hav(lat1,lon1,lat2,lon2){
         const R=6371000,toR=d=>d*Math.PI/180;
         const dLat=toR(lat2-lat1),dLon=toR(lon2-lon1);
@@ -562,118 +895,67 @@
         return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
     }
 
-    // --- Leaflet marker icon ---
     function makeDot(color, size){
         return L.divIcon({
-            html:`<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>`,
+            html:`<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,0.2)"></div>`,
             iconSize:[size,size], iconAnchor:[size/2,size/2], className:''
         });
     }
 
-    // --- Init nearby mini-map on home ---
     function initNearbyMap(lat, lng){
         if(nearbyMapObj) return;
-        nearbyMapObj = L.map('nearbyMap',{zoomControl:false, attributionControl:true, dragging:true}).setView([lat,lng],15);
+        nearbyMapObj = L.map('nearbyMap',{zoomControl:false,attributionControl:true,dragging:true}).setView([lat,lng],15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OSM'}).addTo(nearbyMapObj);
-        nearbyMarker = L.marker([lat,lng],{icon:makeDot('#10B981',16)}).addTo(nearbyMapObj);
+        nearbyMarker = L.marker([lat,lng],{icon:makeDot('#C5D900',16)}).addTo(nearbyMapObj);
     }
 
-    // --- Init walk map (fullscreen, NRC-style: no drag, no zoom, auto-follow) ---
     function initWalkMap(lat, lng){
-        if(wMap){
-            wMap.setView([lat,lng],17);
-            wMarker.setLatLng([lat,lng]);
-            wAccCircle.setLatLng([lat,lng]);
-            return;
-        }
-        wMap = L.map('walkMap',{
-            zoomControl:false, attributionControl:false,
-            dragging:false, touchZoom:false, doubleClickZoom:false,
-            scrollWheelZoom:false, boxZoom:false, keyboard:false
-        }).setView([lat,lng],17);
+        if(wMap){ wMap.setView([lat,lng],17); wMarker.setLatLng([lat,lng]); wAccCircle.setLatLng([lat,lng]); return; }
+        wMap = L.map('walkMap',{zoomControl:false,attributionControl:false,dragging:false,touchZoom:false,doubleClickZoom:false,scrollWheelZoom:false,boxZoom:false,keyboard:false}).setView([lat,lng],17);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(wMap);
-
-        wMarker = L.marker([lat,lng],{icon:makeDot('#10B981',20)}).addTo(wMap);
-        wAccCircle = L.circle([lat,lng],{radius:30,color:'#10B981',fillColor:'#10B981',fillOpacity:0.08,weight:1,opacity:0.3}).addTo(wMap);
-        wPolyline = L.polyline([],{color:'#10B981',weight:5,opacity:0.85,lineJoin:'round',lineCap:'round'}).addTo(wMap);
+        wMarker = L.marker([lat,lng],{icon:makeDot('#C5D900',20)}).addTo(wMap);
+        wAccCircle = L.circle([lat,lng],{radius:30,color:'#C5D900',fillColor:'#C5D900',fillOpacity:0.06,weight:1,opacity:0.2}).addTo(wMap);
+        wPolyline = L.polyline([],{color:'#C5D900',weight:4,opacity:0.8,lineJoin:'round',lineCap:'round'}).addTo(wMap);
     }
 
-    // --- GPS ---
     function initGPS(){
-        if(!navigator.geolocation){ toast('⚠️ GPS를 지원하지 않는 브라우저입니다'); return; }
-
+        if(!navigator.geolocation){ toast('GPS를 지원하지 않는 브라우저입니다'); return; }
         navigator.geolocation.getCurrentPosition(
-            p=>{
-                const {latitude:lat,longitude:lng,accuracy}=p.coords;
-                curPos={lat,lng}; curAcc=accuracy;
-                initNearbyMap(lat,lng);
-                toast('📍 현재 위치를 찾았습니다');
-            },
-            e=>{
-                initNearbyMap(37.5665,126.978);
-                toast('⚠️ GPS: '+e.message);
-            },
-            {enableHighAccuracy:true, timeout:15000, maximumAge:5000}
+            p=>{ const{latitude:lat,longitude:lng,accuracy}=p.coords; curPos={lat,lng}; curAcc=accuracy; setGPS(true); initNearbyMap(lat,lng); toast('현재 위치를 찾았습니다'); },
+            e=>{ setGPS(false); initNearbyMap(37.5665,126.978); toast('GPS: '+e.message); },
+            {enableHighAccuracy:true,timeout:15000,maximumAge:5000}
         );
-
         gpsWatchId = navigator.geolocation.watchPosition(
             p=>{
-                const {latitude:lat,longitude:lng,accuracy}=p.coords;
-                const newPos={lat,lng};
-
-                if(walking && !paused && curPos){
-                    const d=hav(curPos.lat,curPos.lng,lat,lng);
-                    if(d>=2 && accuracy<50){
-                        dist+=d;
-                        route.push({lat,lng,t:Date.now()});
-                        if(wPolyline) wPolyline.addLatLng([lat,lng]);
-                    }
-                }
-
-                curPos=newPos; curAcc=accuracy;
-
-                if(nearbyMarker) nearbyMarker.setLatLng([lat,lng]);
-                if(wMarker){
-                    wMarker.setLatLng([lat,lng]);
-                    wAccCircle.setLatLng([lat,lng]).setRadius(accuracy);
-                    if(wMap) wMap.panTo([lat,lng]);
-                }
+                const{latitude:lat,longitude:lng,accuracy}=p.coords;
+                if(walking&&!paused&&curPos){ const d=hav(curPos.lat,curPos.lng,lat,lng); if(d>=2&&accuracy<50){dist+=d;route.push({lat,lng,t:Date.now()});if(wPolyline)wPolyline.addLatLng([lat,lng]);}}
+                curPos={lat,lng};curAcc=accuracy;setGPS(true);
+                if(nearbyMarker)nearbyMarker.setLatLng([lat,lng]);
+                if(wMarker){wMarker.setLatLng([lat,lng]);wAccCircle.setLatLng([lat,lng]).setRadius(accuracy);if(wMap)wMap.panTo([lat,lng]);}
             },
-            e=>{},
-            {enableHighAccuracy:true, maximumAge:3000, timeout:10000}
+            e=>{setGPS(false);},{enableHighAccuracy:true,maximumAge:3000,timeout:10000}
         );
+    }
+
+    function setGPS(on){
+        const el=document.getElementById('gpsBadge');
+        if(el)el.classList.toggle('on',on);
+        document.getElementById('gpsLabel').textContent=on?'GPS 활성':'GPS 오류';
     }
 
     // --- Pet Selection ---
-    function openWalkScreen(){
-        document.getElementById('petSelectScreen').classList.add('active');
-    }
-    function closePetSelect(){
-        document.getElementById('petSelectScreen').classList.remove('active');
-    }
-    function togglePetCard(card){
-        card.classList.toggle('selected');
-        updateSelectedPets();
-    }
+    function openWalkScreen(){ document.getElementById('petSelectScreen').classList.add('active'); if(typeof lucide!=='undefined')lucide.createIcons(); }
+    function closePetSelect(){ document.getElementById('petSelectScreen').classList.remove('active'); }
+    function togglePetCard(card){ card.classList.toggle('selected'); updateSelectedPets(); }
     function updateSelectedPets(){
-        selectedPets = [];
-        document.querySelectorAll('.pet-select-card.selected').forEach(c=>{
-            selectedPets.push(c.dataset.pet);
-        });
-        document.querySelector('.pet-select-start').disabled = selectedPets.length === 0;
+        selectedPets=[];
+        document.querySelectorAll('.pet-select-card.selected').forEach(c=>selectedPets.push(c.dataset.pet));
+        document.querySelector('.pet-select-start').disabled=selectedPets.length===0;
     }
-    function proceedToWalk(){
-        if(selectedPets.length===0){ toast('반려동물을 선택해주세요'); return; }
-        closePetSelect();
-        openWalkTracking();
-    }
+    function proceedToWalk(){ if(selectedPets.length===0){toast('반려동물을 선택해주세요');return;} closePetSelect(); openWalkTracking(); }
 
-    // --- Walk Screen ---
     function openWalkTracking(){
-        const ws = document.getElementById('walkScreen');
-        ws.classList.add('active');
-
-        // Reset UI
+        document.getElementById('walkScreen').classList.add('active');
         document.getElementById('preStartControls').style.display='flex';
         document.getElementById('walkingControls').style.display='none';
         document.getElementById('walkDistChip').style.display='none';
@@ -681,147 +963,95 @@
         document.getElementById('walkTimer').textContent='00:00:00';
         document.getElementById('wDist').textContent='0.00';
         document.getElementById('wCal').textContent='0';
-        const petLabel = selectedPets.map(p=> p==='나비'?'🐈 '+p:'🐕 '+p).join(', ');
-        document.getElementById('walkPetLabel').textContent= petLabel + '와 산책';
-
+        document.getElementById('walkPetLabel').textContent=selectedPets.join(', ')+'와 산책';
         setTimeout(()=>{
-            const lat = curPos ? curPos.lat : 37.5665;
-            const lng = curPos ? curPos.lng : 126.978;
-            initWalkMap(lat, lng);
-            setTimeout(()=>{ if(wMap) wMap.invalidateSize(); },100);
-        }, 50);
+            initWalkMap(curPos?curPos.lat:37.5665,curPos?curPos.lng:126.978);
+            setTimeout(()=>{if(wMap)wMap.invalidateSize();if(typeof lucide!=='undefined')lucide.createIcons();},100);
+        },50);
     }
 
     function beginTracking(){
-        if(!curPos){ toast('⚠️ GPS 위치를 먼저 확인해주세요'); return; }
-
-        walking=true; paused=false; secs=0; dist=0;
-        route=[{lat:curPos.lat, lng:curPos.lng, t:Date.now()}];
-
-        if(wPolyline) wPolyline.setLatLngs([[curPos.lat,curPos.lng]]);
-        if(wStartMarker) wMap.removeLayer(wStartMarker);
-        wStartMarker = L.circleMarker([curPos.lat,curPos.lng],{
-            radius:8, color:'#fff', fillColor:'#10B981', fillOpacity:1, weight:3
-        }).addTo(wMap);
-
+        if(!curPos){toast('GPS 위치를 먼저 확인해주세요');return;}
+        walking=true;paused=false;secs=0;dist=0;route=[{lat:curPos.lat,lng:curPos.lng,t:Date.now()}];
+        if(wPolyline)wPolyline.setLatLngs([[curPos.lat,curPos.lng]]);
+        if(wStartMarker)wMap.removeLayer(wStartMarker);
+        wStartMarker=L.circleMarker([curPos.lat,curPos.lng],{radius:8,color:'#fff',fillColor:'#C5D900',fillOpacity:1,weight:3}).addTo(wMap);
         document.getElementById('preStartControls').style.display='none';
         document.getElementById('walkingControls').style.display='flex';
         document.getElementById('walkDistChip').style.display='flex';
-        const trackLabel = selectedPets.map(p=> p==='나비'?'🐈 '+p:'🐕 '+p).join(', ');
-        document.getElementById('walkPetLabel').textContent= trackLabel + '와 산책 중';
-
+        document.getElementById('walkPetLabel').textContent=selectedPets.join(', ')+'와 산책 중';
         wMap.setZoom(18);
-
-        tickId = setInterval(()=>{
-            if(!paused){
-                secs++;
-                updateWalkUI();
-            }
-        },1000);
-
-        toast(`🐾 ${selectedPets.join(', ')}와(과) 산책을 시작합니다!`);
+        tickId=setInterval(()=>{if(!paused){secs++;updateWalkUI();}},1000);
+        toast(`${selectedPets.join(', ')}와(과) 산책을 시작합니다!`);
     }
 
     function togglePause(){
         paused=!paused;
-        document.getElementById('pauseBtn').textContent=paused?'▶️':'⏸';
+        const btn=document.getElementById('pauseBtn');
+        btn.innerHTML=paused?'<i data-lucide="play"></i>':'<i data-lucide="pause"></i>';
+        if(typeof lucide!=='undefined')lucide.createIcons();
         document.getElementById('walkPauseLabel').classList.toggle('on',paused);
-        toast(paused?'⏸ 일시정지':'▶️ 산책 재개');
+        toast(paused?'일시정지':'산책 재개');
     }
 
     function stopWalk(){
-        if(secs<3){ toast('조금만 더 걸어보세요! 🐾'); return; }
-        if(!confirm('산책을 종료하시겠습니까?')) return;
-
-        walking=false; paused=false;
-        clearInterval(tickId);
-
-        const km=dist/1000;
-        const cal=Math.round(km*55);
-        const mm=Math.floor(secs/60), ss=secs%60;
-
+        if(secs<3){toast('조금만 더 걸어보세요!');return;}
+        if(!confirm('산책을 종료하시겠습니까?'))return;
+        walking=false;paused=false;clearInterval(tickId);
+        const km=dist/1000,cal=Math.round(km*55),mm=Math.floor(secs/60),ss=secs%60;
         document.getElementById('rDist').textContent=km.toFixed(2)+' km';
         document.getElementById('rTime').textContent=`${mm}분 ${ss}초`;
         document.getElementById('rCal').textContent=cal+' kcal';
         document.getElementById('resultPetMsg').textContent=`${selectedPets.join(', ')}와(과) 즐거운 산책이었어요`;
 
-        // Badges
         const badges=[];
-        if(km>=1) badges.push('🏃 1km 달성');
-        if(km>=3) badges.push('🥇 3km 달성');
-        if(km>=5) badges.push('💎 5km 달성');
-        if(mm>=30) badges.push('⏱ 30분 산책');
-        if(mm>=60) badges.push('🔥 1시간 산책');
-        if(km>=10) badges.push('⚡ 10km 달성');
-        const bd=document.getElementById('resBadges'), bl=document.getElementById('badgeList');
-        if(badges.length>0){
-            bd.style.display='block';
-            bl.innerHTML=badges.map(b=>`<span class="badge-item">${b}</span>`).join('');
-        } else { bd.style.display='none'; }
+        if(km>=1)badges.push('1km 달성');if(km>=3)badges.push('3km 달성');if(km>=5)badges.push('5km 달성');
+        if(mm>=30)badges.push('30분 산책');if(mm>=60)badges.push('1시간 산책');
+        const bd=document.getElementById('resBadges'),bl=document.getElementById('badgeList');
+        if(badges.length>0){bd.style.display='block';bl.innerHTML=badges.map(b=>`<span class="badge-chip">${b}</span>`).join('');}else{bd.style.display='none';}
 
         document.getElementById('walkScreen').classList.remove('active');
         document.getElementById('resultModal').classList.add('active');
-        setTimeout(()=>buildResultMap(),300);
+        spawnConfetti();
+        setTimeout(()=>{buildResultMap();if(typeof lucide!=='undefined')lucide.createIcons();},300);
 
-        // Save
         const h=JSON.parse(localStorage.getItem('withbowwow_walks')||'[]');
         h.unshift({pet:selectedPets.join(','),distance:km,duration:secs,calories:cal,route,date:new Date().toISOString()});
-        if(h.length>50)h.pop();
-        localStorage.setItem('withbowwow_walks',JSON.stringify(h));
+        if(h.length>50)h.pop();localStorage.setItem('withbowwow_walks',JSON.stringify(h));
     }
 
-    function closeWalk(){
-        if(walking){
-            if(confirm('산책을 종료하시겠습니까?')) stopWalk();
-        } else {
-            document.getElementById('walkScreen').classList.remove('active');
-        }
-    }
-
+    function closeWalk(){if(walking){if(confirm('산책을 종료하시겠습니까?'))stopWalk();}else{document.getElementById('walkScreen').classList.remove('active');}}
     function updateWalkUI(){
-        const h=String(Math.floor(secs/3600)).padStart(2,'0');
-        const m=String(Math.floor((secs%3600)/60)).padStart(2,'0');
-        const s=String(secs%60).padStart(2,'0');
+        const h=String(Math.floor(secs/3600)).padStart(2,'0'),m=String(Math.floor((secs%3600)/60)).padStart(2,'0'),s=String(secs%60).padStart(2,'0');
         document.getElementById('walkTimer').textContent=`${h}:${m}:${s}`;
-
-        const km=dist/1000;
-        const cal=Math.round(km*55);
-        document.getElementById('wDist').textContent=km.toFixed(2);
-        document.getElementById('wCal').textContent=cal;
-        document.getElementById('mapDistNum').textContent=km.toFixed(2);
+        const km=dist/1000,cal=Math.round(km*55);
+        document.getElementById('wDist').textContent=km.toFixed(2);document.getElementById('wCal').textContent=cal;document.getElementById('mapDistNum').textContent=km.toFixed(2);
     }
 
-    // --- Result Map ---
     function buildResultMap(){
-        if(route.length<2) return;
-        const el=document.getElementById('resultMapEl');
+        if(route.length<2)return;const el=document.getElementById('resultMapEl');
         if(resMapObj){resMapObj.remove();resMapObj=null;}
         resMapObj=L.map(el,{zoomControl:false,attributionControl:false,dragging:false});
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(resMapObj);
         const pts=route.map(r=>[r.lat,r.lng]);
-        L.polyline(pts,{color:'#10B981',weight:4}).addTo(resMapObj);
-        L.circleMarker(pts[0],{radius:7,color:'#fff',fillColor:'#10B981',fillOpacity:1,weight:3}).addTo(resMapObj);
+        L.polyline(pts,{color:'#C5D900',weight:4}).addTo(resMapObj);
+        L.circleMarker(pts[0],{radius:7,color:'#fff',fillColor:'#C5D900',fillOpacity:1,weight:3}).addTo(resMapObj);
         L.circleMarker(pts[pts.length-1],{radius:7,color:'#fff',fillColor:'#EF4444',fillOpacity:1,weight:3}).addTo(resMapObj);
         resMapObj.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
     }
 
-    // --- UI helpers ---
-    function closeResult(){
-        document.getElementById('resultModal').classList.remove('active');
-        if(resMapObj){resMapObj.remove();resMapObj=null;}
+    function spawnConfetti(){
+        const c=document.getElementById('confettiContainer');c.innerHTML='';
+        const colors=['#C5D900','#0099FF','#9FB300','#33BBFF','#E8F4FF'];
+        for(let i=0;i<30;i++){const d=document.createElement('div');d.className='confetti-dot';d.style.left=Math.random()*100+'%';d.style.background=colors[Math.floor(Math.random()*colors.length)];d.style.animationDelay=Math.random()*1.5+'s';d.style.animationDuration=(1.5+Math.random())+'s';d.style.width=(4+Math.random()*5)+'px';d.style.height=d.style.width;c.appendChild(d);}
     }
-    function saveAndClose(){ toast('✅ 산책 기록이 저장되었습니다'); closeResult(); }
 
-    // Toast
+    function closeResult(){document.getElementById('resultModal').classList.remove('active');if(resMapObj){resMapObj.remove();resMapObj=null;}}
+    function saveAndClose(){toast('산책 기록이 저장되었습니다');closeResult();}
+
     let toastTimer;
-    function toast(msg){
-        const el=document.getElementById('toastEl');
-        el.textContent=msg; el.classList.add('show');
-        clearTimeout(toastTimer);
-        toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
-    }
+    function toast(msg){const el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
 
-    // --- Init ---
     initGPS();
     </script>
 </body>

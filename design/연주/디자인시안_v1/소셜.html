@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>소셜 - 멍이랑 withbowwow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #9CA3AF;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 40px -4px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --nav-height: 72px;
+            --header-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--white);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: var(--text); }
+        .header-logo .paw-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .header-logo em { font-style: normal; color: var(--primary); }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s; text-decoration: none; }
+        .header-btn:hover { background: var(--border); }
+        .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid var(--white); }
+
+        /* ===== Social Tabs ===== */
+        .social-tabs {
+            position: sticky; top: var(--header-height); z-index: 99;
+            display: flex;
+            background: var(--white);
+            border-bottom: 2px solid var(--border);
+        }
+        .social-tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .social-tab:hover { color: var(--text-secondary); }
+        .social-tab.active {
+            color: var(--text);
+            font-weight: 800;
+            border-bottom-color: var(--primary);
+        }
+
+        /* ===== Content ===== */
+        .content { padding-bottom: calc(var(--nav-height) + 20px); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ===== Section Title ===== */
+        .section-title { padding: 24px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+        /* ===== Weekly Calendar ===== */
+        .calendar-section {
+            margin: 16px 16px 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .calendar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .calendar-header h4 { font-size: 15px; font-weight: 700; }
+        .calendar-header span { font-size: 12px; color: var(--text-light); background: var(--bg); padding: 4px 10px; border-radius: 20px; }
+        .calendar-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 8px 2px 10px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .calendar-day:hover { background: var(--bg); }
+        .calendar-day.today { border-color: var(--primary); background: var(--primary-light); }
+        .calendar-day.selected { background: var(--primary-light); border-color: var(--primary); }
+        .calendar-day-label { font-size: 11px; font-weight: 600; color: var(--text-light); }
+        .calendar-day-num { font-size: 13px; font-weight: 700; color: var(--text); }
+        .calendar-day.today .calendar-day-label,
+        .calendar-day.today .calendar-day-num { color: var(--primary-dark); }
+        .calendar-day.selected .calendar-day-label,
+        .calendar-day.selected .calendar-day-num { color: var(--primary-dark); }
+
+        .paw-svg-wrap {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== Leaderboard ===== */
+        .leaderboard-section {
+            margin: 12px 16px 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .leaderboard-date {
+            font-size: 14px; font-weight: 700; color: var(--text);
+            margin-bottom: 6px;
+        }
+        .leaderboard-sub-header {
+            font-size: 12px; font-weight: 600; color: var(--primary-dark);
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .leaderboard-list { display: flex; flex-direction: column; gap: 6px; }
+        .lb-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-xs);
+            transition: background 0.15s;
+        }
+        .lb-row:hover { background: var(--bg); }
+        .lb-row.me {
+            background: var(--primary-light);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+        .lb-rank {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800;
+            flex-shrink: 0;
+            background: var(--bg); color: var(--text-secondary);
+        }
+        .lb-rank.r1 { background: #FEF3C7; color: #D97706; }
+        .lb-rank.r2 { background: #F3F4F6; color: #6B7280; }
+        .lb-rank.r3 { background: #FED7AA; color: #C2410C; }
+        .lb-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .lb-info { flex: 1; min-width: 0; }
+        .lb-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lb-me-badge { font-size: 10px; font-weight: 600; color: var(--primary-dark); background: var(--primary-light); padding: 1px 6px; border-radius: 8px; margin-left: 4px; }
+        .lb-distance { font-size: 14px; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
+        .lb-distance.zero { color: var(--text-light); }
+
+        .lb-divider {
+            height: 1px; background: var(--border); margin: 12px 0;
+        }
+        .lb-not-walked-header {
+            font-size: 12px; font-weight: 600; color: var(--text-light);
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ===== Friend Buttons ===== */
+        .friend-buttons {
+            display: flex; gap: 10px;
+            margin: 16px;
+        }
+        .friend-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            border: none;
+        }
+        .friend-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        }
+        .friend-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+        .friend-btn.outline {
+            background: var(--white);
+            color: var(--primary-dark);
+            border: 2px solid var(--primary);
+        }
+        .friend-btn.outline:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+        /* ===== Challenge Tab ===== */
+        .create-challenge-btn {
+            display: block;
+            margin: 16px;
+            padding: 16px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), #047857);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 16px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+            width: calc(100% - 32px);
+        }
+        .create-challenge-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
+
+        .challenge-card {
+            margin: 0 16px 12px;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .challenge-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+        .challenge-card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .challenge-card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .challenge-card-meta { font-size: 12px; color: var(--text-secondary); margin-bottom: 0; display: flex; align-items: center; gap: 12px; }
+        .challenge-type {
+            font-size: 11px; font-weight: 600;
+            padding: 3px 10px; border-radius: 10px;
+        }
+        .challenge-type.custom { background: #DBEAFE; color: #2563EB; }
+        .challenge-type.monthly { background: var(--accent-light); color: #B45309; }
+        .challenge-deadline { font-size: 11px; color: var(--danger); font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .challenge-participants { display: flex; flex-direction: column; gap: 8px; }
+        .cp-row { display: flex; align-items: center; gap: 10px; }
+        .cp-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .cp-name { font-size: 12px; font-weight: 600; flex: 1; min-width: 0; }
+        .cp-dist { font-size: 13px; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
+
+        /* ===== Monthly Challenges ===== */
+        .monthly-challenge-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+        .monthly-challenge-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .monthly-challenge-item:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+        .monthly-challenge-item.move-to-top {
+            animation: moveToTop 0.5s ease;
+        }
+        @keyframes moveToTop {
+            0% { opacity: 0.5; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .mc-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .mc-info { flex: 1; min-width: 0; }
+        .mc-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .mc-goal { font-size: 12px; color: var(--text-secondary); }
+        .mc-deadline { font-size: 11px; color: var(--danger); font-weight: 600; margin-top: 2px; }
+        .mc-join-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: none;
+        }
+        .mc-join-btn.join {
+            background: var(--primary);
+            color: var(--white);
+        }
+        .mc-join-btn.join:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .mc-join-btn.joined {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            cursor: default;
+        }
+
+        /* ===== Friend Challenge List ===== */
+        .friend-challenge-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+        .friend-challenge-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .friend-challenge-item:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+        .fc-challenge-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .fc-challenge-info { flex: 1; min-width: 0; }
+        .fc-challenge-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .fc-challenge-meta { font-size: 12px; color: var(--text-secondary); }
+        .fc-challenge-deadline { font-size: 11px; color: var(--danger); font-weight: 600; margin-top: 2px; }
+        .fc-challenge-people {
+            font-size: 11px; color: var(--text-light);
+            background: var(--bg);
+            padding: 4px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ===== Challenge Detail Modal ===== */
+        .challenge-detail-info {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .challenge-detail-info .cd-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .challenge-detail-info .cd-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .challenge-detail-info .cd-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .challenge-detail-info .cd-remaining {
+            display: inline-block;
+            background: #FEE2E2;
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+        .cd-leaderboard-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cd-leaderboard { display: flex; flex-direction: column; gap: 6px; }
+        .cd-lb-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-xs);
+            transition: background 0.15s;
+        }
+        .cd-lb-row.me {
+            background: var(--primary-light);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+        .cd-lb-rank {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800;
+            flex-shrink: 0;
+            background: var(--bg); color: var(--text-secondary);
+        }
+        .cd-lb-rank.r1 { background: #FEF3C7; color: #D97706; }
+        .cd-lb-rank.r2 { background: #F3F4F6; color: #6B7280; }
+        .cd-lb-rank.r3 { background: #FED7AA; color: #C2410C; }
+        .cd-lb-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .cd-lb-info { flex: 1; min-width: 0; }
+        .cd-lb-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cd-lb-progress { margin-top: 4px; }
+        .cd-lb-progress-bar {
+            width: 100%; height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .cd-lb-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        .cd-lb-dist { font-size: 14px; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
+
+        .cd-join-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            margin-top: 20px;
+        }
+        .cd-join-btn.join {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        }
+        .cd-join-btn.join:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+        .cd-join-btn.joined {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            cursor: default;
+        }
+
+        /* ===== Bottom Nav ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 8px 12px; border: none; background: none;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            position: relative; min-width: 52px;
+            text-decoration: none; color: inherit;
+        }
+        .nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
+        .nav-item:hover .nav-icon { transform: translateY(-2px); }
+        .nav-item.center-btn { position: relative; top: -14px; }
+        .nav-item.center-btn .nav-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.4);
+            color: white;
+        }
+        .nav-item.center-btn:hover .nav-icon { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(16,185,129,0.5); }
+
+        /* ===== Modal Overlay ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none; align-items: flex-end; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-container {
+            width: 100%; max-width: 480px;
+            max-height: 85vh;
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column;
+        }
+        .modal-overlay.show .modal-container { transform: translateY(0); }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: none; background: var(--bg);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: var(--border); }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
+
+        /* ===== Form fields ===== */
+        .form-field { margin-bottom: 20px; }
+        .form-field label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 8px;
+        }
+        .form-field input, .form-field textarea, .form-field select {
+            width: 100%; padding: 12px 14px;
+            border: 1px solid var(--border); border-radius: var(--radius-xs);
+            font-size: 14px; font-family: inherit; color: var(--text);
+            background: var(--bg); outline: none; transition: border-color 0.2s;
+        }
+        .form-field input:focus, .form-field textarea:focus { border-color: var(--primary); background: var(--white); }
+        .form-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+            margin-top: 8px;
+        }
+        .form-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+
+        /* ===== Search Modal ===== */
+        .search-input-wrap {
+            display: flex; gap: 8px; align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1; padding: 12px 14px;
+            border: 1px solid var(--border); border-radius: 24px;
+            font-size: 14px; font-family: inherit; color: var(--text);
+            background: var(--bg); outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--primary); background: var(--white); }
+        .search-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--primary); color: white;
+            border: none; font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; flex-shrink: 0;
+        }
+        .search-btn:hover { background: var(--primary-dark); }
+
+        .search-result-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-xs);
+            transition: background 0.15s;
+        }
+        .search-result-item:hover { background: var(--bg); }
+        .sr-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .sr-info { flex: 1; }
+        .sr-name { font-size: 14px; font-weight: 600; }
+        .sr-sub { font-size: 12px; color: var(--text-light); }
+        .sr-action-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .sr-action-btn.add { background: var(--primary); color: white; }
+        .sr-action-btn.add:hover { background: var(--primary-dark); }
+        .sr-action-btn.added { background: var(--primary-light); color: var(--primary-dark); cursor: default; }
+
+        /* ===== Friend Request ===== */
+        .request-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .request-item:last-child { border-bottom: none; }
+        .req-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .req-info { flex: 1; }
+        .req-name { font-size: 14px; font-weight: 600; }
+        .req-time { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .req-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .req-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; border: none; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .req-btn.accept { background: var(--primary); color: white; }
+        .req-btn.accept:hover { background: var(--primary-dark); transform: scale(1.1); }
+        .req-btn.reject { background: var(--bg); color: var(--text-light); }
+        .req-btn.reject:hover { background: #FEE2E2; color: var(--danger); transform: scale(1.1); }
+
+        /* ===== Friend invite checkbox ===== */
+        .friend-check-list { display: flex; flex-direction: column; gap: 8px; }
+        .friend-check-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: background 0.15s;
+            border: 1px solid var(--border);
+        }
+        .friend-check-item:hover { background: var(--bg); }
+        .friend-check-item.checked { background: var(--primary-light); border-color: var(--primary); }
+        .fc-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .fc-name { flex: 1; font-size: 13px; font-weight: 600; }
+        .fc-check {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: var(--white); transition: all 0.2s; flex-shrink: 0;
+        }
+        .friend-check-item.checked .fc-check { background: var(--primary); border-color: var(--primary); }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+
+        .tab-panel.active > * {
+            animation: fadeInUp 0.35s ease forwards;
+            opacity: 0;
+        }
+        .tab-panel.active > *:nth-child(1) { animation-delay: 0.03s; }
+        .tab-panel.active > *:nth-child(2) { animation-delay: 0.06s; }
+        .tab-panel.active > *:nth-child(3) { animation-delay: 0.09s; }
+        .tab-panel.active > *:nth-child(4) { animation-delay: 0.12s; }
+        .tab-panel.active > *:nth-child(5) { animation-delay: 0.15s; }
+        .tab-panel.active > *:nth-child(6) { animation-delay: 0.18s; }
+        .tab-panel.active > *:nth-child(7) { animation-delay: 0.21s; }
+        .tab-panel.active > *:nth-child(8) { animation-delay: 0.24s; }
+        .tab-panel.active > *:nth-child(9) { animation-delay: 0.27s; }
+        .tab-panel.active > *:nth-child(10) { animation-delay: 0.30s; }
+
+        /* ===== Toast ===== */
+        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Empty state ===== */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-logo">
+            <div class="paw-icon">&#x1F43E;</div>
+            <span>멍이<em>랑</em></span>
+        </div>
+        <div class="header-actions">
+            <a class="header-btn" href="알림.html" aria-label="알림">&#x1F514;<span class="notification-dot"></span></a>
+            <a class="header-btn" href="설정.html" aria-label="설정">&#x2699;&#xFE0F;</a>
+        </div>
+    </header>
+
+    <!-- Social Tabs -->
+    <div class="social-tabs">
+        <button class="social-tab active" data-tab="leaderboard">리더보드</button>
+        <button class="social-tab" data-tab="challenge">챌린지</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- ==================== TAB 1: 리더보드 ==================== -->
+        <div class="tab-panel active" id="tab-leaderboard">
+
+            <!-- Weekly Calendar -->
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <h4>&#x1F4C5; 주간 산책 현황</h4>
+                    <span id="weekLabel">2월 3주차</span>
+                </div>
+                <div class="calendar-week" id="calendarWeek">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="leaderboard-section" id="leaderboardSection">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Friend Buttons -->
+            <div class="friend-buttons">
+                <button class="friend-btn primary" onclick="openModal('friendSearchModal')">&#x1F50D; 친구찾기</button>
+                <button class="friend-btn outline" onclick="openModal('friendRequestModal')">&#x1F4E9; 친구요청 <span id="requestBadge" style="background:var(--danger);color:white;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px;">2</span></button>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: 챌린지 ==================== -->
+        <div class="tab-panel" id="tab-challenge">
+
+            <!-- Create Challenge Button -->
+            <button class="create-challenge-btn" onclick="openModal('challengeCreateModal')">
+                &#x2795; 챌린지 만들기
+            </button>
+
+            <!-- My Active Challenges (friend challenges) -->
+            <div class="section-title"><h3>&#x1F525; 내가 참가 중인 챌린지</h3></div>
+
+            <div class="friend-challenge-list" id="friendChallengeList">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Monthly Challenges -->
+            <div class="section-title"><h3>&#x1F3C6; 이달의 챌린지</h3></div>
+
+            <div class="monthly-challenge-list" id="monthlyChallengeList">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="height: 16px;"></div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item"><span class="nav-icon">&#x1F3E0;</span><span class="nav-label">홈</span></a>
+        <a href="소셜.html" class="nav-item active"><span class="nav-icon">&#x1F465;</span><span class="nav-label">소셜</span></a>
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item center-btn"><span class="nav-icon">&#x1F43E;</span><span class="nav-label" style="color:var(--primary);font-weight:600">산책</span></a>
+        <a href="지도.html" class="nav-item"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span><span class="nav-label">지도</span></a>
+        <a href="마이페이지.html" class="nav-item"><span class="nav-icon">&#x1F464;</span><span class="nav-label">MY</span></a>
+    </nav>
+
+    <!-- ===== Modal: 친구찾기 ===== -->
+    <div class="modal-overlay" id="friendSearchModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>&#x1F50D; 친구찾기</h3>
+                <button class="modal-close" onclick="closeModal('friendSearchModal')">&#xD7;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-input-wrap">
+                    <input type="text" class="search-input" id="friendSearchInput" placeholder="#태그 또는 강아지 이름으로 검색...">
+                    <button class="search-btn" onclick="searchFriend()">&#x1F50D;</button>
+                </div>
+                <div id="searchResults">
+                    <div class="empty-state">
+                        <div class="icon">&#x1F50E;</div>
+                        <p>#태그(예: #1234) 또는<br>강아지 이름으로 검색해보세요</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: 친구요청 ===== -->
+    <div class="modal-overlay" id="friendRequestModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>&#x1F4E9; 친구요청</h3>
+                <button class="modal-close" onclick="closeModal('friendRequestModal')">&#xD7;</button>
+            </div>
+            <div class="modal-body" id="friendRequestList">
+                <div class="request-item" id="req-1">
+                    <div class="req-avatar" style="background:linear-gradient(135deg,#FEE2E2,#FCA5A5);">&#x1F9AE;</div>
+                    <div class="req-info">
+                        <div class="req-name">바둑이#4567</div>
+                        <div class="req-time">2시간 전</div>
+                    </div>
+                    <div class="req-actions">
+                        <button class="req-btn accept" onclick="acceptRequest('req-1')" title="수락">&#x2713;</button>
+                        <button class="req-btn reject" onclick="rejectRequest('req-1')" title="거절">&#x2715;</button>
+                    </div>
+                </div>
+                <div class="request-item" id="req-2">
+                    <div class="req-avatar" style="background:linear-gradient(135deg,#DBEAFE,#93C5FD);">&#x1F431;</div>
+                    <div class="req-info">
+                        <div class="req-name">나비#8901</div>
+                        <div class="req-time">1일 전</div>
+                    </div>
+                    <div class="req-actions">
+                        <button class="req-btn accept" onclick="acceptRequest('req-2')" title="수락">&#x2713;</button>
+                        <button class="req-btn reject" onclick="rejectRequest('req-2')" title="거절">&#x2715;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: 챌린지 만들기 ===== -->
+    <div class="modal-overlay" id="challengeCreateModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>&#x1F3C5; 챌린지 만들기</h3>
+                <button class="modal-close" onclick="closeModal('challengeCreateModal')">&#xD7;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-field">
+                    <label>챌린지 이름</label>
+                    <input type="text" placeholder="예: 우리 동네 산책 챌린지">
+                </div>
+                <div class="form-field">
+                    <label>목표 거리 (km)</label>
+                    <input type="number" min="1" placeholder="예: 10" value="10">
+                </div>
+                <div class="form-field">
+                    <label>시작일</label>
+                    <input type="date" value="2026-02-19">
+                </div>
+                <div class="form-field">
+                    <label>종료일</label>
+                    <input type="date" value="2026-02-28">
+                </div>
+                <div class="form-field">
+                    <label>친구 초대</label>
+                    <div class="friend-check-list">
+                        <div class="friend-check-item" onclick="toggleFriendCheck(this)">
+                            <div class="fc-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);">&#x1F415;</div>
+                            <div class="fc-name">초코#1234</div>
+                            <div class="fc-check">&#x2713;</div>
+                        </div>
+                        <div class="friend-check-item" onclick="toggleFriendCheck(this)">
+                            <div class="fc-avatar" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4);">&#x1F429;</div>
+                            <div class="fc-name">달이#5678</div>
+                            <div class="fc-check">&#x2713;</div>
+                        </div>
+                        <div class="friend-check-item" onclick="toggleFriendCheck(this)">
+                            <div class="fc-avatar" style="background:linear-gradient(135deg,#DBEAFE,#93C5FD);">&#x1F415;</div>
+                            <div class="fc-name">뽀삐#3456</div>
+                            <div class="fc-check">&#x2713;</div>
+                        </div>
+                        <div class="friend-check-item" onclick="toggleFriendCheck(this)">
+                            <div class="fc-avatar" style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);">&#x1F415;</div>
+                            <div class="fc-name">몽이#7890</div>
+                            <div class="fc-check">&#x2713;</div>
+                        </div>
+                        <div class="friend-check-item" onclick="toggleFriendCheck(this)">
+                            <div class="fc-avatar" style="background:linear-gradient(135deg,#FEE2E2,#FCA5A5);">&#x1F415;</div>
+                            <div class="fc-name">초롱#2345</div>
+                            <div class="fc-check">&#x2713;</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="form-submit" onclick="createChallenge()">챌린지 시작하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: 챌린지 상세 ===== -->
+    <div class="modal-overlay" id="challengeDetailModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>&#x1F3C6; 챌린지 상세</h3>
+                <button class="modal-close" onclick="closeModal('challengeDetailModal')">&#xD7;</button>
+            </div>
+            <div class="modal-body" id="challengeDetailBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    // ============================================================
+    //  멍이랑 소셜 - 리더보드 & 챌린지
+    // ============================================================
+
+    // ===== Data =====
+    const friendColors = ['#EF4444', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899', '#10B981'];
+
+    const friends = [
+        { name: '초코#1234', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
+        { name: '달이#5678', emoji: '\u{1F429}', bg: 'linear-gradient(135deg,#FCE7F3,#F9A8D4)' },
+        { name: '콩이#9012', emoji: '\u{1F436}', bg: 'linear-gradient(135deg,#D1FAE5,#A7F3D0)', isMe: true },
+        { name: '뽀삐#3456', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' },
+        { name: '몽이#7890', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#EDE9FE,#DDD6FE)' },
+        { name: '초롱#2345', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#FEE2E2,#FCA5A5)' }
+    ];
+
+    // Weekly walk data (distance in km for each friend, indexed by day 0-6 = Mon-Sun)
+    // Today is Thursday (day index 3) for the prototype
+    const weekData = [
+        // Mon
+        { walked: [
+            { idx: 0, dist: 3.5 }, { idx: 1, dist: 2.8 }, { idx: 2, dist: 1.9 }, { idx: 3, dist: 1.2 }
+        ]},
+        // Tue
+        { walked: [
+            { idx: 0, dist: 4.0 }, { idx: 2, dist: 2.5 }, { idx: 4, dist: 1.8 }
+        ]},
+        // Wed
+        { walked: [
+            { idx: 0, dist: 4.2 }, { idx: 1, dist: 3.8 }, { idx: 2, dist: 2.1 }, { idx: 3, dist: 1.5 }, { idx: 5, dist: 0.8 }
+        ]},
+        // Thu (today)
+        { walked: [
+            { idx: 0, dist: 4.2 }, { idx: 1, dist: 3.8 }, { idx: 2, dist: 2.1 }, { idx: 3, dist: 1.5 }
+        ]},
+        // Fri
+        { walked: [] },
+        // Sat
+        { walked: [] },
+        // Sun
+        { walked: [] }
+    ];
+
+    const dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+    const dayDates = [17, 18, 19, 20, 21, 22, 23]; // Feb 3rd week
+    const todayIndex = 3; // Thursday
+    let selectedDay = todayIndex;
+
+    // ===== SVG Paw Generator =====
+    function generatePawSVG(walkedFriends) {
+        // walkedFriends: array of { idx, dist } for the day
+        var count = walkedFriends.length;
+
+        // 4 parts: 3 toes (top) + 1 pad (bottom)
+        var toe1 = '<ellipse cx="28" cy="20" rx="11" ry="13"';  // left
+        var toe2 = '<ellipse cx="55" cy="13" rx="10" ry="12"';  // center
+        var toe3 = '<ellipse cx="82" cy="20" rx="11" ry="13"';  // right
+        var pad  = '<path d="M28,48 Q20,68 35,84 Q45,95 55,95 Q65,95 75,84 Q90,68 82,48 Q75,38 55,36 Q35,38 28,48Z"';
+
+        var parts = [toe1, toe2, toe3, pad];
+        var defaultColor = '#D1D5DB';
+
+        if (count === 0) {
+            var svg = '<svg viewBox="0 0 110 100" width="28" height="28" xmlns="http://www.w3.org/2000/svg">';
+            parts.forEach(function(p) {
+                svg += p + ' fill="' + defaultColor + '" opacity="0.4"/>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        if (count >= 4) {
+            // 4명 이상: 무지개 그라디언트
+            var svg = '<svg viewBox="0 0 110 100" width="28" height="28" xmlns="http://www.w3.org/2000/svg">';
+            svg += '<defs><linearGradient id="pawRainbow" x1="0%" y1="0%" x2="100%" y2="100%">';
+            svg += '<stop offset="0%" stop-color="#EF4444"/>';
+            svg += '<stop offset="25%" stop-color="#F59E0B"/>';
+            svg += '<stop offset="50%" stop-color="#10B981"/>';
+            svg += '<stop offset="75%" stop-color="#3B82F6"/>';
+            svg += '<stop offset="100%" stop-color="#8B5CF6"/>';
+            svg += '</linearGradient></defs>';
+            parts.forEach(function(p) {
+                svg += p + ' fill="url(#pawRainbow)"/>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // 1-3명: 각 파트에 친구 색상, 나머지 회색
+        var colors = [];
+        for (var i = 0; i < count && i < 4; i++) {
+            colors.push(friendColors[walkedFriends[i].idx % friendColors.length]);
+        }
+
+        var svg = '<svg viewBox="0 0 110 100" width="28" height="28" xmlns="http://www.w3.org/2000/svg">';
+        parts.forEach(function(p, idx) {
+            if (idx < colors.length) {
+                svg += p + ' fill="' + colors[idx] + '"/>';
+            } else {
+                svg += p + ' fill="' + defaultColor + '" opacity="0.3"/>';
+            }
+        });
+        svg += '</svg>';
+        return svg;
+    }
+
+    // ===== Calendar Rendering =====
+    function renderCalendar() {
+        var container = document.getElementById('calendarWeek');
+        container.innerHTML = '';
+
+        dayLabels.forEach(function(label, i) {
+            var dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            if (i === todayIndex) dayEl.classList.add('today');
+            if (i === selectedDay) dayEl.classList.add('selected');
+            dayEl.onclick = function() { selectDay(i); };
+
+            var data = weekData[i];
+            var pawSvg = generatePawSVG(data.walked);
+
+            dayEl.innerHTML =
+                '<span class="calendar-day-label">' + label + '</span>' +
+                '<span class="calendar-day-num">' + dayDates[i] + '</span>' +
+                '<span class="paw-svg-wrap">' + pawSvg + '</span>';
+
+            container.appendChild(dayEl);
+        });
+    }
+
+    function selectDay(index) {
+        selectedDay = index;
+        renderCalendar();
+        renderLeaderboard();
+    }
+
+    // ===== Leaderboard Rendering =====
+    function renderLeaderboard() {
+        var section = document.getElementById('leaderboardSection');
+        var data = weekData[selectedDay];
+        var dateStr = '2월 ' + dayDates[selectedDay] + '일 (' + dayLabels[selectedDay] + ')';
+
+        // Build walked list sorted by distance
+        var walked = data.walked.slice().sort(function(a, b) { return b.dist - a.dist; });
+        var walkedIndices = new Set(walked.map(function(w) { return w.idx; }));
+
+        // Not walked
+        var notWalked = friends.filter(function(f, i) { return !walkedIndices.has(i); }).map(function(f) {
+            var origIdx = friends.indexOf(f);
+            return { idx: origIdx, dist: 0 };
+        });
+
+        var html = '<div class="leaderboard-date">' + dateStr + '</div>';
+
+        if (walked.length > 0) {
+            html += '<div class="leaderboard-sub-header">\u{1F6B6} 산책한 사람 (' + walked.length + '명)</div>';
+            html += '<div class="leaderboard-list">';
+            walked.forEach(function(w, rank) {
+                var f = friends[w.idx];
+                var rankClass = '';
+                if (rank === 0) rankClass = 'r1';
+                else if (rank === 1) rankClass = 'r2';
+                else if (rank === 2) rankClass = 'r3';
+                var meClass = f.isMe ? ' me' : '';
+                var meBadge = f.isMe ? ' <span class="lb-me-badge">나</span>' : '';
+
+                html += '<div class="lb-row' + meClass + '">';
+                html += '<div class="lb-rank ' + rankClass + '">' + (rank + 1) + '</div>';
+                html += '<div class="lb-avatar" style="background:' + f.bg + '">' + f.emoji + '</div>';
+                html += '<div class="lb-info"><div class="lb-name">' + f.name + meBadge + '</div></div>';
+                html += '<div class="lb-distance">' + w.dist.toFixed(1) + 'km</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+        } else {
+            html += '<div class="empty-state" style="padding:20px 0;">';
+            html += '<div class="icon">\u{1F634}</div>';
+            html += '<p>아직 아무도 산책하지 않았어요</p>';
+            html += '</div>';
+        }
+
+        if (notWalked.length > 0) {
+            html += '<div class="lb-divider"></div>';
+            html += '<div class="lb-not-walked-header">\u{1F4A4} 아직 산책 전 (' + notWalked.length + '명)</div>';
+            html += '<div class="leaderboard-list">';
+            notWalked.forEach(function(w) {
+                var f = friends[w.idx];
+                var meClass = f.isMe ? ' me' : '';
+                var meBadge = f.isMe ? ' <span class="lb-me-badge">나</span>' : '';
+
+                html += '<div class="lb-row' + meClass + '" style="opacity:0.6;">';
+                html += '<div class="lb-rank">-</div>';
+                html += '<div class="lb-avatar" style="background:' + f.bg + '">' + f.emoji + '</div>';
+                html += '<div class="lb-info"><div class="lb-name">' + f.name + meBadge + '</div></div>';
+                html += '<div class="lb-distance zero">0.0km</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+
+        section.innerHTML = html;
+    }
+
+    // ===== Monthly Challenges =====
+    var monthlyChallenges = [
+        { name: '가벼운 산책', goal: '5km', goalNum: 5, icon: '\u{1F6B6}', bg: '#D1FAE5', participants: 1247, joined: true, endDate: '2026-02-28' },
+        { name: '매일 걷기', goal: '10km', goalNum: 10, icon: '\u{1F463}', bg: '#DBEAFE', participants: 892, joined: true, endDate: '2026-02-28' },
+        { name: '활발한 산책러', goal: '20km', goalNum: 20, icon: '\u{1F3C3}', bg: '#FEF3C7', participants: 634, joined: false, endDate: '2026-02-28' },
+        { name: '꾸준한 발걸음', goal: '30km', goalNum: 30, icon: '\u{1F4AA}', bg: '#EDE9FE', participants: 421, joined: false, endDate: '2026-02-28' },
+        { name: '한강 한바퀴', goal: '42km', goalNum: 42, icon: '\u{1F30A}', bg: '#DBEAFE', participants: 289, joined: false, endDate: '2026-02-28' },
+        { name: '산책 매니아', goal: '50km', goalNum: 50, icon: '\u{1F525}', bg: '#FEE2E2', participants: 187, joined: false, endDate: '2026-02-28' },
+        { name: '도시 탐험가', goal: '75km', goalNum: 75, icon: '\u{1F9ED}', bg: '#FCE7F3', participants: 98, joined: false, endDate: '2026-02-28' },
+        { name: '마라토너의 길', goal: '100km', goalNum: 100, icon: '\u{1F3C5}', bg: '#FEF3C7', participants: 52, joined: false, endDate: '2026-02-28' },
+        { name: '울트라 워커', goal: '150km', goalNum: 150, icon: '\u26A1', bg: '#EDE9FE', participants: 21, joined: false, endDate: '2026-02-28' },
+        { name: '전설의 산책왕', goal: '200km', goalNum: 200, icon: '\u{1F451}', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)', participants: 7, joined: false, endDate: '2026-02-28' }
+    ];
+
+    // Monthly challenge sample leaderboard data
+    var monthlyChallengeLeaderboards = {};
+    monthlyChallenges.forEach(function(c, i) {
+        var participants = [];
+        // Generate sample leaderboard based on goal
+        var sampleNames = [
+            { name: '콩이#9012', emoji: '\u{1F436}', bg: 'linear-gradient(135deg,#D1FAE5,#A7F3D0)', isMe: true },
+            { name: '초코#1234', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
+            { name: '달이#5678', emoji: '\u{1F429}', bg: 'linear-gradient(135deg,#FCE7F3,#F9A8D4)' },
+            { name: '뽀삐#3456', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' },
+            { name: '몽이#7890', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#EDE9FE,#DDD6FE)' }
+        ];
+        var numShow = Math.min(5, 3 + Math.floor(Math.random() * 3));
+        for (var j = 0; j < numShow; j++) {
+            var dist = Math.round((c.goalNum * (0.3 + Math.random() * 0.7)) * 10) / 10;
+            participants.push({
+                name: sampleNames[j].name,
+                emoji: sampleNames[j].emoji,
+                bg: sampleNames[j].bg,
+                isMe: sampleNames[j].isMe || false,
+                dist: dist
+            });
+        }
+        participants.sort(function(a, b) { return b.dist - a.dist; });
+        monthlyChallengeLeaderboards[i] = participants;
+    });
+
+    function getDaysRemaining(endDate) {
+        var today = new Date(2026, 1, 19); // Feb 19, 2026 for prototype
+        var end = new Date(endDate);
+        var diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+        return diff > 0 ? diff : 0;
+    }
+
+    function renderMonthlyChallenges() {
+        var list = document.getElementById('monthlyChallengeList');
+        // Sort: joined first
+        var sorted = monthlyChallenges.map(function(c, i) { return { challenge: c, origIndex: i }; });
+        sorted.sort(function(a, b) {
+            if (a.challenge.joined && !b.challenge.joined) return -1;
+            if (!a.challenge.joined && b.challenge.joined) return 1;
+            return 0;
+        });
+
+        var html = '';
+        sorted.forEach(function(item) {
+            var c = item.challenge;
+            var i = item.origIndex;
+            var joinedClass = c.joined ? 'joined' : 'join';
+            var joinedText = c.joined ? '\u2705 참가중' : '참가';
+            var daysLeft = getDaysRemaining(c.endDate);
+
+            html += '<div class="monthly-challenge-item animate-in" onclick="openChallengeDetail(\'monthly\', ' + i + ')" data-index="' + i + '">';
+            html += '<div class="mc-icon" style="background:' + c.bg + ';">' + c.icon + '</div>';
+            html += '<div class="mc-info">';
+            html += '<div class="mc-name">' + c.name + '</div>';
+            html += '<div class="mc-goal">' + c.goal + '/월</div>';
+            html += '<div class="mc-deadline">\u23F0 D-' + daysLeft + '</div>';
+            html += '</div>';
+            html += '<button class="mc-join-btn ' + joinedClass + '" data-index="' + i + '" onclick="event.stopPropagation(); toggleJoinChallenge(this, ' + i + ')">' + joinedText + '</button>';
+            html += '</div>';
+        });
+        list.innerHTML = html;
+    }
+
+    function toggleJoinChallenge(btn, index) {
+        var c = monthlyChallenges[index];
+        if (c.joined) {
+            return;
+        }
+        c.joined = true;
+        c.participants++;
+        btn.className = 'mc-join-btn joined';
+        btn.textContent = '\u2705 참가중';
+        toast('\u{1F389} "' + c.name + '" 챌린지에 참가했습니다!');
+
+        // Re-render with animation (joined items go to top)
+        setTimeout(function() {
+            renderMonthlyChallenges();
+            // Apply move-to-top animation to the newly joined item
+            var items = document.querySelectorAll('.monthly-challenge-item');
+            items.forEach(function(item) {
+                if (parseInt(item.dataset.index) === index) {
+                    item.classList.add('move-to-top');
+                }
+            });
+        }, 300);
+    }
+
+    // ===== Friend Challenges =====
+    var friendChallenges = [
+        {
+            name: '한강 달리기',
+            goal: '30km',
+            goalNum: 30,
+            icon: '\u{1F3C3}',
+            bg: '#DBEAFE',
+            endDate: '2026-02-28',
+            participants: [
+                { name: '초코#1234', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)', dist: 18.5 },
+                { name: '콩이#9012', emoji: '\u{1F436}', bg: 'linear-gradient(135deg,#D1FAE5,#A7F3D0)', isMe: true, dist: 12.3 },
+                { name: '달이#5678', emoji: '\u{1F429}', bg: 'linear-gradient(135deg,#FCE7F3,#F9A8D4)', dist: 8.7 }
+            ]
+        },
+        {
+            name: '매일 아침 산책',
+            goal: '20km',
+            goalNum: 20,
+            icon: '\u{1F305}',
+            bg: '#FEF3C7',
+            endDate: '2026-02-28',
+            participants: [
+                { name: '콩이#9012', emoji: '\u{1F436}', bg: 'linear-gradient(135deg,#D1FAE5,#A7F3D0)', isMe: true, dist: 14.2 },
+                { name: '뽀삐#3456', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)', dist: 9.8 }
+            ]
+        }
+    ];
+
+    function renderFriendChallenges() {
+        var list = document.getElementById('friendChallengeList');
+        if (friendChallenges.length === 0) {
+            list.innerHTML = '<div class="empty-state"><div class="icon">\u{1F6B6}</div><p>참가 중인 친구 챌린지가 없습니다</p></div>';
+            return;
+        }
+        var html = '';
+        friendChallenges.forEach(function(c, i) {
+            var daysLeft = getDaysRemaining(c.endDate);
+            html += '<div class="friend-challenge-item animate-in" onclick="openChallengeDetail(\'friend\', ' + i + ')">';
+            html += '<div class="fc-challenge-icon" style="background:' + c.bg + ';">' + c.icon + '</div>';
+            html += '<div class="fc-challenge-info">';
+            html += '<div class="fc-challenge-name">' + c.name + '</div>';
+            html += '<div class="fc-challenge-meta">' + c.goal + '/월</div>';
+            html += '<div class="fc-challenge-deadline">\u23F0 D-' + daysLeft + '</div>';
+            html += '</div>';
+            html += '<div class="fc-challenge-people">\u{1F465} ' + c.participants.length + '명</div>';
+            html += '</div>';
+        });
+        list.innerHTML = html;
+    }
+
+    // ===== Challenge Detail Modal =====
+    function openChallengeDetail(type, index) {
+        var body = document.getElementById('challengeDetailBody');
+        var challenge, leaderboard, goalNum, isJoined;
+
+        if (type === 'monthly') {
+            var c = monthlyChallenges[index];
+            challenge = {
+                name: c.name,
+                goal: c.goal + '/월',
+                icon: c.icon,
+                endDate: c.endDate,
+                participants: c.participants
+            };
+            goalNum = c.goalNum;
+            isJoined = c.joined;
+            leaderboard = monthlyChallengeLeaderboards[index] || [];
+        } else {
+            var c = friendChallenges[index];
+            challenge = {
+                name: c.name,
+                goal: c.goal + '/월',
+                icon: c.icon,
+                endDate: c.endDate,
+                participants: c.participants.length
+            };
+            goalNum = c.goalNum;
+            isJoined = true; // friend challenges are always joined
+            leaderboard = c.participants.slice().sort(function(a, b) { return b.dist - a.dist; });
+        }
+
+        var daysLeft = getDaysRemaining(challenge.endDate);
+        var startDate = '2026-02-01';
+        var endDate = challenge.endDate;
+
+        var html = '';
+        // Info section
+        html += '<div class="challenge-detail-info">';
+        html += '<div class="cd-title">' + challenge.icon + ' ' + challenge.name + '</div>';
+        html += '<div class="cd-meta">';
+        html += '<span>\u{1F3AF} 목표: ' + challenge.goal + '</span>';
+        html += '<span>\u{1F4C5} 기간: ' + startDate + ' ~ ' + endDate + '</span>';
+        html += '<span>\u{1F465} 참가자: ' + (typeof challenge.participants === 'number' ? challenge.participants.toLocaleString() + '명' : challenge.participants + '명') + '</span>';
+        html += '</div>';
+        html += '<div class="cd-remaining">\u23F0 D-' + daysLeft + '</div>';
+        html += '</div>';
+
+        // Leaderboard
+        html += '<div class="cd-leaderboard-title">\u{1F3C6} 참가자 리더보드</div>';
+        html += '<div class="cd-leaderboard">';
+        leaderboard.forEach(function(p, rank) {
+            var rankClass = '';
+            if (rank === 0) rankClass = 'r1';
+            else if (rank === 1) rankClass = 'r2';
+            else if (rank === 2) rankClass = 'r3';
+            var meClass = p.isMe ? ' me' : '';
+            var meBadge = p.isMe ? ' <span class="lb-me-badge">나</span>' : '';
+            var pct = Math.min(100, Math.round((p.dist / goalNum) * 100));
+            var barColor = p.isMe ? 'var(--primary)' : 'var(--secondary)';
+
+            html += '<div class="cd-lb-row' + meClass + '">';
+            html += '<div class="cd-lb-rank ' + rankClass + '">' + (rank + 1) + '</div>';
+            html += '<div class="cd-lb-avatar" style="background:' + p.bg + '">' + p.emoji + '</div>';
+            html += '<div class="cd-lb-info">';
+            html += '<div class="cd-lb-name">' + p.name + meBadge + '</div>';
+            html += '<div class="cd-lb-progress"><div class="cd-lb-progress-bar"><div class="cd-lb-progress-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div></div>';
+            html += '</div>';
+            html += '<div class="cd-lb-dist">' + p.dist.toFixed(1) + 'km</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+
+        // Join button
+        var joinBtnClass = isJoined ? 'cd-join-btn joined' : 'cd-join-btn join';
+        var joinBtnText = isJoined ? '\u2705 참가중' : '\u{1F3C3} 참가하기';
+        var joinOnclick = '';
+        if (!isJoined && type === 'monthly') {
+            joinOnclick = ' onclick="joinFromDetail(' + index + ')"';
+        }
+        html += '<button class="' + joinBtnClass + '"' + joinOnclick + '>' + joinBtnText + '</button>';
+
+        body.innerHTML = html;
+        openModal('challengeDetailModal');
+    }
+
+    function joinFromDetail(index) {
+        var c = monthlyChallenges[index];
+        if (c.joined) return;
+        c.joined = true;
+        c.participants++;
+        toast('\u{1F389} "' + c.name + '" 챌린지에 참가했습니다!');
+        renderMonthlyChallenges();
+        // Update the detail modal button
+        var btn = document.querySelector('#challengeDetailBody .cd-join-btn');
+        if (btn) {
+            btn.className = 'cd-join-btn joined';
+            btn.textContent = '\u2705 참가중';
+            btn.onclick = null;
+        }
+    }
+
+    // ===== Tab Switching =====
+    var tabs = document.querySelectorAll('.social-tab');
+    var panels = document.querySelectorAll('.tab-panel');
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            var target = tab.dataset.tab;
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            panels.forEach(function(p) {
+                p.classList.remove('active');
+                if (p.id === 'tab-' + target) {
+                    p.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // ===== Modal =====
+    function openModal(id) {
+        var modal = document.getElementById(id);
+        modal.style.display = 'flex';
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() { modal.classList.add('show'); });
+        });
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        var modal = document.getElementById(id);
+        modal.classList.remove('show');
+        setTimeout(function() { modal.style.display = 'none'; document.body.style.overflow = ''; }, 350);
+    }
+    document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(this.id);
+        });
+    });
+
+    // ===== Friend Search =====
+    var searchDatabase = [
+        { name: '루비#5555', emoji: '\u{1F436}', bg: 'linear-gradient(135deg,#FEE2E2,#FCA5A5)', sub: '포메라니안' },
+        { name: '하루#6666', emoji: '\u{1F9AE}', bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)', sub: '시바 이누' },
+        { name: '두부#7777', emoji: '\u{1F429}', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)', sub: '말티즈' },
+        { name: '코코#8888', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#D1FAE5,#A7F3D0)', sub: '래브라도 리트리버' },
+        { name: '초코#1234', emoji: '\u{1F415}', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)', sub: '골든 리트리버 (이미 친구)' },
+    ];
+
+    function searchFriend() {
+        var query = document.getElementById('friendSearchInput').value.trim().toLowerCase();
+        var results = document.getElementById('searchResults');
+
+        if (!query) {
+            results.innerHTML = '<div class="empty-state"><div class="icon">\u{1F50E}</div><p>#태그(예: #1234) 또는<br>강아지 이름으로 검색해보세요</p></div>';
+            return;
+        }
+
+        var matched = searchDatabase.filter(function(s) {
+            return s.name.toLowerCase().includes(query);
+        });
+
+        if (matched.length === 0) {
+            results.innerHTML = '<div class="empty-state"><div class="icon">\u{1F614}</div><p>"' + query + '" 검색 결과가 없습니다</p></div>';
+            return;
+        }
+
+        var html = '';
+        matched.forEach(function(s) {
+            var isAlreadyFriend = s.sub.includes('이미 친구');
+            html += '<div class="search-result-item">';
+            html += '<div class="sr-avatar" style="background:' + s.bg + '">' + s.emoji + '</div>';
+            html += '<div class="sr-info"><div class="sr-name">' + s.name + '</div><div class="sr-sub">' + s.sub + '</div></div>';
+            if (isAlreadyFriend) {
+                html += '<button class="sr-action-btn added">\u2705 친구</button>';
+            } else {
+                html += '<button class="sr-action-btn add" onclick="addFriend(this)">친구 추가</button>';
+            }
+            html += '</div>';
+        });
+        results.innerHTML = html;
+    }
+
+    // Allow Enter key in search
+    document.getElementById('friendSearchInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') searchFriend();
+    });
+
+    function addFriend(btn) {
+        btn.className = 'sr-action-btn added';
+        btn.textContent = '\u2709 요청 보냄';
+        btn.onclick = null;
+        toast('\u{1F4E8} 친구 요청을 보냈습니다!');
+    }
+
+    // ===== Friend Requests =====
+    function acceptRequest(id) {
+        var item = document.getElementById(id);
+        item.style.transition = 'all 0.3s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(50px)';
+        setTimeout(function() {
+            item.innerHTML = '<div style="text-align:center;padding:10px;color:var(--primary-dark);font-size:13px;font-weight:600;">\u2705 친구가 되었습니다!</div>';
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, 300);
+        toast('\u{1F389} 친구 요청을 수락했습니다!');
+        updateRequestBadge();
+    }
+
+    function rejectRequest(id) {
+        var item = document.getElementById(id);
+        item.style.transition = 'all 0.3s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-50px)';
+        setTimeout(function() {
+            item.innerHTML = '<div style="text-align:center;padding:10px;color:var(--text-light);font-size:13px;">요청을 거절했습니다</div>';
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, 300);
+        updateRequestBadge();
+    }
+
+    var requestCount = 2;
+    function updateRequestBadge() {
+        requestCount--;
+        var badge = document.getElementById('requestBadge');
+        if (requestCount <= 0) {
+            badge.style.display = 'none';
+        } else {
+            badge.textContent = requestCount;
+        }
+    }
+
+    // ===== Challenge Create =====
+    function createChallenge() {
+        var checked = document.querySelectorAll('.friend-check-item.checked');
+        if (checked.length === 0) {
+            toast('\u26A0\uFE0F 친구를 1명 이상 초대해주세요');
+            return;
+        }
+        toast('\u{1F389} 챌린지가 생성되었습니다!');
+        closeModal('challengeCreateModal');
+    }
+
+    function toggleFriendCheck(item) {
+        item.classList.toggle('checked');
+    }
+
+    // ===== Toast =====
+    var toastTimer;
+    function toast(msg) {
+        var el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2500);
+    }
+
+    // ===== Init =====
+    renderCalendar();
+    renderLeaderboard();
+    renderMonthlyChallenges();
+    renderFriendChallenges();
+    </script>
+</body>
+</html>

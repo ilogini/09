@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>설정 - 멍이랑 withbowwow</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <style>
+        :root {
+            --lime: #C5D900; --lime-dark: #9FB300; --lime-light: rgba(197,217,0,0.10); --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF; --azure-dark: #0077CC; --azure-light: rgba(0,153,255,0.08); --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C; --text-secondary: #5C6F82; --text-muted: #94A3B8;
+            --bg-base: #F8FCFA; --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12); --glass-blur: blur(20px);
+            --danger: #EF4444;
+            --radius-xl: 28px; --radius-lg: 24px; --radius-md: 20px; --radius-sm: 14px; --radius-xs: 10px;
+            --modal-width: 480px; --modal-padding-x: 20px;
+            --nav-height: 76px; --header-height: 58px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header (Glassmorphism) ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 0 var(--modal-padding-x);
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid rgba(197,217,0,0.08);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: var(--glass-bg); font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; text-decoration: none; color: var(--text-primary);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+        }
+        .back-btn i { width: 20px; height: 20px; }
+        .back-btn:hover { background: var(--glass-bg-heavy); }
+        .header-title {
+            font-size: 17px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .header-title i { width: 20px; height: 20px; color: var(--lime); }
+
+        /* ===== Content ===== */
+        .content { padding: 12px var(--modal-padding-x) 32px; }
+
+        /* ===== Settings Section (Glass Cards) ===== */
+        .settings-section {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 18px 20px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* ===== Settings Row ===== */
+        .settings-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px;
+            min-height: 54px;
+            transition: background 0.15s;
+        }
+        .settings-row:not(:last-child) {
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .settings-row.clickable { cursor: pointer; }
+        .settings-row.clickable:hover { background: rgba(197,217,0,0.04); }
+        .settings-row.clickable:active { background: rgba(197,217,0,0.08); }
+
+        .row-left {
+            display: flex; align-items: center; gap: 14px;
+            flex: 1; min-width: 0;
+        }
+        .row-icon {
+            width: 38px; height: 38px;
+            border-radius: var(--radius-xs);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .row-icon i { width: 20px; height: 20px; }
+        .row-icon.lime { background: var(--lime-light); color: var(--lime-dark); }
+        .row-icon.azure { background: var(--azure-light); color: var(--azure-dark); }
+        .row-icon.yellow { background: rgba(245,158,11,0.10); color: #D97706; }
+        .row-icon.gray { background: rgba(148,163,184,0.10); color: var(--text-secondary); }
+        .row-icon.red { background: rgba(239,68,68,0.10); color: var(--danger); }
+
+        .row-text { flex: 1; min-width: 0; }
+        .row-label {
+            font-size: 15px; font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .row-desc {
+            font-size: 12px; font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .row-right {
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+        .row-value {
+            font-size: 13px; font-weight: 600;
+            color: var(--text-muted);
+        }
+        .row-chevron {
+            color: var(--text-muted);
+            display: flex; align-items: center;
+        }
+        .row-chevron i { width: 16px; height: 16px; }
+
+        /* ===== Toggle Switch (Lime active) ===== */
+        .toggle-switch {
+            position: relative;
+            width: 50px; height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0; width: 0; height: 0;
+            position: absolute;
+        }
+        .toggle-slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #D1D5DB;
+            border-radius: 28px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px; width: 22px;
+            left: 3px; bottom: 3px;
+            background: var(--bg-white);
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--lime);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(22px);
+        }
+        .toggle-switch input:focus-visible + .toggle-slider {
+            outline: 2px solid var(--lime);
+            outline-offset: 2px;
+        }
+
+        /* ===== Plan Badge ===== */
+        .plan-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px;
+            background: var(--bg-base);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .plan-badge.premium {
+            background: rgba(245,158,11,0.10);
+            border-color: rgba(245,158,11,0.3);
+            color: #92400E;
+        }
+
+        /* ===== Action Button ===== */
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 7px 14px;
+            background: var(--glass-bg-heavy);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { background: var(--lime-light); border-color: rgba(197,217,0,0.25); }
+        .action-btn:active { transform: scale(0.97); }
+
+        /* ===== Connected Account ===== */
+        .connected-account {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .kakao-icon {
+            width: 24px; height: 24px;
+            background: #FEE500;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800;
+            color: #3C1E1E;
+        }
+        .connected-label {
+            font-size: 13px; font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* ===== Logout Section ===== */
+        .logout-section {
+            padding: 8px 0 40px;
+        }
+        .logout-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1.5px solid rgba(239,68,68,0.25);
+            border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            color: var(--danger);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .logout-btn i { width: 18px; height: 18px; }
+        .logout-btn:hover {
+            background: rgba(239,68,68,0.05);
+            border-color: rgba(239,68,68,0.4);
+        }
+        .logout-btn:active {
+            background: rgba(239,68,68,0.1);
+            transform: scale(0.98);
+        }
+
+        /* ===== App Version ===== */
+        .app-version-footer {
+            text-align: center;
+            padding: 8px 20px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ===== Time Picker Bottom Sheet ===== */
+        .bottomsheet-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 600;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .bottomsheet-overlay.show { opacity: 1; visibility: visible; }
+
+        .bottomsheet {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            max-width: var(--modal-width);
+            margin: 0 auto;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            border: 1px solid var(--glass-border);
+            border-bottom: none;
+            z-index: 601;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bottomsheet-overlay.show + .bottomsheet,
+        .bottomsheet.show { transform: translateY(0); }
+
+        .bottomsheet-handle {
+            width: 36px; height: 4px;
+            background: rgba(197,217,0,0.25);
+            border-radius: 4px;
+            margin: 10px auto 0;
+        }
+
+        .bottomsheet-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px 12px;
+        }
+        .bottomsheet-title {
+            font-size: 17px; font-weight: 700;
+            color: var(--text-primary);
+        }
+        .bottomsheet-close {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .bottomsheet-close i { width: 18px; height: 18px; }
+        .bottomsheet-close:hover { background: var(--glass-bg-heavy); }
+
+        /* Time Picker Wheels */
+        .time-picker-body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 20px 20px;
+        }
+
+        .wheel-container {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            background: var(--bg-base);
+        }
+        .wheel-container.wheel-hour,
+        .wheel-container.wheel-minute { width: 80px; }
+        .wheel-container.wheel-ampm { width: 72px; }
+
+        .wheel-container::before,
+        .wheel-container::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            height: 60px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .wheel-container::before {
+            top: 0;
+            background: linear-gradient(to bottom, var(--bg-base) 20%, transparent);
+        }
+        .wheel-container::after {
+            bottom: 0;
+            background: linear-gradient(to top, var(--bg-base) 20%, transparent);
+        }
+
+        .wheel-highlight {
+            position: absolute;
+            top: 50%; left: 4px; right: 4px;
+            transform: translateY(-50%);
+            height: 44px;
+            background: var(--bg-white);
+            border-radius: var(--radius-xs);
+            border: 1.5px solid var(--lime-light);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .wheel-scroll {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .wheel-scroll::-webkit-scrollbar { display: none; }
+
+        .wheel-item {
+            height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-muted);
+            scroll-snap-align: center;
+            transition: color 0.15s, transform 0.15s;
+            user-select: none;
+            cursor: pointer;
+        }
+        .wheel-item.selected {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .wheel-spacer { height: 68px; }
+
+        .time-colon {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding: 0 2px;
+            align-self: center;
+        }
+
+        .bottomsheet-footer {
+            padding: 0 20px 28px;
+        }
+        .confirm-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--lime);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .confirm-btn:hover { background: var(--lime-dark); }
+        .confirm-btn:active { transform: scale(0.98); }
+
+        /* Reminder time row indent style */
+        .settings-row.sub-row {
+            padding-left: 34px;
+            background: rgba(197,217,0,0.03);
+        }
+        .settings-row.sub-row .row-icon {
+            width: 32px; height: 32px;
+        }
+        .settings-row.sub-row .row-icon i { width: 16px; height: 16px; }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+
+        /* ===== Toast ===== */
+        .toast-el {
+            position: fixed; bottom: 90px; left: 50%;
+            transform: translateX(-50%) translateY(12px);
+            background: rgba(26,43,60,0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: white; padding: 10px 20px;
+            border-radius: var(--radius-lg);
+            font-size: 13px; font-weight: 500;
+            z-index: 500; opacity: 0;
+            transition: all 0.25s; pointer-events: none;
+            white-space: nowrap; max-width: 90%;
+        }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="마이페이지.html" class="back-btn" aria-label="뒤로가기">
+                <i data-lucide="arrow-left"></i>
+            </a>
+            <span class="header-title">
+                <i data-lucide="settings"></i>
+                설정
+            </span>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- 알림 설정 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">알림 설정</div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon lime"><i data-lucide="bell-ring"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">산책 리마인더</div>
+                        <div class="row-desc">설정한 시간에 산책 알림을 받아요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleNotification('산책 리마인더', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-row sub-row clickable" id="reminderTimeRow" onclick="openTimePicker()">
+                <div class="row-left">
+                    <div class="row-icon lime"><i data-lucide="clock"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">리마인더 시간</div>
+                        <div class="row-desc">설정한 시간에 알림을 보내드려요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-value" id="reminderTimeDisplay">오후 4:00</span>
+                    <span class="row-chevron"><i data-lucide="chevron-right"></i></span>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon yellow"><i data-lucide="award"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">뱃지 획득 알림</div>
+                        <div class="row-desc">새로운 뱃지를 획득하면 알려드려요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleNotification('뱃지 획득 알림', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon azure"><i data-lucide="message-circle"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">소셜 알림</div>
+                        <div class="row-desc">친구 요청, 좋아요, 댓글 알림</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" onchange="toggleNotification('소셜 알림', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 구독 관리 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">구독 관리</div>
+
+            <div class="settings-row clickable" onclick="location.href='프리미엄.html'">
+                <div class="row-left">
+                    <div class="row-icon yellow"><i data-lucide="crown"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">현재 플랜</div>
+                        <div class="row-desc">프리미엄으로 업그레이드하고 더 많은 기능을 즐겨보세요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="plan-badge">무료 플랜</span>
+                    <span class="row-chevron"><i data-lucide="chevron-right"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 계정 설정 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">계정 설정</div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon gray"><i data-lucide="link"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">연결된 계정</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <div class="connected-account">
+                        <div class="kakao-icon">K</div>
+                        <span class="connected-label">카카오 로그인</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon gray"><i data-lucide="shield"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">비밀번호 변경</div>
+                        <div class="row-desc">계정 보안을 위해 주기적으로 변경해주세요</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <button class="action-btn" onclick="toast('비밀번호 변경 기능은 준비 중입니다')">변경</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 앱 정보 -->
+        <div class="settings-section animate-in">
+            <div class="section-header">앱 정보</div>
+
+            <div class="settings-row">
+                <div class="row-left">
+                    <div class="row-icon lime"><i data-lucide="smartphone"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">앱 버전</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-value">v1.0.0</span>
+                </div>
+            </div>
+
+            <div class="settings-row clickable" onclick="toast('개인정보처리방침 페이지는 준비 중입니다')">
+                <div class="row-left">
+                    <div class="row-icon gray"><i data-lucide="file-text"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">개인정보처리방침</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-chevron"><i data-lucide="chevron-right"></i></span>
+                </div>
+            </div>
+
+            <div class="settings-row clickable" onclick="toast('이용약관 페이지는 준비 중입니다')">
+                <div class="row-left">
+                    <div class="row-icon gray"><i data-lucide="clipboard-list"></i></div>
+                    <div class="row-text">
+                        <div class="row-label">이용약관</div>
+                    </div>
+                </div>
+                <div class="row-right">
+                    <span class="row-chevron"><i data-lucide="chevron-right"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로그아웃 -->
+        <div class="logout-section animate-in">
+            <button class="logout-btn" onclick="handleLogout()">
+                <i data-lucide="log-out"></i>
+                로그아웃
+            </button>
+        </div>
+
+        <div class="app-version-footer animate-in">
+            멍이랑 withbowwow &middot; Made with Love
+        </div>
+
+    </div>
+
+    <!-- Time Picker Bottom Sheet -->
+    <div class="bottomsheet-overlay" id="timePickerOverlay" onclick="closeTimePicker()"></div>
+    <div class="bottomsheet" id="timePickerSheet">
+        <div class="bottomsheet-handle"></div>
+        <div class="bottomsheet-header">
+            <span class="bottomsheet-title">리마인더 시간 설정</span>
+            <button class="bottomsheet-close" onclick="closeTimePicker()" aria-label="닫기">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="time-picker-body">
+            <div class="wheel-container wheel-hour">
+                <div class="wheel-highlight"></div>
+                <div class="wheel-scroll" id="hourWheel"></div>
+            </div>
+            <span class="time-colon">:</span>
+            <div class="wheel-container wheel-minute">
+                <div class="wheel-highlight"></div>
+                <div class="wheel-scroll" id="minuteWheel"></div>
+            </div>
+            <div class="wheel-container wheel-ampm">
+                <div class="wheel-highlight"></div>
+                <div class="wheel-scroll" id="ampmWheel"></div>
+            </div>
+        </div>
+        <div class="bottomsheet-footer">
+            <button class="confirm-btn" onclick="confirmTime()">확인</button>
+        </div>
+    </div>
+
+    <div class="toast-el" id="toastEl"></div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+    /* ===== Initialize Lucide Icons ===== */
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+
+        // Prevent body scroll when scrolling inside wheel
+        document.querySelectorAll('.wheel-scroll').forEach(wheel => {
+            wheel.addEventListener('touchmove', e => e.stopPropagation(), { passive: true });
+        });
+    });
+
+    /* ===== Toast ===== */
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function toggleNotification(name, isOn) {
+        const state = isOn ? 'ON' : 'OFF';
+        toast(name + ' ' + state);
+    }
+
+    function handleLogout() {
+        if (confirm('정말 로그아웃 하시겠어요?')) {
+            toast('로그아웃 되었습니다');
+            setTimeout(() => {
+                location.href = '멍이랑_메인페이지_시안.html';
+            }, 1200);
+        }
+    }
+
+    /* ===== Time Picker Logic ===== */
+    const ITEM_HEIGHT = 44;
+    let currentHour = 4;    // 1-12
+    let currentMinute = 0;  // 0,5,10,...55
+    let currentAmpm = 1;    // 0=AM, 1=PM
+
+    // Build wheel items
+    function buildWheel(container, items, selectedIdx) {
+        container.innerHTML = '';
+        // top spacer (68px = container 180/2 - itemHeight/2 = 90-22 = 68)
+        const topSpacer = document.createElement('div');
+        topSpacer.className = 'wheel-spacer';
+        container.appendChild(topSpacer);
+
+        items.forEach((val, i) => {
+            const item = document.createElement('div');
+            item.className = 'wheel-item' + (i === selectedIdx ? ' selected' : '');
+            item.textContent = val;
+            item.dataset.index = i;
+            item.addEventListener('click', () => {
+                container.scrollTo({ top: i * ITEM_HEIGHT, behavior: 'smooth' });
+            });
+            container.appendChild(item);
+        });
+
+        // bottom spacer
+        const bottomSpacer = document.createElement('div');
+        bottomSpacer.className = 'wheel-spacer';
+        container.appendChild(bottomSpacer);
+
+        // scroll to selected
+        requestAnimationFrame(() => {
+            container.scrollTop = selectedIdx * ITEM_HEIGHT;
+        });
+    }
+
+    function getSelectedIndex(container) {
+        return Math.round(container.scrollTop / ITEM_HEIGHT);
+    }
+
+    function updateSelectedStyle(container) {
+        const idx = getSelectedIndex(container);
+        const items = container.querySelectorAll('.wheel-item');
+        items.forEach((item, i) => {
+            item.classList.toggle('selected', i === idx);
+        });
+    }
+
+    // Attach scroll-snap end listener
+    function attachScrollEnd(container) {
+        let scrollTimeout;
+        container.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                // Snap to nearest
+                const idx = getSelectedIndex(container);
+                container.scrollTo({ top: idx * ITEM_HEIGHT, behavior: 'smooth' });
+                updateSelectedStyle(container);
+            }, 80);
+        });
+    }
+
+    const hours = Array.from({length: 12}, (_, i) => String(i + 1));
+    const minutes = Array.from({length: 12}, (_, i) => String(i * 5).padStart(2, '0'));
+    const ampms = ['오전', '오후'];
+
+    function initWheels() {
+        const hourWheel = document.getElementById('hourWheel');
+        const minuteWheel = document.getElementById('minuteWheel');
+        const ampmWheel = document.getElementById('ampmWheel');
+
+        buildWheel(hourWheel, hours, currentHour - 1);
+        buildWheel(minuteWheel, minutes, currentMinute / 5);
+        buildWheel(ampmWheel, ampms, currentAmpm);
+
+        attachScrollEnd(hourWheel);
+        attachScrollEnd(minuteWheel);
+        attachScrollEnd(ampmWheel);
+    }
+
+    function openTimePicker() {
+        initWheels();
+        document.getElementById('timePickerOverlay').classList.add('show');
+        document.getElementById('timePickerSheet').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeTimePicker() {
+        document.getElementById('timePickerOverlay').classList.remove('show');
+        document.getElementById('timePickerSheet').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function confirmTime() {
+        const hourIdx = getSelectedIndex(document.getElementById('hourWheel'));
+        const minuteIdx = getSelectedIndex(document.getElementById('minuteWheel'));
+        const ampmIdx = getSelectedIndex(document.getElementById('ampmWheel'));
+
+        currentHour = hourIdx + 1;
+        currentMinute = minuteIdx * 5;
+        currentAmpm = ampmIdx;
+
+        const ampmLabel = ampms[currentAmpm];
+        const minuteStr = String(currentMinute).padStart(2, '0');
+        const display = ampmLabel + ' ' + currentHour + ':' + minuteStr;
+
+        document.getElementById('reminderTimeDisplay').textContent = display;
+        closeTimePicker();
+        toast('리마인더 시간이 변경되었습니다');
+    }
+    </script>
+
+</body>
+</html>

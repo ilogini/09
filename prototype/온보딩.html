@@ -4,39 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>시작하기 - 멍이랑</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <style>
         :root {
-            --primary: #10B981;
-            --primary-dark: #059669;
-            --primary-light: #D1FAE5;
-            --secondary: #3B82F6;
-            --secondary-dark: #1D4ED8;
-            --accent: #F59E0B;
-            --accent-light: #FEF3C7;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --text-light: #9CA3AF;
-            --bg: #F9FAFB;
-            --white: #FFFFFF;
-            --border: #E5E7EB;
+            /* DS v2 Colors */
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10);
+            --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08);
+            --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12);
+            --glass-blur: blur(20px);
             --danger: #EF4444;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --radius-xs: 8px;
+
+            /* DS v2 Radius */
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+
+            /* DS v2 Layout */
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
             --header-height: 56px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--white);
-            color: var(--text);
-            max-width: 480px;
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
             margin: 0 auto;
             min-height: 100vh;
             position: relative;
@@ -76,30 +91,56 @@
         .slide.left { transform: translateX(-100%); opacity: 0; }
         .slide.right { transform: translateX(100%); opacity: 0; }
 
-        .slide-emoji {
-            font-size: 80px;
-            margin-bottom: 24px;
-            animation: floatEmoji 3s ease-in-out infinite;
+        .slide-icon-wrap {
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floatIcon 3s ease-in-out infinite;
         }
-        @keyframes floatEmoji {
+        .slide-icon-wrap svg {
+            width: 56px;
+            height: 56px;
+            stroke-width: 1.5;
+        }
+        .slide-1 .slide-icon-wrap svg { color: var(--lime-dark); }
+        .slide-2 .slide-icon-wrap svg { color: var(--azure); }
+        .slide-3 .slide-icon-wrap svg { color: var(--lime-dark); }
+
+        @keyframes floatIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-12px); }
         }
 
         .slide-bg-circle {
-            width: 160px; height: 160px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 32px;
         }
-        .slide-1 .slide-bg-circle { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
-        .slide-2 .slide-bg-circle { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-        .slide-3 .slide-bg-circle { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+        .slide-1 .slide-bg-circle {
+            background: linear-gradient(135deg, var(--lime-light), rgba(197,217,0,0.18));
+            box-shadow: 0 8px 32px var(--lime-glow);
+        }
+        .slide-2 .slide-bg-circle {
+            background: linear-gradient(135deg, var(--azure-light), rgba(0,153,255,0.15));
+            box-shadow: 0 8px 32px var(--azure-glow);
+        }
+        .slide-3 .slide-bg-circle {
+            background: linear-gradient(135deg, var(--lime-light), rgba(0,153,255,0.10));
+            box-shadow: 0 8px 32px var(--lime-glow);
+        }
 
         .slide h2 {
-            font-size: 24px; font-weight: 800;
+            font-size: 24px;
+            font-weight: 800;
             margin-bottom: 12px;
             line-height: 1.3;
+            color: var(--text-primary);
         }
         .slide p {
             font-size: 15px;
@@ -116,192 +157,366 @@
             padding: 16px 24px 24px;
         }
         .slide-dots {
-            display: flex; gap: 8px;
+            display: flex;
+            gap: 8px;
             position: absolute;
-            left: 50%; transform: translateX(-50%);
+            left: 50%;
+            transform: translateX(-50%);
         }
         .dot {
-            width: 8px; height: 8px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: var(--border);
+            background: var(--glass-border);
             transition: all 0.3s;
+            cursor: pointer;
         }
         .dot.active {
             width: 24px;
             border-radius: 8px;
-            background: var(--primary);
+            background: var(--lime);
         }
         .nav-arrow {
-            width: 44px; height: 44px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: none;
-            background: var(--bg);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             font-size: 18px;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s;
             z-index: 2;
+            color: var(--text-secondary);
         }
-        .nav-arrow:hover { background: var(--border); }
-        .nav-arrow:disabled { opacity: 0.3; cursor: default; }
+        .nav-arrow svg {
+            width: 20px;
+            height: 20px;
+        }
+        .nav-arrow:hover {
+            background: var(--glass-bg);
+            border-color: var(--lime);
+        }
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
         .nav-arrow.next {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: var(--text-primary);
+            border: none;
+            box-shadow: 0 4px 16px var(--lime-glow);
         }
-        .nav-arrow.next:hover { background: var(--primary-dark); }
+        .nav-arrow.next:hover {
+            box-shadow: 0 6px 24px rgba(197,217,0,0.40);
+            transform: translateY(-1px);
+        }
         .skip-btn {
-            font-size: 14px; font-weight: 600;
-            color: var(--text-light);
-            background: none; border: none;
-            cursor: pointer; font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
             padding: 8px;
             z-index: 2;
+            transition: color 0.2s;
         }
-        .skip-btn:hover { color: var(--text-secondary); }
+        .skip-btn:hover {
+            color: var(--text-secondary);
+        }
 
         /* ===== Login Section ===== */
         .login-section {
             padding: 20px 24px 32px;
-            background: var(--bg);
-            border-radius: 24px 24px 0 0;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            border-top: 1px solid var(--glass-border);
         }
         .login-title {
             text-align: center;
-            font-size: 16px; font-weight: 700;
+            font-size: 16px;
+            font-weight: 700;
             margin-bottom: 16px;
+            color: var(--text-primary);
         }
-        .login-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .login-btn {
             width: 100%;
             padding: 14px;
             border-radius: var(--radius-sm);
             border: none;
-            font-size: 15px; font-weight: 600;
+            font-size: 15px;
+            font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             transition: all 0.2s;
         }
-        .login-btn:hover { transform: translateY(-1px); }
-        .login-btn:active { transform: translateY(0); }
-        .login-kakao { background: #FEE500; color: #3C1E1E; }
-        .login-naver { background: #03C75A; color: white; }
-        .login-apple { background: #000000; color: white; }
+        .login-btn:hover {
+            transform: translateY(-1px);
+        }
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        .login-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .login-kakao {
+            background: #FEE500;
+            color: #3C1E1E;
+        }
+        .login-naver {
+            background: #03C75A;
+            color: white;
+        }
+        .login-apple {
+            background: #000000;
+            color: white;
+        }
         .login-terms {
             text-align: center;
-            font-size: 11px; color: var(--text-light);
+            font-size: 11px;
+            color: var(--text-muted);
             margin-top: 16px;
             line-height: 1.5;
         }
-        .login-terms a { color: var(--text-secondary); text-decoration: underline; }
+        .login-terms a {
+            color: var(--text-secondary);
+            text-decoration: underline;
+        }
 
         /* ===== Pet Registration Section ===== */
         .register-section {
             display: none;
             padding: 0;
-            background: var(--white);
+            background: var(--bg-base);
             min-height: 100vh;
             flex-direction: column;
         }
-        .register-section.active { display: flex; }
+        .register-section.active {
+            display: flex;
+        }
 
         .register-header {
-            padding: 16px 20px;
-            display: flex; align-items: center; gap: 12px;
-            border-bottom: 1px solid var(--border);
+            padding: 16px var(--modal-padding-x);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
         }
-        .register-header h3 { font-size: 17px; font-weight: 700; }
+        .register-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .register-header h3 svg {
+            width: 20px;
+            height: 20px;
+            color: var(--lime-dark);
+        }
         .register-close {
-            width: 36px; height: 36px; border-radius: 50%; border: none;
-            background: var(--bg); font-size: 18px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        .register-close svg {
+            width: 18px;
+            height: 18px;
+        }
+        .register-close:hover {
+            border-color: var(--lime);
+            background: var(--lime-light);
         }
 
-        .register-content { padding: 24px 20px; flex: 1; }
+        .register-content {
+            padding: 24px var(--modal-padding-x);
+            flex: 1;
+        }
 
         .photo-upload {
-            width: 100px; height: 100px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: var(--bg);
-            border: 3px dashed var(--border);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 3px dashed var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             margin: 0 auto 24px;
             cursor: pointer;
             transition: all 0.2s;
+            color: var(--text-muted);
         }
-        .photo-upload:hover { border-color: var(--primary); background: var(--primary-light); }
-        .photo-upload .cam-icon { font-size: 28px; margin-bottom: 2px; }
-        .photo-upload .cam-text { font-size: 10px; color: var(--text-light); }
+        .photo-upload:hover {
+            border-color: var(--lime);
+            background: var(--lime-light);
+        }
+        .photo-upload svg {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 2px;
+            color: var(--text-muted);
+        }
+        .photo-upload:hover svg {
+            color: var(--lime-dark);
+        }
+        .photo-upload .cam-text {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: inherit;
+        }
 
-        .form-group { margin-bottom: 18px; }
+        .form-group {
+            margin-bottom: 18px;
+        }
         .form-label {
             display: block;
-            font-size: 13px; font-weight: 600;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
         .form-input {
             width: 100%;
             padding: 12px 16px;
-            border: 1.5px solid var(--border);
+            border: 1.5px solid var(--glass-border);
             border-radius: var(--radius-xs);
             font-size: 15px;
             font-family: inherit;
-            background: var(--white);
-            transition: border-color 0.2s;
-            color: var(--text);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: all 0.2s;
+            color: var(--text-primary);
         }
-        .form-input:focus { outline: none; border-color: var(--primary); }
-        .form-input::placeholder { color: var(--text-light); }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--lime);
+            box-shadow: 0 0 0 3px var(--lime-light);
+            background: var(--bg-white);
+        }
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
 
         .type-selector {
-            display: flex; gap: 10px;
+            display: flex;
+            gap: 10px;
         }
         .type-btn {
             flex: 1;
             padding: 12px;
             border-radius: var(--radius-xs);
-            border: 1.5px solid var(--border);
-            background: var(--white);
-            font-size: 14px; font-weight: 600;
+            border: 1.5px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            font-size: 14px;
+            font-weight: 600;
             font-family: inherit;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
+            color: var(--text-primary);
         }
         .type-btn.selected {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            color: var(--primary-dark);
+            border-color: var(--lime);
+            background: var(--lime-light);
+            color: var(--lime-dark);
+            box-shadow: 0 0 0 3px rgba(197,217,0,0.08);
         }
-        .type-btn:hover { border-color: var(--primary); }
+        .type-btn:hover {
+            border-color: var(--lime);
+        }
 
-        .form-row { display: flex; gap: 12px; }
-        .form-row .form-group { flex: 1; }
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
 
         .register-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: var(--text-primary);
             border: none;
-            border-radius: var(--radius);
-            font-size: 16px; font-weight: 700;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
             font-family: inherit;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(16,185,129,0.35);
+            box-shadow: 0 6px 24px var(--lime-glow);
             transition: all 0.3s;
             margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .register-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(16,185,129,0.45); }
+        .register-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(197,217,0,0.40);
+        }
+        .register-btn:active {
+            transform: translateY(0);
+        }
 
         /* ===== Hide main when register is active ===== */
-        .main-onboarding.hidden { display: none; }
+        .main-onboarding.hidden {
+            display: none;
+        }
 
-        /* ===== Animation ===== */
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        /* ===== Animations ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
     </style>
 </head>
 <body>
@@ -315,7 +530,9 @@
                 <!-- Slide 1 -->
                 <div class="slide slide-1 active" data-index="0">
                     <div class="slide-bg-circle">
-                        <span class="slide-emoji">🐾</span>
+                        <div class="slide-icon-wrap">
+                            <i data-lucide="paw-print"></i>
+                        </div>
                     </div>
                     <h2>반려동물과 함께하는<br>즐거운 산책</h2>
                     <p>GPS로 산책을 기록하고,<br>소중한 추억을 남겨요</p>
@@ -324,7 +541,9 @@
                 <!-- Slide 2 -->
                 <div class="slide slide-2 right" data-index="1">
                     <div class="slide-bg-circle">
-                        <span class="slide-emoji">🏅</span>
+                        <div class="slide-icon-wrap">
+                            <i data-lucide="award"></i>
+                        </div>
                     </div>
                     <h2>뱃지를 모으며<br>성장해요</h2>
                     <p>Apple Fitness처럼 산책 목표를 달성하고<br>다양한 뱃지를 수집하세요</p>
@@ -333,7 +552,9 @@
                 <!-- Slide 3 -->
                 <div class="slide slide-3 right" data-index="2">
                     <div class="slide-bg-circle">
-                        <span class="slide-emoji">🏆</span>
+                        <div class="slide-icon-wrap">
+                            <i data-lucide="trophy"></i>
+                        </div>
                     </div>
                     <h2>동네 산책 친구와<br>함께 경쟁해요</h2>
                     <p>랭킹으로 동기부여하고,<br>함께 산책하는 즐거움을 느껴보세요</p>
@@ -348,7 +569,9 @@
                     <div class="dot" data-dot="1"></div>
                     <div class="dot" data-dot="2"></div>
                 </div>
-                <button class="nav-arrow next" id="nextBtn" onclick="nextSlide()">→</button>
+                <button class="nav-arrow next" id="nextBtn" onclick="nextSlide()">
+                    <i data-lucide="arrow-right"></i>
+                </button>
             </div>
         </div>
 
@@ -357,13 +580,13 @@
             <div class="login-title">3초 만에 시작하기</div>
             <div class="login-buttons">
                 <button class="login-btn login-kakao" onclick="showRegister()">
-                    💬 카카오로 시작하기
+                    <i data-lucide="message-circle"></i> 카카오로 시작하기
                 </button>
                 <button class="login-btn login-naver" onclick="showRegister()">
-                    🟢 네이버로 시작하기
+                    <i data-lucide="navigation"></i> 네이버로 시작하기
                 </button>
                 <button class="login-btn login-apple" onclick="showRegister()">
-                     Apple로 시작하기
+                    <i data-lucide="smartphone"></i> Apple로 시작하기
                 </button>
             </div>
             <div class="login-terms">
@@ -376,14 +599,16 @@
     <!-- Pet Registration Section -->
     <div class="register-section" id="registerSection">
         <div class="register-header">
-            <button class="register-close" onclick="hideRegister()">←</button>
-            <h3>🐾 반려동물 등록</h3>
+            <button class="register-close" onclick="hideRegister()">
+                <i data-lucide="arrow-left"></i>
+            </button>
+            <h3><i data-lucide="paw-print"></i> 반려동물 등록</h3>
         </div>
 
         <div class="register-content">
             <!-- Photo Upload -->
             <div class="photo-upload">
-                <span class="cam-icon">📷</span>
+                <i data-lucide="camera"></i>
                 <span class="cam-text">사진 등록</span>
             </div>
 
@@ -397,9 +622,15 @@
             <div class="form-group">
                 <label class="form-label">종류</label>
                 <div class="type-selector">
-                    <button class="type-btn selected" onclick="selectType(this)">🐕 강아지</button>
-                    <button class="type-btn" onclick="selectType(this)">🐈 고양이</button>
-                    <button class="type-btn" onclick="selectType(this)">🐾 기타</button>
+                    <button class="type-btn selected" onclick="selectType(this)">
+                        <i data-lucide="dog" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:4px;"></i>강아지
+                    </button>
+                    <button class="type-btn" onclick="selectType(this)">
+                        <i data-lucide="cat" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:4px;"></i>고양이
+                    </button>
+                    <button class="type-btn" onclick="selectType(this)">
+                        <i data-lucide="paw-print" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:4px;"></i>기타
+                    </button>
                 </div>
             </div>
 
@@ -423,12 +654,18 @@
 
             <!-- Submit -->
             <button class="register-btn" onclick="completeRegister()">
-                🐾 시작하기!
+                <i data-lucide="paw-print"></i> 시작하기!
             </button>
         </div>
     </div>
 
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script>
+    // ===== Initialize Lucide Icons =====
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+
     // ===== Slide Logic =====
     let currentSlide = 0;
     const totalSlides = 3;
@@ -450,13 +687,12 @@
 
         currentSlide = index;
 
-        // Update button text on last slide
+        // Update button icon on last slide
         const nextBtn = document.getElementById('nextBtn');
-        if (currentSlide === totalSlides - 1) {
-            nextBtn.textContent = '✓';
-        } else {
-            nextBtn.textContent = '→';
-        }
+        nextBtn.innerHTML = currentSlide === totalSlides - 1
+            ? '<i data-lucide="check"></i>'
+            : '<i data-lucide="arrow-right"></i>';
+        lucide.createIcons({ nodes: [nextBtn] });
     }
 
     function nextSlide() {
@@ -522,7 +758,7 @@
 
     function completeRegister() {
         // In a real app, this would save data and navigate to the main screen
-        alert('반려동물 등록이 완료되었습니다! 🎉\n\n멍이랑과 함께 즐거운 산책을 시작하세요!');
+        alert('반려동물 등록이 완료되었습니다! \n\n멍이랑과 함께 즐거운 산책을 시작하세요!');
     }
     </script>
 </body>

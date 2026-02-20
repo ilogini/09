@@ -1,0 +1,2105 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MY - 멍이랑 withbowwow</title>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --lime: #C5D900; --lime-dark: #9FB300; --lime-light: rgba(197,217,0,0.10); --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF; --azure-dark: #0077CC; --azure-light: rgba(0,153,255,0.08); --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C; --text-secondary: #5C6F82; --text-muted: #94A3B8;
+            --bg-base: #F8FCFA; --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12); --glass-blur: blur(20px);
+            --danger: #EF4444; --accent: #F59E0B; --accent-light: #FEF3C7;
+            --radius-xl: 28px; --radius-lg: 24px; --radius-md: 20px; --radius-sm: 14px; --radius-xs: 10px;
+            --modal-width: 480px; --modal-padding-x: 20px;
+            --nav-height: 76px; --header-height: 58px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Common Header — glass ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid rgba(197,217,0,0.08);
+        }
+        .header-title {
+            font-size: 20px; font-weight: 800;
+        }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            background: var(--bg-base); font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transition: background 0.2s; text-decoration: none;
+            color: inherit;
+        }
+        .header-btn:hover { background: var(--glass-border); }
+
+        /* ===== Content ===== */
+        .content { padding-bottom: calc(var(--nav-height) + 20px); }
+
+        /* ===== Section Title ===== */
+        .section-title {
+            padding: 24px 16px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .section-title h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .section-title .more { font-size: 13px; color: var(--text-muted); text-decoration: none; cursor: pointer; }
+        .section-title .more:hover { color: var(--lime); }
+
+        /* ===== Profile Section ===== */
+        .profile-section {
+            padding: 24px 16px 16px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .profile-header {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 16px;
+        }
+        .profile-avatar {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--lime-light), #A7F3D0);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(197,217,0,0.2);
+        }
+        .profile-info { flex: 1; }
+        .profile-name-row {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap;
+        }
+        .profile-name { font-size: 20px; font-weight: 800; }
+        .title-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px;
+            background: rgba(197, 217, 0, 0.1);
+            border: 1px solid rgba(197, 217, 0, 0.25);
+            border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            color: var(--lime-dark);
+            white-space: nowrap;
+        }
+        .profile-sub-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 4px;
+        }
+        .profile-id { font-size: 12px; color: var(--text-muted); }
+        .profile-status { font-size: 12px; color: var(--text-secondary); }
+        .profile-actions {
+            display: flex; gap: 8px;
+            flex-shrink: 0;
+        }
+        .profile-edit-btn,
+        .title-change-btn {
+            padding: 8px 14px;
+            background: var(--bg-base); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            font-size: 12px; font-weight: 600; font-family: inherit;
+            color: var(--text-secondary); cursor: pointer;
+            transition: all 0.2s;
+        }
+        .profile-edit-btn:hover,
+        .title-change-btn:hover { background: var(--glass-border); }
+        .title-change-btn {
+            background: rgba(197,217,0,0.08);
+            border-color: rgba(197,217,0,0.2);
+            color: var(--lime-dark);
+        }
+        .title-change-btn:hover { background: rgba(197,217,0,0.15); }
+
+        /* ===== Running Grade Section ===== */
+        .grade-card {
+            margin: 0 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, #0077CC, #0099FF, #9FB300);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .grade-card::before {
+            content: '';
+            position: absolute; top: -30px; right: -30px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .grade-card::after {
+            content: '';
+            position: absolute; bottom: -20px; left: -20px;
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .grade-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+            position: relative; z-index: 1;
+        }
+        .grade-current {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .grade-icon {
+            font-size: 36px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .grade-info h4 {
+            font-size: 18px; font-weight: 800;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .grade-info .grade-level {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2px;
+        }
+        .grade-total {
+            text-align: right;
+            position: relative; z-index: 1;
+        }
+        .grade-total .total-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+        .grade-total .total-value {
+            font-size: 22px; font-weight: 800;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .grade-total .total-unit {
+            font-size: 13px; font-weight: 500;
+        }
+        .grade-progress-section {
+            position: relative; z-index: 1;
+        }
+        .grade-progress-bar {
+            width: 100%; height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .grade-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FCD34D, #F59E0B);
+            border-radius: 10px;
+            transition: width 1s ease;
+            box-shadow: 0 0 8px rgba(252, 211, 77, 0.4);
+        }
+        .grade-progress-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            display: flex; justify-content: space-between;
+        }
+
+        /* ===== Pet Profile Cards (Horizontal Scroll) ===== */
+        .pet-scroll {
+            display: flex; gap: 12px;
+            overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            padding: 0 16px 4px;
+        }
+        .pet-scroll::-webkit-scrollbar { display: none; }
+        .pet-profile-card {
+            min-width: 260px; flex-shrink: 0;
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            scroll-snap-align: start;
+            border: 2px solid var(--glass-border);
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .pet-profile-card.selected { border-color: var(--lime); background: var(--lime-light); }
+        .pet-profile-card:hover { border-color: var(--lime); box-shadow: var(--shadow); }
+        .pet-profile-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .pet-profile-avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; flex-shrink: 0;
+        }
+        .pet-profile-avatar.dog { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .pet-profile-avatar.cat { background: linear-gradient(135deg, #FCE7F3, #F9A8D4); }
+        .pet-profile-info h4 { font-size: 15px; font-weight: 700; }
+        .pet-profile-info p { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        .pet-stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .pet-stat-mini {
+            text-align: center;
+            background: var(--bg-base);
+            border-radius: var(--radius-xs);
+            padding: 8px 4px;
+        }
+        .pet-profile-card.selected .pet-stat-mini { background: var(--bg-white); }
+        .pet-stat-mini .value { font-size: 14px; font-weight: 700; color: var(--lime-dark); }
+        .pet-stat-mini .label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .pet-profile-card .photo-hint {
+            display: flex; align-items: center; justify-content: center;
+            gap: 4px; margin-top: 10px;
+            font-size: 11px; color: var(--text-muted);
+            padding-top: 10px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .pet-profile-card.selected .photo-hint { border-top-color: rgba(197,217,0,0.2); }
+
+        /* ===== Walk Record Section ===== */
+        .recent-records { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+        .record-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px;
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--glass-border);
+        }
+        .record-item:hover { box-shadow: var(--shadow); transform: translateX(4px); }
+        .record-route {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: var(--lime-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .record-route svg { width: 28px; height: 28px; }
+        .record-info { flex: 1; min-width: 0; }
+        .record-date { font-size: 11px; color: var(--text-muted); }
+        .record-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
+        .record-meta { display: flex; gap: 10px; margin-top: 4px; }
+        .record-meta span { font-size: 11px; color: var(--text-secondary); }
+        .record-meta span strong { color: var(--text-primary); }
+        .record-arrow { font-size: 16px; color: var(--text-muted); }
+
+        /* More records expandable */
+        .more-records-btn {
+            display: flex; align-items: center; justify-content: center;
+            padding: 12px;
+            margin: 12px 16px 0;
+            background: var(--bg-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
+            font-family: inherit;
+            gap: 6px;
+            width: calc(100% - 32px);
+        }
+        .more-records-btn:hover { background: var(--bg-base); color: var(--lime); }
+
+        .expanded-records {
+            display: none;
+            padding: 0 16px;
+            flex-direction: column; gap: 10px;
+        }
+        .expanded-records.show { display: flex; }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px 0;
+            display: none;
+        }
+        .filter-tabs.show { display: flex; }
+        .filter-tab {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-white);
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .filter-tab.active {
+            background: var(--lime);
+            color: white;
+            border-color: var(--lime);
+        }
+        .filter-tab:hover:not(.active) { border-color: var(--lime); color: var(--lime); }
+
+        /* ===================================================
+           BADGE SECTION - Apple Fitness / Pikmin Bloom Style
+           =================================================== */
+
+        .badge-section {
+            margin: 0 16px;
+            padding: 20px;
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+        }
+        .badge-section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .badge-section-header h3 {
+            font-size: 18px; font-weight: 800;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .badge-total-count {
+            font-size: 12px; font-weight: 600;
+            color: var(--lime-dark);
+            background: var(--lime-light);
+            padding: 4px 10px; border-radius: 20px;
+        }
+        .badge-view-all {
+            font-size: 13px; font-weight: 600;
+            color: var(--lime); text-decoration: none;
+            display: flex; align-items: center; gap: 4px;
+            transition: color 0.2s;
+        }
+        .badge-view-all:hover { color: var(--lime-dark); }
+
+        .badge-subsection { margin-bottom: 20px; }
+        .badge-subsection:last-child { margin-bottom: 0; }
+        .badge-subsection-title {
+            font-size: 13px; font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .badge-progress-scroll {
+            display: flex; gap: 12px;
+            overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            padding-bottom: 4px;
+            margin: 0 -4px; padding-left: 4px; padding-right: 4px;
+        }
+        .badge-progress-scroll::-webkit-scrollbar { display: none; }
+
+        .badge-progress-card {
+            min-width: 180px; flex-shrink: 0;
+            background: linear-gradient(145deg, var(--bg-base), var(--bg-white));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            scroll-snap-align: start;
+            cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .badge-progress-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+        .badge-progress-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--glass-border);
+            border-radius: 3px;
+        }
+        .badge-progress-card.distance::before { background: linear-gradient(90deg, var(--azure), #60A5FA); }
+        .badge-progress-card.streak::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+        .badge-progress-card.explore::before { background: linear-gradient(90deg, var(--accent), #FBBF24); }
+
+        .badge-p-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin-bottom: 10px;
+            position: relative;
+            opacity: 0.7;
+        }
+        .badge-p-icon.distance { background: rgba(59,130,246,0.12); }
+        .badge-p-icon.streak { background: rgba(239,68,68,0.12); }
+        .badge-p-icon.explore { background: rgba(245,158,11,0.12); }
+        .badge-p-icon.time { background: rgba(139,92,246,0.12); }
+
+        .badge-progress-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+        .badge-progress-card .badge-p-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        .badge-progress-bar-wrap {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .badge-progress-bar {
+            flex: 1; height: 8px;
+            background: var(--glass-border);
+            border-radius: 8px; overflow: hidden;
+        }
+        .badge-progress-fill {
+            height: 100%; border-radius: 8px;
+            transition: width 1s ease;
+        }
+        .badge-progress-fill.blue { background: linear-gradient(90deg, var(--azure), #60A5FA); }
+        .badge-progress-fill.red { background: linear-gradient(90deg, #EF4444, #F87171); }
+        .badge-progress-fill.amber { background: linear-gradient(90deg, var(--accent), #FBBF24); }
+        .badge-progress-fill.purple { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+        .badge-progress-fill.green { background: linear-gradient(90deg, var(--lime), #34D399); }
+        .badge-progress-percent {
+            font-size: 12px; font-weight: 700;
+            color: var(--text-secondary);
+            white-space: nowrap; min-width: 32px; text-align: right;
+        }
+        .badge-progress-detail {
+            font-size: 11px; color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* --- Earned Badges (Glow Effect) --- */
+        .badge-earned-scroll {
+            display: flex; gap: 14px;
+            overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            padding: 8px 4px 4px;
+            margin: 0 -4px;
+        }
+        .badge-earned-scroll::-webkit-scrollbar { display: none; }
+
+        .badge-earned-card {
+            min-width: 120px; flex-shrink: 0;
+            text-align: center;
+            scroll-snap-align: start;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .badge-earned-card:hover { transform: scale(1.05); }
+
+        .badge-earned-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px;
+            position: relative;
+            box-shadow:
+                0 0 15px rgba(197,217,0,0.3),
+                0 0 30px rgba(197,217,0,0.15),
+                inset 0 0 10px rgba(255,255,255,0.3);
+            animation: badgeGlow 3s ease-in-out infinite;
+        }
+        .badge-earned-icon.green {
+            background: linear-gradient(145deg, #D1FAE5, #6EE7B7);
+            border: 2px solid var(--lime);
+        }
+        .badge-earned-icon.blue {
+            background: linear-gradient(145deg, #DBEAFE, #93C5FD);
+            border: 2px solid var(--azure);
+            box-shadow: 0 0 15px rgba(59,130,246,0.3), 0 0 30px rgba(59,130,246,0.15);
+        }
+        .badge-earned-icon.red {
+            background: linear-gradient(145deg, #FEE2E2, #FCA5A5);
+            border: 2px solid #EF4444;
+            box-shadow: 0 0 15px rgba(239,68,68,0.3), 0 0 30px rgba(239,68,68,0.15);
+        }
+        .badge-earned-icon.amber {
+            background: linear-gradient(145deg, #FEF3C7, #FCD34D);
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(245,158,11,0.3), 0 0 30px rgba(245,158,11,0.15);
+        }
+        .badge-earned-icon.purple {
+            background: linear-gradient(145deg, #EDE9FE, #C4B5FD);
+            border: 2px solid #8B5CF6;
+            box-shadow: 0 0 15px rgba(139,92,246,0.3), 0 0 30px rgba(139,92,246,0.15);
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(197,217,0,0.3), 0 0 30px rgba(197,217,0,0.1); }
+            50% { box-shadow: 0 0 20px rgba(197,217,0,0.5), 0 0 40px rgba(197,217,0,0.2); }
+        }
+
+        .badge-earned-icon .check-mark {
+            position: absolute; bottom: -2px; right: -2px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--lime); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800;
+            border: 2px solid var(--bg-white);
+            box-shadow: var(--shadow-sm);
+        }
+        .badge-earned-card h4 { font-size: 12px; font-weight: 600; line-height: 1.3; }
+        .badge-earned-card .badge-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        /* --- Category Grid (2x3) --- */
+        .badge-category-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .badge-category-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px;
+            background: var(--bg-base);
+            border-radius: var(--radius-sm);
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .badge-category-item:hover { border-color: var(--lime); background: var(--lime-light); }
+        .badge-cat-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .badge-cat-icon.distance { background: rgba(59,130,246,0.12); }
+        .badge-cat-icon.streak { background: rgba(239,68,68,0.12); }
+        .badge-cat-icon.explore { background: rgba(245,158,11,0.12); }
+        .badge-cat-icon.time { background: rgba(139,92,246,0.12); }
+        .badge-cat-icon.special { background: rgba(236,72,153,0.12); }
+        .badge-cat-icon.season { background: rgba(197,217,0,0.12); }
+        .badge-cat-info { flex: 1; min-width: 0; }
+        .badge-cat-name { font-size: 13px; font-weight: 600; }
+        .badge-cat-count { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .badge-cat-bar {
+            height: 4px; background: var(--glass-border);
+            border-radius: 4px; overflow: hidden; margin-top: 6px;
+        }
+        .badge-cat-bar-fill { height: 100%; border-radius: 4px; }
+        .badge-cat-bar-fill.blue { background: var(--azure); }
+        .badge-cat-bar-fill.red { background: #EF4444; }
+        .badge-cat-bar-fill.amber { background: var(--accent); }
+        .badge-cat-bar-fill.purple { background: #8B5CF6; }
+        .badge-cat-bar-fill.pink { background: #EC4899; }
+        .badge-cat-bar-fill.green { background: var(--lime); }
+
+        /* ===== Premium Banner ===== */
+        .premium-banner {
+            margin: 20px 16px 0;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #0077CC, #0099FF);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; gap: 14px;
+            cursor: pointer; transition: transform 0.2s;
+            text-decoration: none;
+        }
+        .premium-banner:hover { transform: translateY(-2px); }
+        .premium-badge {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #F59E0B, #EAB308);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .premium-text h4 { font-size: 14px; font-weight: 700; color: white; }
+        .premium-text p { font-size: 12px; color: #A5B4FC; margin-top: 2px; }
+        .premium-price { margin-left: auto; text-align: right; }
+        .premium-price .price { font-size: 16px; font-weight: 700; color: #FCD34D; }
+        .premium-price .period { font-size: 11px; color: #A5B4FC; }
+
+        /* ===== Bottom Nav — glass ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(197,217,0,0.08);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 4px; padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 3px; padding: 8px 14px; border: none; background: none;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            position: relative; min-width: 52px; text-decoration: none; color: inherit;
+        }
+        .nav-item .nav-icon-wrap {
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-item .nav-icon-wrap .lucide { width: 22px; height: 22px; stroke-width: 1.6; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+        .nav-item.active .nav-icon-wrap { color: var(--lime-dark); }
+        .nav-item.active .nav-label { color: var(--lime-dark); font-weight: 600; }
+        .nav-item.active::after {
+            content: ''; position: absolute; bottom: 4px;
+            width: 4px; height: 4px; background: var(--lime); border-radius: 50%;
+        }
+        .nav-item.center-btn { position: relative; top: -16px; }
+        .nav-item.center-btn .nav-icon-wrap {
+            width: 54px; height: 54px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border-radius: 50%; color: white;
+            box-shadow: 0 4px 20px var(--lime-glow);
+            font-size: 24px;
+        }
+        .nav-item.center-btn .nav-label { color: var(--lime-dark); font-weight: 600; margin-top: 6px; }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+
+        /* ===== Toast ===== */
+        .toast-el { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(17,24,39,0.88); backdrop-filter: blur(8px); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 500; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; max-width: 90%; }
+        .toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Divider ===== */
+        .section-divider {
+            height: 8px;
+            background: var(--bg-base);
+        }
+
+        /* ===== Full-screen Modal (shared) ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none; align-items: flex-end; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal-container {
+            width: 100%; max-width: 480px;
+            max-height: 92vh;
+            background: var(--bg-white);
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column;
+        }
+        .modal-overlay.show .modal-container { transform: translateY(0); }
+
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .modal-header h3 {
+            font-size: 18px; font-weight: 800;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: none; background: var(--bg-base);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: var(--glass-border); }
+
+        .modal-body {
+            flex: 1; overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== Photo Archive Modal ===== */
+        .archive-month-label {
+            font-size: 15px; font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .archive-month-label:first-child { margin-top: 0; }
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+        .archive-photo {
+            aspect-ratio: 1;
+            border-radius: var(--radius-xs);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 11px; color: white; font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        .archive-photo .photo-date {
+            position: absolute; bottom: 6px; left: 6px;
+            font-size: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 6px; border-radius: 4px;
+            color: white;
+        }
+        .archive-photo .photo-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        /* ===== Title Selection Modal ===== */
+        .title-selector {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .title-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-base);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .title-option:hover { border-color: var(--lime); background: rgba(197,217,0,0.04); }
+        .title-option.selected {
+            border-color: var(--lime);
+            background: rgba(197,217,0,0.06);
+            box-shadow: 0 0 0 1px var(--lime);
+        }
+        .title-option .title-icon { font-size: 22px; }
+        .title-option .title-name {
+            font-size: 14px; font-weight: 600;
+            flex: 1;
+        }
+        .title-option .title-desc {
+            font-size: 11px; color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .title-option .title-check {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: white;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .title-option.selected .title-check {
+            background: var(--lime);
+            border-color: var(--lime);
+        }
+        .title-option.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .title-option.locked .title-name {
+            color: var(--text-muted);
+        }
+        .title-option .title-info {
+            flex: 1; min-width: 0;
+        }
+        .title-apply-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: white;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(197,217,0,0.3);
+            margin-top: 16px;
+        }
+        .title-apply-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(197,217,0,0.4); }
+
+        /* ===== Profile Edit Modal ===== */
+        .edit-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .edit-tab {
+            flex: 1; padding: 14px;
+            text-align: center;
+            font-size: 14px; font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s;
+            border: none; background: none;
+            font-family: inherit;
+            position: relative;
+        }
+        .edit-tab.active {
+            color: var(--lime);
+        }
+        .edit-tab.active::after {
+            content: '';
+            position: absolute; bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: var(--lime);
+        }
+
+        .edit-tab-content { display: none; }
+        .edit-tab-content.active { display: block; }
+
+        .edit-field {
+            margin-bottom: 20px;
+        }
+        .edit-field label {
+            display: block;
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .edit-field input,
+        .edit-field textarea,
+        .edit-field select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            font-size: 14px; font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-base);
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .edit-field textarea {
+            resize: vertical; min-height: 60px;
+        }
+        .edit-field input:focus,
+        .edit-field textarea:focus,
+        .edit-field select:focus {
+            border-color: var(--lime);
+            background: var(--bg-white);
+        }
+
+        /* Icon selector */
+        .icon-selector {
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .icon-option {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            background: var(--bg-base);
+            font-size: 24px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .icon-option:hover { border-color: var(--lime); background: var(--lime-light); }
+        .icon-option.selected {
+            border-color: var(--lime);
+            background: var(--lime-light);
+            box-shadow: 0 0 0 3px rgba(197,217,0,0.2);
+        }
+
+        /* Pet edit list */
+        .pet-edit-card {
+            padding: 16px;
+            background: var(--bg-base);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            border: 1px solid var(--glass-border);
+        }
+        .pet-edit-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 14px;
+        }
+        .pet-edit-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+        }
+        .pet-edit-avatar::after {
+            content: '\1F4F7';
+            position: absolute;
+            bottom: -2px; right: -2px;
+            width: 18px; height: 18px;
+            background: var(--lime);
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-white);
+            line-height: 1;
+        }
+        .pet-edit-header h4 { font-size: 15px; font-weight: 700; }
+        .pet-edit-fields {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .pet-edit-field label {
+            display: block;
+            font-size: 11px; font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .pet-edit-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-white);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .pet-edit-field input:focus { border-color: var(--lime); }
+
+        .edit-save-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: white;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(197,217,0,0.3);
+            margin-top: 8px;
+        }
+        .edit-save-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(197,217,0,0.4); }
+
+        /* ===== Walk History Expanded Modal ===== */
+        .history-filter-row {
+            display: flex; gap: 8px; margin-bottom: 16px;
+        }
+        .history-filter-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            background: var(--bg-white);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
+            font-family: inherit;
+            text-align: center;
+        }
+        .history-filter-btn.active {
+            background: var(--lime);
+            color: white;
+            border-color: var(--lime);
+        }
+        .history-filter-btn:hover:not(.active) { border-color: var(--lime); color: var(--lime); }
+
+        .history-summary {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin-bottom: 20px;
+        }
+        .history-stat {
+            text-align: center;
+            padding: 14px 8px;
+            background: var(--bg-base);
+            border-radius: var(--radius-sm);
+        }
+        .history-stat .stat-value { font-size: 18px; font-weight: 800; color: var(--lime-dark); }
+        .history-stat .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .history-records { display: flex; flex-direction: column; gap: 10px; }
+    </style>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+    <!-- ===== Common Header ===== -->
+    <header class="header">
+        <h1 class="header-title">&#x1F43E; 멍이랑</h1>
+        <div class="header-actions">
+            <a href="알림.html" class="header-btn">&#x1F514;</a>
+            <a href="설정.html" class="header-btn">&#x2699;&#xFE0F;</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- ===== 1. Profile Section (with active title) ===== -->
+        <section class="profile-section animate-in">
+            <div class="profile-header">
+                <div class="profile-avatar">&#x1F60A;</div>
+                <div class="profile-info">
+                    <div class="profile-name-row">
+                        <span class="profile-name">초코#1234</span>
+                        <span class="title-badge" id="currentTitleBadge">&#x1F3C3; 마라토너</span>
+                    </div>
+                    <div class="profile-sub-row">
+                        <span class="profile-id">@walk_lover_2026</span>
+                        <span class="profile-status">&middot; 오늘도 산책 중!</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="profile-edit-btn" onclick="openEditModal()" style="flex:1;">&#x270F;&#xFE0F; 프로필 편집</button>
+                <button class="title-change-btn" onclick="openModal('titleModal')" style="flex:1;">&#x1F3C5; 칭호 변경</button>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ===== 2. Grade Card (산책 등급) ===== -->
+        <div class="section-title"><h3>&#x1F3C5; 산책 등급</h3><a class="more" onclick="openModal('gradeModal')">전체 등급 보기 &rarr;</a></div>
+
+        <div class="grade-card animate-in">
+            <div class="grade-card-header">
+                <div class="grade-current">
+                    <span class="grade-icon">&#x1F415;</span>
+                    <div class="grade-info">
+                        <h4>동네 산책러</h4>
+                        <div class="grade-level">Lv.3</div>
+                    </div>
+                </div>
+                <div class="grade-total">
+                    <div class="total-label">누적 거리</div>
+                    <div class="total-value">142.5<span class="total-unit">km</span></div>
+                </div>
+            </div>
+            <div class="grade-progress-section">
+                <div class="grade-progress-bar">
+                    <div class="grade-progress-fill" style="width: 95%"></div>
+                </div>
+                <div class="grade-progress-text">
+                    <span>다음 등급: 활발한 산책러 (150km)</span>
+                    <span>142.5 / 150km</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider" style="margin-top:20px;"></div>
+
+        <!-- ===== 3. Pet Cards (horizontal scroll, clickable -> archive) ===== -->
+        <div class="section-title"><h3>&#x1F43E; 반려동물과의 추억</h3></div>
+
+        <div class="pet-scroll">
+            <div class="pet-profile-card selected" onclick="openPetArchive('초코', '&#x1F415;')">
+                <div class="pet-profile-top">
+                    <div class="pet-profile-avatar dog">&#x1F415;</div>
+                    <div class="pet-profile-info">
+                        <h4>초코</h4>
+                        <p>골든 리트리버 &middot; 3살 &middot; 28kg</p>
+                    </div>
+                </div>
+                <div class="pet-stats-row">
+                    <div class="pet-stat-mini"><div class="value">142.5km</div><div class="label">총 거리</div></div>
+                    <div class="pet-stat-mini"><div class="value">38:20</div><div class="label">총 시간</div></div>
+                    <div class="pet-stat-mini"><div class="value">86회</div><div class="label">총 횟수</div></div>
+                </div>
+                <div class="photo-hint">&#x1F4F7; 탭하여 사진 앨범 보기</div>
+            </div>
+            <div class="pet-profile-card" onclick="openPetArchive('나비', '&#x1F408;')">
+                <div class="pet-profile-top">
+                    <div class="pet-profile-avatar cat">&#x1F408;</div>
+                    <div class="pet-profile-info">
+                        <h4>나비</h4>
+                        <p>코리안 숏헤어 &middot; 2살 &middot; 4.2kg</p>
+                    </div>
+                </div>
+                <div class="pet-stats-row">
+                    <div class="pet-stat-mini"><div class="value">28.3km</div><div class="label">총 거리</div></div>
+                    <div class="pet-stat-mini"><div class="value">8:45</div><div class="label">총 시간</div></div>
+                    <div class="pet-stat-mini"><div class="value">22회</div><div class="label">총 횟수</div></div>
+                </div>
+                <div class="photo-hint">&#x1F4F7; 탭하여 사진 앨범 보기</div>
+            </div>
+            <div class="pet-profile-card" style="min-width:120px;display:flex;align-items:center;justify-content:center;background:var(--bg-base);border:2px dashed var(--glass-border);" onclick="openPetTab()">
+                <div style="text-align:center;">
+                    <div style="font-size:28px;margin-bottom:6px;">&#x2795;</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-muted);">추가</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider" style="margin-top:20px;"></div>
+
+        <!-- ===== 4. Walk History (list only, 3 recent + 더보기) ===== -->
+        <div class="section-title"><h3>&#x1F550; 산책 기록</h3></div>
+
+        <!-- Recent Walk Records (3 items) -->
+        <div class="recent-records">
+            <a href="산책상세.html" class="record-item animate-in" style="text-decoration:none;color:inherit;">
+                <div class="record-route">
+                    <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L8 10 L16 14 L24 4" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#C5D900"/><circle cx="24" cy="4" r="2.5" fill="#9FB300"/></svg>
+                </div>
+                <div class="record-info">
+                    <div class="record-date">오늘 오전 7:30</div>
+                    <div class="record-title">보라매공원 코스 &#x1F415;</div>
+                    <div class="record-meta">
+                        <span>&#x1F4CF; <strong>3.2km</strong></span>
+                        <span>&#x23F1; <strong>42분</strong></span>
+                        <span>&#x1F525; <strong>165kcal</strong></span>
+                    </div>
+                </div>
+                <span class="record-arrow">&rsaquo;</span>
+            </a>
+            <a href="산책상세.html" class="record-item animate-in" style="text-decoration:none;color:inherit;">
+                <div class="record-route">
+                    <svg viewBox="0 0 28 28" fill="none"><path d="M6 20 L14 6 L22 16" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="20" r="2.5" fill="#C5D900"/><circle cx="22" cy="16" r="2.5" fill="#9FB300"/></svg>
+                </div>
+                <div class="record-info">
+                    <div class="record-date">어제 오후 6:15</div>
+                    <div class="record-title">한강 산책로 &#x1F415;</div>
+                    <div class="record-meta">
+                        <span>&#x1F4CF; <strong>4.7km</strong></span>
+                        <span>&#x23F1; <strong>58분</strong></span>
+                        <span>&#x1F525; <strong>231kcal</strong></span>
+                    </div>
+                </div>
+                <span class="record-arrow">&rsaquo;</span>
+            </a>
+            <a href="산책상세.html" class="record-item animate-in" style="text-decoration:none;color:inherit;">
+                <div class="record-route">
+                    <svg viewBox="0 0 28 28" fill="none"><path d="M4 18 Q14 4 24 12 Q18 24 8 20" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="4" cy="18" r="2.5" fill="#C5D900"/><circle cx="8" cy="20" r="2.5" fill="#9FB300"/></svg>
+                </div>
+                <div class="record-info">
+                    <div class="record-date">2.10 (월) 오전 8:00</div>
+                    <div class="record-title">서리풀공원 &#x1F408;</div>
+                    <div class="record-meta">
+                        <span>&#x1F4CF; <strong>1.8km</strong></span>
+                        <span>&#x23F1; <strong>25분</strong></span>
+                        <span>&#x1F525; <strong>90kcal</strong></span>
+                    </div>
+                </div>
+                <span class="record-arrow">&rsaquo;</span>
+            </a>
+        </div>
+
+        <!-- More Records Button -->
+        <a class="more-records-btn" id="moreRecordsBtn" href="산책기록.html" style="text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:center;">
+            <span>더보기</span>
+            <span>&#x25BC;</span>
+        </a>
+
+        <div class="section-divider" style="margin-top:20px;"></div>
+
+        <!-- ===== 5. Badge Section (kept as-is) ===== -->
+        <div class="section-title">
+            <h3>&#x1F3C5; 나의 뱃지</h3>
+            <a class="more" href="뱃지.html">전체보기 &rarr;</a>
+        </div>
+
+        <div class="badge-section animate-in">
+            <div class="badge-section-header">
+                <h3>&#x1F3C5; 뱃지 컬렉션</h3>
+                <span class="badge-total-count">9 / 37 획득</span>
+            </div>
+
+            <!-- ---- In Progress Badges ---- -->
+            <div class="badge-subsection">
+                <div class="badge-subsection-title">&#x1F525; 진행 중</div>
+                <div class="badge-progress-scroll">
+                    <div class="badge-progress-card distance">
+                        <div class="badge-p-icon distance">&#x1F3C3;</div>
+                        <h4>50km 마라토너</h4>
+                        <div class="badge-p-desc">누적 50km 달성하기</div>
+                        <div class="badge-progress-bar-wrap">
+                            <div class="badge-progress-bar"><div class="badge-progress-fill blue" style="width:76%"></div></div>
+                            <span class="badge-progress-percent">76%</span>
+                        </div>
+                        <div class="badge-progress-detail">38 / 50 km</div>
+                    </div>
+                    <div class="badge-progress-card streak">
+                        <div class="badge-p-icon streak">&#x1F525;</div>
+                        <h4>7일 연속 산책</h4>
+                        <div class="badge-p-desc">매일 산책 7일 연속</div>
+                        <div class="badge-progress-bar-wrap">
+                            <div class="badge-progress-bar"><div class="badge-progress-fill red" style="width:71%"></div></div>
+                            <span class="badge-progress-percent">71%</span>
+                        </div>
+                        <div class="badge-progress-detail">5 / 7 일</div>
+                    </div>
+                    <div class="badge-progress-card explore">
+                        <div class="badge-p-icon explore">&#x1F9ED;</div>
+                        <h4>동네 탐험가</h4>
+                        <div class="badge-p-desc">서로 다른 5곳 방문</div>
+                        <div class="badge-progress-bar-wrap">
+                            <div class="badge-progress-bar"><div class="badge-progress-fill amber" style="width:60%"></div></div>
+                            <span class="badge-progress-percent">60%</span>
+                        </div>
+                        <div class="badge-progress-detail">3 / 5 곳</div>
+                    </div>
+                    <div class="badge-progress-card">
+                        <div class="badge-p-icon time">&#x23F1;</div>
+                        <h4>산책 마스터</h4>
+                        <div class="badge-p-desc">누적 10시간 산책</div>
+                        <div class="badge-progress-bar-wrap">
+                            <div class="badge-progress-bar"><div class="badge-progress-fill purple" style="width:45%"></div></div>
+                            <span class="badge-progress-percent">45%</span>
+                        </div>
+                        <div class="badge-progress-detail">4:30 / 10:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---- Recently Earned Badges (Glow) ---- -->
+            <div class="badge-subsection">
+                <div class="badge-subsection-title">&#x2728; 최근 획득</div>
+                <div class="badge-earned-scroll">
+                    <div class="badge-earned-card">
+                        <div class="badge-earned-icon green">
+                            &#x1F43E;
+                            <span class="check-mark">&#x2713;</span>
+                        </div>
+                        <h4>첫 발자국</h4>
+                        <div class="badge-date">2.3 획득</div>
+                    </div>
+                    <div class="badge-earned-card">
+                        <div class="badge-earned-icon blue">
+                            &#x1F948;
+                            <span class="check-mark">&#x2713;</span>
+                        </div>
+                        <h4>5km 워커</h4>
+                        <div class="badge-date">2.5 획득</div>
+                    </div>
+                    <div class="badge-earned-card">
+                        <div class="badge-earned-icon red">
+                            &#x1F525;
+                            <span class="check-mark">&#x2713;</span>
+                        </div>
+                        <h4>3일 연속</h4>
+                        <div class="badge-date">2.7 획득</div>
+                    </div>
+                    <div class="badge-earned-card">
+                        <div class="badge-earned-icon amber">
+                            &#x1F305;
+                            <span class="check-mark">&#x2713;</span>
+                        </div>
+                        <h4>얼리버드</h4>
+                        <div class="badge-date">2.8 획득</div>
+                    </div>
+                    <div class="badge-earned-card">
+                        <div class="badge-earned-icon purple">
+                            &#x1F319;
+                            <span class="check-mark">&#x2713;</span>
+                        </div>
+                        <h4>나이트워커</h4>
+                        <div class="badge-date">2.9 획득</div>
+                    </div>
+                    <div class="badge-earned-card">
+                        <div class="badge-earned-icon green">
+                            &#x1F3C3;
+                            <span class="check-mark">&#x2713;</span>
+                        </div>
+                        <h4>10km 달성</h4>
+                        <div class="badge-date">2.10 획득</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---- Category Grid 2x3 ---- -->
+            <div class="badge-subsection">
+                <div class="badge-subsection-title">&#x1F4C2; 카테고리</div>
+                <div class="badge-category-grid">
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=거리'">
+                        <div class="badge-cat-icon distance">&#x1F4CF;</div>
+                        <div class="badge-cat-info">
+                            <div class="badge-cat-name">거리</div>
+                            <div class="badge-cat-count">3 / 8 획득</div>
+                            <div class="badge-cat-bar"><div class="badge-cat-bar-fill blue" style="width:37.5%"></div></div>
+                        </div>
+                    </div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=연속'">
+                        <div class="badge-cat-icon streak">&#x1F525;</div>
+                        <div class="badge-cat-info">
+                            <div class="badge-cat-name">연속</div>
+                            <div class="badge-cat-count">2 / 7 획득</div>
+                            <div class="badge-cat-bar"><div class="badge-cat-bar-fill red" style="width:28.6%"></div></div>
+                        </div>
+                    </div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=탐험'">
+                        <div class="badge-cat-icon explore">&#x1F9ED;</div>
+                        <div class="badge-cat-info">
+                            <div class="badge-cat-name">탐험</div>
+                            <div class="badge-cat-count">1 / 5 획득</div>
+                            <div class="badge-cat-bar"><div class="badge-cat-bar-fill amber" style="width:20%"></div></div>
+                        </div>
+                    </div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=시간'">
+                        <div class="badge-cat-icon time">&#x23F1;</div>
+                        <div class="badge-cat-info">
+                            <div class="badge-cat-name">시간</div>
+                            <div class="badge-cat-count">2 / 5 획득</div>
+                            <div class="badge-cat-bar"><div class="badge-cat-bar-fill purple" style="width:40%"></div></div>
+                        </div>
+                    </div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=스페셜'">
+                        <div class="badge-cat-icon special">&#x1F48E;</div>
+                        <div class="badge-cat-info">
+                            <div class="badge-cat-name">스페셜</div>
+                            <div class="badge-cat-count">1 / 8 획득</div>
+                            <div class="badge-cat-bar"><div class="badge-cat-bar-fill pink" style="width:12.5%"></div></div>
+                        </div>
+                    </div>
+                    <div class="badge-category-item" onclick="location.href='뱃지.html?cat=시즌'">
+                        <div class="badge-cat-icon season">&#x1F338;</div>
+                        <div class="badge-cat-info">
+                            <div class="badge-cat-name">시즌</div>
+                            <div class="badge-cat-count">0 / 4 획득</div>
+                            <div class="badge-cat-bar"><div class="badge-cat-bar-fill green" style="width:0%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider" style="margin-top:20px;"></div>
+
+        <!-- ===== 6. Premium Banner (kept as-is) ===== -->
+        <a href="프리미엄.html" class="premium-banner animate-in">
+            <div class="premium-badge">&#x1F451;</div>
+            <div class="premium-text">
+                <h4>멍이랑 프리미엄</h4>
+                <p>광고 제거 + 상세 통계 + 무제한 뱃지</p>
+            </div>
+            <div class="premium-price">
+                <div class="price">&#x20A9;3,900</div>
+                <div class="period">/월</div>
+            </div>
+        </a>
+
+        <div style="height: 24px;"></div>
+    </main>
+
+    <!-- ===== Modal: Title Selection (칭호 변경) ===== -->
+    <div class="modal-overlay" id="titleModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x1F3C5; 칭호 변경</h3>
+                <button class="modal-close" onclick="closeModal('titleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="title-selector" id="titleSelector">
+                    <!-- Unlocked titles -->
+                    <div class="title-option selected" data-title="&#x1F3C3; 마라토너" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F3C3;</span>
+                        <div class="title-info">
+                            <div class="title-name">마라토너</div>
+                            <div class="title-desc">누적 42.195km 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F305; 얼리버드" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F305;</span>
+                        <div class="title-info">
+                            <div class="title-name">얼리버드</div>
+                            <div class="title-desc">새벽 산책 10회 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F989; 올빼미" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F989;</span>
+                        <div class="title-info">
+                            <div class="title-name">올빼미</div>
+                            <div class="title-desc">야간 산책 10회 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F525; 연속왕" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F525;</span>
+                        <div class="title-info">
+                            <div class="title-name">연속왕</div>
+                            <div class="title-desc">7일 연속 산책 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <div class="title-option" data-title="&#x1F4F8; 사진왕" onclick="selectTitle(this)">
+                        <span class="title-icon">&#x1F4F8;</span>
+                        <div class="title-info">
+                            <div class="title-name">사진왕</div>
+                            <div class="title-desc">산책 사진 50장 달성</div>
+                        </div>
+                        <span class="title-check">&#x2713;</span>
+                    </div>
+                    <!-- Locked titles -->
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F9ED;</span>
+                        <div class="title-info">
+                            <div class="title-name">탐험가</div>
+                            <div class="title-desc">10개 장소 방문 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x2B50;</span>
+                        <div class="title-info">
+                            <div class="title-name">소셜스타</div>
+                            <div class="title-desc">좋아요 100개 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F451;</span>
+                        <div class="title-info">
+                            <div class="title-name">동네챔피언</div>
+                            <div class="title-desc">주간 랭킹 1위 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F327;&#xFE0F;</span>
+                        <div class="title-info">
+                            <div class="title-name">비바람워커</div>
+                            <div class="title-desc">비오는 날 산책 5회 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                    <div class="title-option locked" onclick="toast('아직 획득하지 못한 칭호입니다')">
+                        <span class="title-icon">&#x1F396;</span>
+                        <div class="title-info">
+                            <div class="title-name">원년멤버</div>
+                            <div class="title-desc">서비스 초기 가입 (미획득)</div>
+                        </div>
+                        <span class="title-check" style="opacity:0.3;">&#x1F512;</span>
+                    </div>
+                </div>
+                <button class="title-apply-btn" onclick="applyTitle()">칭호 적용하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Pet Photo Archive (일/월/년 tabs) ===== -->
+    <div class="modal-overlay" id="archiveModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3 id="archiveTitle">&#x1F415; 초코와의 추억</h3>
+                <button class="modal-close" onclick="closeModal('archiveModal')">&times;</button>
+            </div>
+            <!-- Archive Tabs -->
+            <div class="archive-tabs" style="display:flex;border-bottom:2px solid var(--glass-border);flex-shrink:0;">
+                <button class="archive-tab active" onclick="switchArchiveTab(this, 'day')" style="flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--lime);cursor:pointer;border:none;background:none;font-family:inherit;position:relative;">일
+                    <span class="archive-tab-bar" style="position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--lime);"></span>
+                </button>
+                <button class="archive-tab" onclick="switchArchiveTab(this, 'month')" style="flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:inherit;position:relative;">월</button>
+                <button class="archive-tab" onclick="switchArchiveTab(this, 'year')" style="flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:inherit;position:relative;">년</button>
+            </div>
+            <div class="modal-body" id="archiveBody">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Profile Edit (Pet Only) ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x270F;&#xFE0F; 프로필 편집</h3>
+                <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Pet Selector with 대표 프로필 button -->
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--glass-border);">
+                    <div style="display:flex;gap:8px;flex:1;overflow-x:auto;">
+                        <button class="pet-select-btn active" onclick="selectPetEdit(this, 'petEdit_choco')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid var(--lime);background:var(--lime-light);font-size:13px;font-weight:600;color:var(--lime-dark);cursor:pointer;font-family:inherit;white-space:nowrap;">&#x1F415; 초코</button>
+                        <button class="pet-select-btn" onclick="selectPetEdit(this, 'petEdit_nabi')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid var(--glass-border);background:var(--bg-white);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;white-space:nowrap;">&#x1F408; 나비</button>
+                    </div>
+                    <button onclick="toast('대표 프로필이 설정되었습니다')" style="padding:8px 12px;border-radius:var(--radius-xs);border:1px solid rgba(197,217,0,0.3);background:rgba(197,217,0,0.08);font-size:11px;font-weight:700;color:var(--lime-dark);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.2s;">&#x2B50; 대표 프로필로 설정</button>
+                </div>
+
+                <!-- Pet Edit: 초코 -->
+                <div class="pet-edit-panel active" id="petEdit_choco">
+                    <div class="pet-edit-card">
+                        <div class="pet-edit-header">
+                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F415;</div>
+                            <h4>초코</h4>
+                        </div>
+                        <div class="pet-edit-fields">
+                            <div class="pet-edit-field">
+                                <label>이름</label>
+                                <input type="text" value="초코">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>견종/묘종</label>
+                                <input type="text" value="골든 리트리버">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>나이</label>
+                                <input type="text" value="3살">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>체중</label>
+                                <input type="text" value="28kg">
+                            </div>
+                        </div>
+                        <div class="pet-detail-fields" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--glass-border);">
+                            <div class="pet-edit-fields">
+                                <div class="pet-edit-field">
+                                    <label>성별</label>
+                                    <select style="width:100%;padding:10px 12px;border:1px solid var(--glass-border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--bg-white);outline:none;">
+                                        <option selected>남아</option>
+                                        <option>여아</option>
+                                    </select>
+                                </div>
+                                <div class="pet-edit-field">
+                                    <label>생일</label>
+                                    <input type="date" value="2023-03-15">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="edit-save-btn" onclick="savePets()">저장하기</button>
+                </div>
+
+                <!-- Pet Edit: 나비 -->
+                <div class="pet-edit-panel" id="petEdit_nabi" style="display:none;">
+                    <div class="pet-edit-card">
+                        <div class="pet-edit-header">
+                            <div class="pet-edit-avatar" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4);" onclick="toast('&#x1F4F7; 사진 변경 (카메라 기능)')">&#x1F408;</div>
+                            <h4>나비</h4>
+                        </div>
+                        <div class="pet-edit-fields">
+                            <div class="pet-edit-field">
+                                <label>이름</label>
+                                <input type="text" value="나비">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>견종/묘종</label>
+                                <input type="text" value="코리안 숏헤어">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>나이</label>
+                                <input type="text" value="2살">
+                            </div>
+                            <div class="pet-edit-field">
+                                <label>체중</label>
+                                <input type="text" value="4.2kg">
+                            </div>
+                        </div>
+                        <div class="pet-detail-fields" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--glass-border);">
+                            <div class="pet-edit-fields">
+                                <div class="pet-edit-field">
+                                    <label>성별</label>
+                                    <select style="width:100%;padding:10px 12px;border:1px solid var(--glass-border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--bg-white);outline:none;">
+                                        <option>남아</option>
+                                        <option selected>여아</option>
+                                    </select>
+                                </div>
+                                <div class="pet-edit-field">
+                                    <label>생일</label>
+                                    <input type="date" value="2024-01-20">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="edit-save-btn" onclick="savePets()">저장하기</button>
+                </div>
+
+                <!-- Add Pet Button -->
+                <button onclick="toast('반려동물 추가 화면으로 이동')" style="width:100%;padding:14px;margin-top:12px;background:var(--bg-base);border:2px dashed var(--glass-border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:inherit;transition:all 0.2s;">+ 반려동물 추가</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Walk History Expanded ===== -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x1F4CB; 전체 산책 기록</h3>
+                <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Filter Tabs -->
+                <div class="history-filter-row">
+                    <button class="history-filter-btn active" onclick="switchHistoryFilter(this, 'weekly')">주간</button>
+                    <button class="history-filter-btn" onclick="switchHistoryFilter(this, 'monthly')">월간</button>
+                    <button class="history-filter-btn" onclick="switchHistoryFilter(this, 'yearly')">연간</button>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="history-summary">
+                    <div class="history-stat">
+                        <div class="stat-value">27.5km</div>
+                        <div class="stat-label">총 거리</div>
+                    </div>
+                    <div class="history-stat">
+                        <div class="stat-value">6:20</div>
+                        <div class="stat-label">총 시간</div>
+                    </div>
+                    <div class="history-stat">
+                        <div class="stat-value">7회</div>
+                        <div class="stat-label">산책 횟수</div>
+                    </div>
+                </div>
+
+                <!-- Full record list -->
+                <div class="history-records">
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L8 10 L16 14 L24 4" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#C5D900"/><circle cx="24" cy="4" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">오늘 오전 7:30</div>
+                            <div class="record-title">보라매공원 코스 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>3.2km</strong></span>
+                                <span>&#x23F1; <strong>42분</strong></span>
+                                <span>&#x1F525; <strong>165kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M6 20 L14 6 L22 16" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="20" r="2.5" fill="#C5D900"/><circle cx="22" cy="16" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">어제 오후 6:15</div>
+                            <div class="record-title">한강 산책로 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>4.7km</strong></span>
+                                <span>&#x23F1; <strong>58분</strong></span>
+                                <span>&#x1F525; <strong>231kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 18 Q14 4 24 12 Q18 24 8 20" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="4" cy="18" r="2.5" fill="#C5D900"/><circle cx="8" cy="20" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.10 (월) 오전 8:00</div>
+                            <div class="record-title">서리풀공원 &#x1F408;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>1.8km</strong></span>
+                                <span>&#x23F1; <strong>25분</strong></span>
+                                <span>&#x1F525; <strong>90kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L12 8 L20 18 L24 6" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#C5D900"/><circle cx="24" cy="6" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.9 (일) 오후 5:00</div>
+                            <div class="record-title">양재천 산책 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>5.1km</strong></span>
+                                <span>&#x23F1; <strong>63분</strong></span>
+                                <span>&#x1F525; <strong>248kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M6 20 L14 6 L22 16" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="20" r="2.5" fill="#C5D900"/><circle cx="22" cy="16" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.8 (토) 오전 9:15</div>
+                            <div class="record-title">올림픽공원 코스 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>6.3km</strong></span>
+                                <span>&#x23F1; <strong>72분</strong></span>
+                                <span>&#x1F525; <strong>312kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 18 Q14 4 24 12 Q18 24 8 20" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="4" cy="18" r="2.5" fill="#C5D900"/><circle cx="8" cy="20" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.7 (금) 오후 7:30</div>
+                            <div class="record-title">반포 한강공원 &#x1F408;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>2.4km</strong></span>
+                                <span>&#x23F1; <strong>32분</strong></span>
+                                <span>&#x1F525; <strong>118kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                    <a href="산책상세.html" class="record-item" style="text-decoration:none;color:inherit;">
+                        <div class="record-route">
+                            <svg viewBox="0 0 28 28" fill="none"><path d="M4 22 L8 10 L16 14 L24 4" stroke="#C5D900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="22" r="2.5" fill="#C5D900"/><circle cx="24" cy="4" r="2.5" fill="#9FB300"/></svg>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-date">2.6 (목) 오전 6:45</div>
+                            <div class="record-title">남산 둘레길 &#x1F415;</div>
+                            <div class="record-meta">
+                                <span>&#x1F4CF; <strong>4.2km</strong></span>
+                                <span>&#x23F1; <strong>55분</strong></span>
+                                <span>&#x1F525; <strong>210kcal</strong></span>
+                            </div>
+                        </div>
+                        <span class="record-arrow">&rsaquo;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Grade Detail (전체 등급 보기) ===== -->
+    <div class="modal-overlay" id="gradeModal">
+        <div class="modal-container" style="max-height:95vh;">
+            <div class="modal-header">
+                <h3>&#x1F3C5; 전체 등급 보기</h3>
+                <button class="modal-close" onclick="closeModal('gradeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <!-- Grade 1: 산책 입문자 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);">
+                        <span style="font-size:28px;">&#x1F43E;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 입문자</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.1</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">0 ~ 10km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--lime);font-weight:700;">&#x2713; 달성</span>
+                    </div>
+                    <!-- Grade 2: 산책 초보 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);">
+                        <span style="font-size:28px;">&#x1F436;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 초보</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.2</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">10 ~ 50km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--lime);font-weight:700;">&#x2713; 달성</span>
+                    </div>
+                    <!-- Grade 3: 동네 산책러 (현재) -->
+                    <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:rgba(197,217,0,0.06);border-radius:var(--radius-sm);border:2px solid var(--lime);position:relative;">
+                        <span style="font-size:28px;">&#x1F415;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">동네 산책러</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.3</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">50 ~ 150km</div>
+                            <div style="margin-top:8px;">
+                                <div style="width:100%;height:8px;background:var(--glass-border);border-radius:8px;overflow:hidden;">
+                                    <div style="width:95%;height:100%;background:linear-gradient(90deg,var(--lime),#34D399);border-radius:8px;"></div>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                                    <span style="font-size:10px;color:var(--text-muted);">142.5km / 150km</span>
+                                    <span style="font-size:10px;font-weight:700;color:var(--lime);">95%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="font-size:14px;color:var(--accent);font-weight:700;">&#x2605; 현재</span>
+                    </div>
+                    <!-- Grade 4: 활발한 산책러 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F3C3;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">활발한 산책러</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.4</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">150 ~ 300km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 5: 산책 매니아 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F4AA;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 매니아</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.5</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">300 ~ 500km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 6: 산책 고수 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F525;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 고수</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.6</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">500 ~ 750km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 7: 산책 달인 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F9ED;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 달인</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.7</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">750 ~ 1,000km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 8: 산책 마스터 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F31F;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 마스터</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.8</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">1,000 ~ 1,500km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 9: 산책 그랜드마스터 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-base);border-radius:var(--radius-sm);border:1px solid var(--glass-border);opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F3C5;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 그랜드마스터</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.9</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">1,500 ~ 2,000km</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                    <!-- Grade 10: 산책 레전드 -->
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,rgba(254,243,199,0.3),rgba(253,230,138,0.3));border-radius:var(--radius-sm);border:1px solid #FDE68A;opacity:0.65;">
+                        <span style="font-size:28px;">&#x1F451;</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:14px;font-weight:700;">산책 레전드</span>
+                                <span style="font-size:11px;color:var(--text-muted);">Lv.10</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">2,000km 이상</div>
+                        </div>
+                        <span style="font-size:14px;color:var(--text-muted);">&#x1F512;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Common Bottom Nav — glass ===== -->
+    <nav class="bottom-nav">
+        <a class="nav-item" href="멍이랑_메인페이지_시안.html"><span class="nav-icon-wrap"><i data-lucide="home"></i></span><span class="nav-label">홈</span></a>
+        <a class="nav-item" href="소셜.html"><span class="nav-icon-wrap"><i data-lucide="users"></i></span><span class="nav-label">소셜</span></a>
+        <button class="nav-item center-btn" onclick="location.href='멍이랑_메인페이지_시안.html'"><span class="nav-icon-wrap">🐾</span><span class="nav-label">산책</span></button>
+        <a class="nav-item" href="랭킹.html"><span class="nav-icon-wrap"><i data-lucide="trophy"></i></span><span class="nav-label">랭킹</span></a>
+        <a class="nav-item active" href="마이페이지.html"><span class="nav-icon-wrap"><i data-lucide="user"></i></span><span class="nav-label">MY</span></a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast-el" id="toastEl"></div>
+
+    <script>
+    // ===== Toast =====
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    // ===== Modal Open/Close =====
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+        });
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 350);
+    }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal(this.id);
+            }
+        });
+    });
+
+    // ===== Title Selection =====
+    function selectTitle(el) {
+        if (el.classList.contains('locked')) return;
+        document.querySelectorAll('#titleSelector .title-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function applyTitle() {
+        const selected = document.querySelector('#titleSelector .title-option.selected');
+        if (selected) {
+            const titleText = selected.getAttribute('data-title');
+            document.getElementById('currentTitleBadge').innerHTML = titleText;
+            toast('칭호가 변경되었습니다');
+            closeModal('titleModal');
+        }
+    }
+
+    // ===== Pet Photo Archive (일/월/년) =====
+    let currentArchivePet = '초코';
+    let currentArchiveTab = 'day';
+
+    const archiveDataByDay = {
+        '초코': [
+            { label: '2026년 2월 19일', photos: [
+                { color: '#A7F3D0', icon: '\uD83D\uDCF7' },
+                { color: '#FDE68A', icon: '\uD83D\uDCF7' },
+                { color: '#93C5FD', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 18일', photos: [
+                { color: '#C4B5FD', icon: '\uD83D\uDCF7' },
+                { color: '#FCA5A5', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 15일', photos: [
+                { color: '#6EE7B7', icon: '\uD83D\uDCF7' },
+                { color: '#FCD34D', icon: '\uD83D\uDCF7' },
+                { color: '#A78BFA', icon: '\uD83D\uDCF7' },
+                { color: '#F9A8D4', icon: '\uD83D\uDCF7' },
+            ]},
+        ],
+        '나비': [
+            { label: '2026년 2월 19일', photos: [
+                { color: '#F9A8D4', icon: '\uD83D\uDCF7' },
+                { color: '#C4B5FD', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 17일', photos: [
+                { color: '#FDE68A', icon: '\uD83D\uDCF7' },
+            ]},
+            { label: '2026년 2월 14일', photos: [
+                { color: '#67E8F9', icon: '\uD83D\uDCF7' },
+                { color: '#FCA5A5', icon: '\uD83D\uDCF7' },
+                { color: '#86EFAC', icon: '\uD83D\uDCF7' },
+            ]},
+        ]
+    };
+
+    const archiveDataByMonth = {
+        '초코': [
+            { label: '2026년 2월', photos: Array.from({length: 8}, (_, i) => ({ color: ['#A7F3D0','#FDE68A','#93C5FD','#C4B5FD','#FCA5A5','#6EE7B7','#FCD34D','#A78BFA'][i], icon: '\uD83D\uDCF7' })) },
+            { label: '2026년 1월', photos: Array.from({length: 12}, (_, i) => ({ color: ['#FCD34D','#A78BFA','#F9A8D4','#67E8F9','#86EFAC','#FCA5A5','#FDBA74','#C4B5FD','#A7F3D0','#FDE68A','#93C5FD','#6EE7B7'][i], icon: '\uD83D\uDCF7' })) },
+        ],
+        '나비': [
+            { label: '2026년 2월', photos: Array.from({length: 5}, (_, i) => ({ color: ['#F9A8D4','#C4B5FD','#FDE68A','#67E8F9','#FCA5A5'][i], icon: '\uD83D\uDCF7' })) },
+            { label: '2026년 1월', photos: Array.from({length: 6}, (_, i) => ({ color: ['#67E8F9','#FCA5A5','#86EFAC','#F9A8D4','#FDBA74','#A78BFA'][i], icon: '\uD83D\uDCF7' })) },
+        ]
+    };
+
+    const archiveDataByYear = {
+        '초코': [
+            { label: '2026년', photos: Array.from({length: 20}, (_, i) => ({ color: ['#A7F3D0','#FDE68A','#93C5FD','#C4B5FD','#FCA5A5','#6EE7B7','#FCD34D','#A78BFA','#F9A8D4','#67E8F9','#86EFAC','#FDBA74','#A7F3D0','#FDE68A','#93C5FD','#C4B5FD','#FCA5A5','#6EE7B7','#FCD34D','#A78BFA'][i], icon: '\uD83D\uDCF7' })) },
+        ],
+        '나비': [
+            { label: '2026년', photos: Array.from({length: 11}, (_, i) => ({ color: ['#F9A8D4','#C4B5FD','#FDE68A','#67E8F9','#FCA5A5','#86EFAC','#FDBA74','#A78BFA','#A7F3D0','#FDE68A','#93C5FD'][i], icon: '\uD83D\uDCF7' })) },
+        ]
+    };
+
+    function openPetArchive(petName, petIcon) {
+        currentArchivePet = petName;
+        currentArchiveTab = 'day';
+        const petIconMap = { '초코': '\uD83D\uDC15', '나비': '\uD83D\uDC08' };
+        document.getElementById('archiveTitle').innerHTML = (petIconMap[petName] || '') + ' ' + petName + '와의 추억';
+
+        // Reset tab styling
+        document.querySelectorAll('.archive-tab').forEach((tab, idx) => {
+            tab.style.color = idx === 0 ? 'var(--lime)' : 'var(--text-muted)';
+            const bar = tab.querySelector('.archive-tab-bar');
+            if (idx === 0) {
+                if (!bar) {
+                    const span = document.createElement('span');
+                    span.className = 'archive-tab-bar';
+                    span.style.cssText = 'position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--lime);';
+                    tab.appendChild(span);
+                }
+            } else {
+                if (bar) bar.remove();
+            }
+        });
+
+        renderArchiveContent();
+        openModal('archiveModal');
+    }
+
+    function switchArchiveTab(btn, tabType) {
+        currentArchiveTab = tabType;
+        document.querySelectorAll('.archive-tab').forEach(tab => {
+            tab.style.color = 'var(--text-muted)';
+            const bar = tab.querySelector('.archive-tab-bar');
+            if (bar) bar.remove();
+        });
+        btn.style.color = 'var(--lime)';
+        const barSpan = document.createElement('span');
+        barSpan.className = 'archive-tab-bar';
+        barSpan.style.cssText = 'position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--lime);';
+        btn.appendChild(barSpan);
+        renderArchiveContent();
+    }
+
+    function renderArchiveContent() {
+        let dataSource;
+        if (currentArchiveTab === 'day') {
+            dataSource = archiveDataByDay[currentArchivePet] || [];
+        } else if (currentArchiveTab === 'month') {
+            dataSource = archiveDataByMonth[currentArchivePet] || [];
+        } else {
+            dataSource = archiveDataByYear[currentArchivePet] || [];
+        }
+
+        let html = '';
+        dataSource.forEach(group => {
+            html += '<div class="archive-month-label">' + group.label + '</div>';
+            html += '<div class="archive-grid">';
+            group.photos.forEach(photo => {
+                html += '<div class="archive-photo" style="background:' + photo.color + ';">';
+                html += '<span class="photo-icon">' + photo.icon + '</span>';
+                html += '</div>';
+            });
+            html += '</div>';
+        });
+
+        if (!html) {
+            html = '<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-size:14px;">사진이 없습니다</div>';
+        }
+
+        document.getElementById('archiveBody').innerHTML = html;
+    }
+
+    // ===== Profile Edit Modal =====
+    function openEditModal() {
+        openModal('editModal');
+    }
+
+    function selectPetEdit(btn, panelId) {
+        // Update button styles
+        document.querySelectorAll('.pet-select-btn').forEach(b => {
+            b.style.borderColor = 'var(--glass-border)';
+            b.style.background = 'var(--bg-white)';
+            b.style.color = 'var(--text-secondary)';
+        });
+        btn.style.borderColor = 'var(--lime)';
+        btn.style.background = 'var(--lime-light)';
+        btn.style.color = 'var(--lime-dark)';
+
+        // Show/hide panels
+        document.querySelectorAll('.pet-edit-panel').forEach(p => p.style.display = 'none');
+        document.getElementById(panelId).style.display = 'block';
+    }
+
+    function savePets() {
+        toast('반려동물 정보가 저장되었습니다');
+        closeModal('editModal');
+    }
+
+    // ===== Walk History Modal Filter =====
+    function switchHistoryFilter(btn, period) {
+        document.querySelectorAll('.history-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        toast(btn.textContent + ' 기록 보기');
+    }
+
+    // ===== Open Pet Tab (from + add button) =====
+    function openPetTab() {
+        openModal('editModal');
+    }
+
+    // ===== Initialize Lucide Icons =====
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+
+    </script>
+</body>
+</html>

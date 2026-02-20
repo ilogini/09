@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>내 주변 - 멍이랑</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <style>
+        :root {
+            --lime: #C5D900; --lime-dark: #9FB300; --lime-light: rgba(197,217,0,0.10); --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF; --azure-dark: #0077CC; --azure-light: rgba(0,153,255,0.08); --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C; --text-secondary: #5C6F82; --text-muted: #94A3B8;
+            --bg-base: #F8FCFA; --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12); --glass-blur: blur(20px);
+            --danger: #EF4444;
+            --radius-xl: 28px; --radius-lg: 24px; --radius-md: 20px; --radius-sm: 14px; --radius-xs: 10px;
+            --modal-width: 480px; --modal-padding-x: 20px;
+            --nav-height: 76px; --header-height: 58px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Header — Glassmorphism ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 0 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-logo {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border-radius: var(--radius-xs);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px var(--lime-glow);
+        }
+        .header-logo .lucide { width: 18px; height: 18px; color: var(--bg-white); stroke-width: 2.2; }
+        .header-title {
+            font-size: 17px; font-weight: 700; color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .header-title .lucide { width: 18px; height: 18px; color: var(--lime-dark); stroke-width: 2; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: var(--glass-bg); backdrop-filter: blur(8px);
+            border: 1.5px solid var(--glass-border);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; text-decoration: none; position: relative;
+            color: var(--text-secondary);
+        }
+        .header-btn .lucide { width: 18px; height: 18px; stroke-width: 1.8; }
+        .header-btn:hover { background: var(--lime-light); border-color: rgba(197,217,0,0.25); }
+        .notification-dot {
+            position: absolute; top: 7px; right: 7px;
+            width: 8px; height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        /* ===== Search Bar ===== */
+        .search-bar-wrap {
+            position: absolute; top: 12px; left: 16px; right: 64px; z-index: 10;
+        }
+        .search-bar {
+            width: 100%;
+            display: flex; align-items: center; gap: 10px;
+            padding: 0 16px;
+            height: 44px;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1.5px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .search-bar:focus-within {
+            border-color: var(--lime);
+            box-shadow: 0 4px 20px var(--lime-glow);
+        }
+        .search-bar .lucide { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; stroke-width: 2; }
+        .search-bar input {
+            flex: 1; border: none; background: transparent; outline: none;
+            font-size: 14px; font-weight: 500; color: var(--text-primary);
+            font-family: inherit;
+        }
+        .search-bar input::placeholder { color: var(--text-muted); }
+
+        /* ===== Map Area ===== */
+        .map-area {
+            width: 100%;
+            height: 50vh;
+            background: #E8EDF2;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-placeholder {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #E8EDF2 0%, #D5DCE4 50%, #E8EDF2 100%);
+            position: relative;
+        }
+
+        /* Map grid lines */
+        .map-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(148,163,184,0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148,163,184,0.12) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Map markers */
+        .map-marker {
+            position: absolute;
+            width: 38px; height: 38px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+            z-index: 2;
+            transition: transform 0.2s;
+        }
+        .map-marker:hover { transform: rotate(-45deg) scale(1.15); }
+        .map-marker .marker-icon { transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+        .map-marker .marker-icon .lucide { width: 16px; height: 16px; color: var(--bg-white); stroke-width: 2.2; }
+        .marker-park { background: var(--lime); }
+        .marker-cafe { background: #F59E0B; }
+        .marker-hospital { background: var(--azure); }
+        .marker-pharmacy { background: #8B5CF6; }
+
+        /* My location */
+        .my-location {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+        .my-dot {
+            width: 18px; height: 18px;
+            background: var(--lime);
+            border: 3px solid var(--bg-white);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px var(--lime-glow);
+            position: relative;
+        }
+        .my-dot::before {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px; height: 48px;
+            background: rgba(197,217,0,0.15);
+            border-radius: 50%;
+            animation: locationPulse 2s infinite;
+        }
+        @keyframes locationPulse {
+            0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.8; }
+            100% { transform: translate(-50%,-50%) scale(1.5); opacity: 0; }
+        }
+
+        /* Map control buttons */
+        .map-controls {
+            position: absolute; top: 12px; right: 12px; z-index: 10;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .map-ctrl-btn {
+            width: 42px; height: 42px;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1.5px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        .map-ctrl-btn .lucide { width: 18px; height: 18px; stroke-width: 2; }
+        .map-ctrl-btn:hover {
+            background: var(--bg-white);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+            border-color: rgba(197,217,0,0.25);
+        }
+        .map-ctrl-btn:active { transform: scale(0.94); }
+
+        .map-label {
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            font-size: 12px; color: var(--text-muted); font-weight: 500;
+            opacity: 0.5;
+        }
+
+        /* ===== Filter Bar ===== */
+        .filter-bar {
+            display: flex; gap: 8px; padding: 14px 20px;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-btn {
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 16px;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.25s;
+        }
+        .filter-btn .lucide { width: 15px; height: 15px; stroke-width: 2; }
+        .filter-btn.active {
+            border-color: var(--lime);
+            background: var(--lime-light);
+            color: var(--lime-dark);
+            box-shadow: 0 2px 12px var(--lime-glow);
+        }
+        .filter-btn:hover { border-color: rgba(197,217,0,0.4); }
+        .filter-count {
+            background: rgba(0,0,0,0.04);
+            color: var(--text-muted);
+            font-size: 11px;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .filter-btn.active .filter-count {
+            background: var(--lime);
+            color: var(--bg-white);
+        }
+
+        /* ===== Bottom Sheet — Glassmorphism ===== */
+        .bottom-sheet {
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-bottom: none;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            margin-top: -16px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 -6px 30px rgba(0,0,0,0.06);
+            min-height: 40vh;
+        }
+        .sheet-handle {
+            width: 40px; height: 4px;
+            background: var(--text-muted);
+            opacity: 0.3;
+            border-radius: 4px;
+            margin: 0 auto;
+            position: relative;
+            top: 12px;
+        }
+        .sheet-header {
+            padding: 24px 20px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sheet-header h3 {
+            font-size: 17px; font-weight: 700; color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .sheet-header .result-count {
+            font-size: 13px; color: var(--text-muted); font-weight: 500;
+        }
+
+        /* ===== Place List ===== */
+        .place-list {
+            padding: 0 20px 100px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .place-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .place-item:hover {
+            background: var(--lime-light);
+            border-color: rgba(197,217,0,0.25);
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px var(--lime-glow);
+        }
+        .place-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .place-icon .lucide { width: 22px; height: 22px; stroke-width: 1.8; }
+        .place-icon.park { background: var(--lime-light); }
+        .place-icon.park .lucide { color: var(--lime-dark); }
+        .place-icon.cafe { background: rgba(245,158,11,0.10); }
+        .place-icon.cafe .lucide { color: #D97706; }
+        .place-icon.hospital { background: var(--azure-light); }
+        .place-icon.hospital .lucide { color: var(--azure-dark); }
+        .place-icon.pharmacy { background: rgba(139,92,246,0.08); }
+        .place-icon.pharmacy .lucide { color: #7C3AED; }
+        .place-info { flex: 1; min-width: 0; }
+        .place-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; color: var(--text-primary); }
+        .place-meta {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .place-tag {
+            font-size: 11px; font-weight: 600;
+            padding: 2px 9px; border-radius: 8px;
+        }
+        .place-tag.park { background: var(--lime-light); color: var(--lime-dark); }
+        .place-tag.cafe { background: rgba(245,158,11,0.10); color: #B45309; }
+        .place-tag.hospital { background: var(--azure-light); color: var(--azure-dark); }
+        .place-tag.pharmacy { background: rgba(139,92,246,0.08); color: #6D28D9; }
+        .place-detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .place-right { text-align: right; flex-shrink: 0; }
+        .place-distance { font-size: 14px; font-weight: 700; color: var(--azure); }
+        .place-rating {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 12px; color: var(--lime-dark); font-weight: 600;
+            margin-top: 4px; justify-content: flex-end;
+        }
+        .place-rating .lucide { width: 13px; height: 13px; fill: var(--lime); color: var(--lime); stroke-width: 0; }
+
+        /* ===== Bottom Nav — Glassmorphism ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: var(--modal-width);
+            height: var(--nav-height);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-top: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 8px;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px 12px;
+            text-decoration: none;
+            min-width: 52px;
+            transition: all 0.2s;
+        }
+        .nav-item .lucide { width: 22px; height: 22px; stroke-width: 1.8; color: var(--text-muted); }
+        .nav-item span { font-size: 10px; font-weight: 500; color: var(--text-muted); }
+        .nav-item.active .lucide { color: var(--lime-dark); }
+        .nav-item.active span { font-weight: 600; color: var(--lime-dark); }
+        .nav-center {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px 12px;
+            text-decoration: none;
+            min-width: 52px;
+            position: relative; top: -14px;
+        }
+        .nav-center-btn {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 24px var(--lime-glow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .nav-center-btn:hover { transform: scale(1.06); box-shadow: 0 8px 32px var(--lime-glow); }
+        .nav-center-btn .lucide { width: 26px; height: 26px; color: var(--bg-white); stroke-width: 2.2; }
+        .nav-center span { font-size: 10px; font-weight: 600; color: var(--lime-dark); }
+
+        /* ===== Animation ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+
+        /* ===== Modal frame utility ===== */
+        .modal-frame {
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+            max-width: var(--modal-width);
+            padding: var(--modal-padding-x);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header (glassmorphism + lime accent) -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <i data-lucide="paw-print"></i>
+            </div>
+            <span class="header-title">
+                <i data-lucide="map"></i>
+                내 주변
+            </span>
+        </div>
+        <div class="header-actions">
+            <a href="알림.html" class="header-btn">
+                <i data-lucide="bell"></i>
+                <span class="notification-dot"></span>
+            </a>
+            <a href="#" class="header-btn">
+                <i data-lucide="settings"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Map Area -->
+    <div class="map-area">
+        <div class="map-placeholder">
+            <div class="map-grid"></div>
+
+            <!-- Search Bar (glass + lime focus) -->
+            <div class="search-bar-wrap">
+                <div class="search-bar">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="장소, 주소 검색...">
+                </div>
+            </div>
+
+            <!-- Map Markers (lime-based colors) -->
+            <div class="map-marker marker-park" style="top: 25%; left: 30%;">
+                <span class="marker-icon"><i data-lucide="trees"></i></span>
+            </div>
+            <div class="map-marker marker-park" style="top: 60%; left: 20%;">
+                <span class="marker-icon"><i data-lucide="trees"></i></span>
+            </div>
+            <div class="map-marker marker-cafe" style="top: 35%; left: 65%;">
+                <span class="marker-icon"><i data-lucide="coffee"></i></span>
+            </div>
+            <div class="map-marker marker-cafe" style="top: 70%; left: 55%;">
+                <span class="marker-icon"><i data-lucide="coffee"></i></span>
+            </div>
+            <div class="map-marker marker-hospital" style="top: 20%; left: 75%;">
+                <span class="marker-icon"><i data-lucide="heart-pulse"></i></span>
+            </div>
+            <div class="map-marker marker-pharmacy" style="top: 55%; left: 80%;">
+                <span class="marker-icon"><i data-lucide="pill"></i></span>
+            </div>
+
+            <!-- My Location -->
+            <div class="my-location">
+                <div class="my-dot"></div>
+            </div>
+
+            <!-- Map Controls (glass) -->
+            <div class="map-controls">
+                <button class="map-ctrl-btn" title="내 위치"><i data-lucide="locate"></i></button>
+                <button class="map-ctrl-btn" title="확대"><i data-lucide="plus"></i></button>
+                <button class="map-ctrl-btn" title="축소"><i data-lucide="minus"></i></button>
+            </div>
+
+            <span class="map-label">지도 영역 (Placeholder)</span>
+        </div>
+    </div>
+
+    <!-- Filter Bar (glass background, lime active) -->
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            <i data-lucide="trees"></i> 공원 <span class="filter-count">2</span>
+        </button>
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            <i data-lucide="coffee"></i> 카페 <span class="filter-count">2</span>
+        </button>
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            <i data-lucide="heart-pulse"></i> 병원 <span class="filter-count">1</span>
+        </button>
+        <button class="filter-btn active" onclick="toggleFilter(this)">
+            <i data-lucide="pill"></i> 약국 <span class="filter-count">1</span>
+        </button>
+        <button class="filter-btn" onclick="toggleFilter(this)">
+            <i data-lucide="store"></i> 상점 <span class="filter-count">0</span>
+        </button>
+    </div>
+
+    <!-- Bottom Sheet (glassmorphism) -->
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <h3><i data-lucide="map-pin" style="width:17px;height:17px;color:var(--lime-dark);stroke-width:2;"></i> 주변 장소</h3>
+            <span class="result-count">6개 장소</span>
+        </div>
+
+        <div class="place-list">
+            <!-- Place 1 -->
+            <div class="place-item animate-in">
+                <div class="place-icon park"><i data-lucide="trees"></i></div>
+                <div class="place-info">
+                    <div class="place-name">보라매공원 반려동물 놀이터</div>
+                    <div class="place-meta">
+                        <span class="place-tag park">공원</span>
+                    </div>
+                    <div class="place-detail">반려동물 전용 · 무료 · 06:00~22:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">450m</div>
+                    <div class="place-rating"><i data-lucide="star"></i> 4.7</div>
+                </div>
+            </div>
+
+            <!-- Place 2 -->
+            <div class="place-item animate-in">
+                <div class="place-icon cafe"><i data-lucide="coffee"></i></div>
+                <div class="place-info">
+                    <div class="place-name">멍멍카페</div>
+                    <div class="place-meta">
+                        <span class="place-tag cafe">카페</span>
+                    </div>
+                    <div class="place-detail">반려동물 동반 · 대형견 OK · 10:00~22:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">800m</div>
+                    <div class="place-rating"><i data-lucide="star"></i> 4.5</div>
+                </div>
+            </div>
+
+            <!-- Place 3 -->
+            <div class="place-item animate-in">
+                <div class="place-icon hospital"><i data-lucide="heart-pulse"></i></div>
+                <div class="place-info">
+                    <div class="place-name">해피 동물병원</div>
+                    <div class="place-meta">
+                        <span class="place-tag hospital">동물병원</span>
+                    </div>
+                    <div class="place-detail">24시 진료 · 응급실 운영</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">1.2km</div>
+                    <div class="place-rating"><i data-lucide="star"></i> 4.8</div>
+                </div>
+            </div>
+
+            <!-- Place 4 -->
+            <div class="place-item animate-in">
+                <div class="place-icon park"><i data-lucide="trees"></i></div>
+                <div class="place-info">
+                    <div class="place-name">신림 근린공원</div>
+                    <div class="place-meta">
+                        <span class="place-tag park">공원</span>
+                    </div>
+                    <div class="place-detail">산책로 · 운동시설 · 24시간</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">1.5km</div>
+                    <div class="place-rating"><i data-lucide="star"></i> 4.3</div>
+                </div>
+            </div>
+
+            <!-- Place 5 -->
+            <div class="place-item animate-in">
+                <div class="place-icon cafe"><i data-lucide="coffee"></i></div>
+                <div class="place-info">
+                    <div class="place-name">펫프렌즈 카페</div>
+                    <div class="place-meta">
+                        <span class="place-tag cafe">카페</span>
+                    </div>
+                    <div class="place-detail">소형견 전용 · 야외 테라스 · 09:00~21:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">1.8km</div>
+                    <div class="place-rating"><i data-lucide="star"></i> 4.6</div>
+                </div>
+            </div>
+
+            <!-- Place 6 -->
+            <div class="place-item animate-in">
+                <div class="place-icon pharmacy"><i data-lucide="pill"></i></div>
+                <div class="place-info">
+                    <div class="place-name">보라매 동물약국</div>
+                    <div class="place-meta">
+                        <span class="place-tag pharmacy">약국</span>
+                    </div>
+                    <div class="place-detail">처방약 · 건강식품 · 09:00~19:00</div>
+                </div>
+                <div class="place-right">
+                    <div class="place-distance">2.1km</div>
+                    <div class="place-rating"><i data-lucide="star"></i> 4.4</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav (glassmorphism + center paw button, map tab active) -->
+    <nav class="bottom-nav">
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item">
+            <i data-lucide="home"></i>
+            <span>홈</span>
+        </a>
+        <a href="소셜.html" class="nav-item">
+            <i data-lucide="users"></i>
+            <span>소셜</span>
+        </a>
+        <a href="멍이랑_메인페이지_시안.html" class="nav-center">
+            <div class="nav-center-btn">
+                <i data-lucide="paw-print"></i>
+            </div>
+            <span>산책</span>
+        </a>
+        <a href="지도.html" class="nav-item active">
+            <i data-lucide="map"></i>
+            <span>지도</span>
+        </a>
+        <a href="마이페이지.html" class="nav-item">
+            <i data-lucide="user"></i>
+            <span>MY</span>
+        </a>
+    </nav>
+
+    <!-- Lucide Icons Init + Existing JS -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+
+    function toggleFilter(btn) {
+        btn.classList.toggle('active');
+    }
+    </script>
+</body>
+</html>

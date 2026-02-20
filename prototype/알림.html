@@ -4,156 +4,273 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>알림 - 멍이랑</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <style>
         :root {
-            --primary: #10B981;
-            --primary-dark: #059669;
-            --primary-light: #D1FAE5;
-            --secondary: #3B82F6;
-            --secondary-dark: #1D4ED8;
-            --accent: #F59E0B;
-            --accent-light: #FEF3C7;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --text-light: #9CA3AF;
-            --bg: #F9FAFB;
-            --white: #FFFFFF;
-            --border: #E5E7EB;
+            --lime: #C5D900; --lime-dark: #9FB300; --lime-light: rgba(197,217,0,0.10); --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF; --azure-dark: #0077CC; --azure-light: rgba(0,153,255,0.08); --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C; --text-secondary: #5C6F82; --text-muted: #94A3B8;
+            --bg-base: #F8FCFA; --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12); --glass-blur: blur(20px);
             --danger: #EF4444;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --radius-xs: 8px;
-            --header-height: 56px;
+            --radius-xl: 28px; --radius-lg: 24px; --radius-md: 20px; --radius-sm: 14px; --radius-xs: 10px;
+            --modal-width: 480px; --modal-padding-x: 20px;
+            --nav-height: 76px; --header-height: 58px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            max-width: 480px;
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
             margin: 0 auto;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* ===== Header ===== */
+        /* ===== Header (Glassmorphism) ===== */
         .header {
             position: sticky; top: 0; z-index: 100;
-            background: var(--white);
-            padding: 0 16px;
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 0 var(--modal-padding-x);
             display: flex; align-items: center; justify-content: space-between;
             height: var(--header-height);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(197,217,0,0.08);
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .back-btn {
-            width: 36px; height: 36px; border-radius: 50%; border: none;
-            background: var(--bg); font-size: 18px; cursor: pointer;
+            width: 38px; height: 38px; border-radius: var(--radius-xs);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            font-size: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s; text-decoration: none; color: var(--text);
+            transition: all 0.2s ease; text-decoration: none; color: var(--text-primary);
         }
-        .back-btn:hover { background: var(--border); }
-        .header-title { font-size: 17px; font-weight: 700; }
+        .back-btn:hover { background: var(--glass-bg-heavy); border-color: var(--lime-glow); }
+        .back-btn i { width: 20px; height: 20px; color: var(--text-secondary); }
+        .header-title {
+            font-size: 17px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-primary);
+        }
+        .header-title i { width: 20px; height: 20px; color: var(--lime); }
         .mark-read-btn {
-            font-size: 13px; font-weight: 600; color: var(--primary);
-            background: none; border: none; cursor: pointer;
-            font-family: inherit; padding: 6px 12px;
-            border-radius: 8px; transition: background 0.2s;
+            font-size: 13px; font-weight: 600; color: var(--lime-dark);
+            background: var(--lime-light); border: none; cursor: pointer;
+            font-family: inherit; padding: 7px 14px;
+            border-radius: var(--radius-xs); transition: all 0.2s ease;
         }
-        .mark-read-btn:hover { background: var(--primary-light); }
+        .mark-read-btn:hover { background: var(--lime-glow); color: var(--lime-dark); }
 
         /* ===== Content ===== */
-        .content { padding: 0 0 32px; }
+        .content { padding: 0 0 calc(var(--nav-height) + 16px); }
 
         /* ===== Group Header ===== */
         .group-header {
-            padding: 20px 16px 8px;
-            font-size: 13px; font-weight: 700;
-            color: var(--text-secondary);
+            padding: 20px var(--modal-padding-x) 10px;
+            font-size: 12px; font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        /* ===== Notification Item ===== */
-        .notif-list { display: flex; flex-direction: column; }
+        /* ===== Notification List ===== */
+        .notif-list {
+            display: flex; flex-direction: column;
+            gap: 8px;
+            padding: 0 var(--modal-padding-x);
+        }
+
+        /* ===== Notification Item (Glass Card) ===== */
         .notif-item {
             display: flex; align-items: flex-start; gap: 14px;
             padding: 14px 16px;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.25s ease;
             position: relative;
             text-decoration: none;
             color: inherit;
         }
-        .notif-item:hover { background: var(--bg); }
-        .notif-item.unread { background: #F0FDF4; }
+        .notif-item:hover {
+            background: var(--glass-bg-heavy);
+            border-color: var(--lime-glow);
+        }
+        .notif-item.unread {
+            background: var(--glass-bg-heavy);
+            border-color: var(--lime-glow);
+        }
         .notif-item.unread::before {
             content: '';
-            position: absolute; left: 8px; top: 50%;
-            transform: translateY(-50%);
-            width: 6px; height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
+            position: absolute; left: -2px; top: 14px;
+            width: 4px; height: 24px;
+            background: linear-gradient(180deg, var(--lime), var(--lime-dark));
+            border-radius: 0 4px 4px 0;
         }
+
+        /* ===== Notification Icon ===== */
         .notif-icon {
             width: 44px; height: 44px;
-            border-radius: 14px;
+            border-radius: var(--radius-xs);
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; flex-shrink: 0;
+            flex-shrink: 0;
         }
-        .notif-icon.badge-type { background: var(--accent-light); }
-        .notif-icon.ranking-type { background: #EDE9FE; }
-        .notif-icon.social-type { background: #DBEAFE; }
-        .notif-icon.reminder-type { background: var(--primary-light); }
-        .notif-icon.season-type { background: #FCE7F3; }
-        .notif-icon.system-type { background: #F3F4F6; }
+        .notif-icon i { width: 22px; height: 22px; }
+        .notif-icon.badge-type { background: var(--lime-light); }
+        .notif-icon.badge-type i { color: var(--lime-dark); }
+        .notif-icon.ranking-type { background: rgba(245,158,11,0.10); }
+        .notif-icon.ranking-type i { color: #F59E0B; }
+        .notif-icon.social-type { background: var(--azure-light); }
+        .notif-icon.social-type i { color: var(--azure); }
+        .notif-icon.reminder-type { background: var(--lime-light); }
+        .notif-icon.reminder-type i { color: var(--lime); }
+        .notif-icon.season-type { background: rgba(236,72,153,0.08); }
+        .notif-icon.season-type i { color: #EC4899; }
+        .notif-icon.system-type { background: rgba(148,163,184,0.10); }
+        .notif-icon.system-type i { color: var(--text-muted); }
+        .notif-icon.challenge-type { background: rgba(245,158,11,0.10); }
+        .notif-icon.challenge-type i { color: #F59E0B; }
+        .notif-icon.fire-type { background: rgba(239,68,68,0.08); }
+        .notif-icon.fire-type i { color: var(--danger); }
+
+        /* ===== Notification Content ===== */
         .notif-content { flex: 1; min-width: 0; }
         .notif-message {
             font-size: 14px; font-weight: 500;
-            line-height: 1.5;
-            color: var(--text);
+            line-height: 1.55;
+            color: var(--text-primary);
         }
         .notif-item.unread .notif-message { font-weight: 600; }
         .notif-time {
-            font-size: 12px; color: var(--text-light);
+            font-size: 12px; color: var(--text-muted);
             margin-top: 4px;
         }
+
+        /* ===== Action Tags ===== */
         .notif-action-tag {
-            display: inline-block;
+            display: inline-flex; align-items: center; gap: 4px;
             font-size: 11px; font-weight: 600;
-            padding: 2px 8px; border-radius: 6px;
+            padding: 3px 10px; border-radius: 6px;
             margin-top: 6px;
         }
-        .tag-badge { background: var(--accent-light); color: #92400E; }
-        .tag-ranking { background: #EDE9FE; color: #5B21B6; }
-        .tag-social { background: #DBEAFE; color: #1E40AF; }
+        .tag-badge { background: var(--lime-light); color: var(--lime-dark); }
+        .tag-ranking { background: rgba(245,158,11,0.10); color: #D97706; }
+        .tag-social { background: var(--azure-light); color: var(--azure-dark); }
 
-        /* ===== Empty State ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-light);
+        /* ===== Challenge Buttons ===== */
+        .challenge-actions {
+            display: flex; gap: 8px; margin-top: 10px;
         }
-        .empty-state .icon { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
-        .empty-state p { font-size: 14px; }
+        .btn-accept {
+            padding: 7px 22px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: var(--text-primary); border: none;
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .btn-accept:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .btn-reject {
+            padding: 7px 22px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            border-radius: var(--radius-xs);
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .btn-reject:hover { background: var(--glass-bg-heavy); }
 
-        /* ===== Animation ===== */
-        .animate-in { animation: fadeInUp 0.3s ease forwards; opacity: 0; }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        .notif-item:nth-child(1) { animation-delay: 0.02s; }
-        .notif-item:nth-child(2) { animation-delay: 0.04s; }
-        .notif-item:nth-child(3) { animation-delay: 0.06s; }
-        .notif-item:nth-child(4) { animation-delay: 0.08s; }
-        .notif-item:nth-child(5) { animation-delay: 0.10s; }
+        /* ===== Challenge Result ===== */
+        .challenge-result {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 600;
+            margin-top: 10px;
+        }
+        .challenge-result i { width: 16px; height: 16px; }
+        .challenge-result.accepted { color: var(--lime-dark); }
+        .challenge-result.rejected { color: var(--text-muted); }
+
+        /* ===== Bottom Nav (Glass) ===== */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: var(--modal-width);
+            height: var(--nav-height);
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: space-around;
+            z-index: 200;
+            padding: 0 8px;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 3px; text-decoration: none;
+            color: var(--text-muted); font-size: 10px; font-weight: 600;
+            padding: 6px 12px;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+        .nav-item i { width: 24px; height: 24px; }
+        .nav-item.active { color: var(--lime-dark); }
+        .nav-item:hover { color: var(--text-secondary); }
+
+        /* Center paw button */
+        .nav-center {
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            box-shadow: 0 4px 20px var(--lime-glow), 0 2px 8px rgba(197,217,0,0.15);
+            margin-top: -24px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .nav-center:hover { transform: scale(1.06); box-shadow: 0 6px 28px var(--lime-glow); }
+        .nav-center .paw-icon { font-size: 26px; line-height: 1; }
+
+        /* Notification badge on bell */
+        .nav-badge {
+            position: absolute; top: 2px; right: 6px;
+            width: 8px; height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        /* ===== Animations ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notif-item:nth-child(1) { animation-delay: 0.03s; }
+        .notif-item:nth-child(2) { animation-delay: 0.06s; }
+        .notif-item:nth-child(3) { animation-delay: 0.09s; }
+        .notif-item:nth-child(4) { animation-delay: 0.12s; }
+        .notif-item:nth-child(5) { animation-delay: 0.15s; }
+        .notif-item:nth-child(6) { animation-delay: 0.18s; }
+
+        .group-header { animation: fadeInUp 0.3s ease forwards; opacity: 0; }
+        .notif-list:nth-of-type(1) .group-header { animation-delay: 0s; }
     </style>
 </head>
 <body>
@@ -161,8 +278,13 @@
     <!-- Header -->
     <header class="header">
         <div class="header-left">
-            <a href="멍이랑_메인페이지_시안.html" class="back-btn" aria-label="뒤로가기">←</a>
-            <span class="header-title">🔔 알림</span>
+            <a href="멍이랑_메인페이지_시안.html" class="back-btn" aria-label="뒤로가기">
+                <i data-lucide="chevron-left"></i>
+            </a>
+            <span class="header-title">
+                <i data-lucide="bell"></i>
+                알림
+            </span>
         </div>
         <button class="mark-read-btn" onclick="markAllRead()">모두 읽음</button>
     </header>
@@ -174,7 +296,9 @@
         <div class="group-header">오늘</div>
         <div class="notif-list">
             <a href="뱃지.html" class="notif-item unread animate-in">
-                <div class="notif-icon badge-type">🏅</div>
+                <div class="notif-icon badge-type">
+                    <i data-lucide="award"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message">50km 마라토너 뱃지까지 <strong>12km</strong> 남았어요!</div>
                     <div class="notif-time">오전 10:30</div>
@@ -182,7 +306,9 @@
                 </div>
             </a>
             <div class="notif-item unread animate-in">
-                <div class="notif-icon ranking-type">🏆</div>
+                <div class="notif-icon ranking-type">
+                    <i data-lucide="trophy"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message">동네 랭킹 <strong>2위</strong>로 올라갔어요!</div>
                     <div class="notif-time">오전 9:15</div>
@@ -190,7 +316,9 @@
                 </div>
             </div>
             <div class="notif-item unread animate-in">
-                <div class="notif-icon social-type">👥</div>
+                <div class="notif-icon social-type">
+                    <i data-lucide="users"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message"><strong>초코아빠</strong>님이 나를 팔로우했어요</div>
                     <div class="notif-time">오전 8:42</div>
@@ -198,13 +326,15 @@
                 </div>
             </div>
             <div class="notif-item unread animate-in">
-                <div class="notif-icon" style="background: #FEF3C7;">🏅</div>
+                <div class="notif-icon challenge-type">
+                    <i data-lucide="swords"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message"><strong>초코#1234</strong>님이 <strong>'주간 30km 도전'</strong> 챌린지에 초대했어요</div>
                     <div class="notif-time">30분 전</div>
-                    <div style="display: flex; gap: 8px; margin-top: 8px;">
-                        <button onclick="acceptChallenge(this)" style="padding: 6px 20px; background: #10B981; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;">참가</button>
-                        <button onclick="rejectChallenge(this)" style="padding: 6px 20px; background: #F3F4F6; color: #6B7280; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;">거절</button>
+                    <div class="challenge-actions" id="challenge-actions">
+                        <button class="btn-accept" onclick="acceptChallenge(this)">참가</button>
+                        <button class="btn-reject" onclick="rejectChallenge(this)">거절</button>
                     </div>
                 </div>
             </div>
@@ -214,22 +344,28 @@
         <div class="group-header">어제</div>
         <div class="notif-list">
             <a href="뱃지.html" class="notif-item animate-in">
-                <div class="notif-icon badge-type">🏅</div>
+                <div class="notif-icon badge-type">
+                    <i data-lucide="award"></i>
+                </div>
                 <div class="notif-content">
-                    <div class="notif-message">축하해요! '<strong>5km 워커</strong>' 뱃지를 획득했어요! 🎉</div>
+                    <div class="notif-message">축하해요! '<strong>5km 워커</strong>' 뱃지를 획득했어요!</div>
                     <div class="notif-time">오후 6:30</div>
                     <span class="notif-action-tag tag-badge">뱃지 획득</span>
                 </div>
             </a>
             <div class="notif-item animate-in">
-                <div class="notif-icon reminder-type">🐾</div>
+                <div class="notif-icon reminder-type">
+                    <i data-lucide="paw-print"></i>
+                </div>
                 <div class="notif-content">
-                    <div class="notif-message">산책 시간이에요! 초코가 기다리고 있어요 🐕</div>
+                    <div class="notif-message">산책 시간이에요! 초코가 기다리고 있어요</div>
                     <div class="notif-time">오후 5:00</div>
                 </div>
             </div>
             <a href="뱃지.html" class="notif-item animate-in">
-                <div class="notif-icon season-type">🌟</div>
+                <div class="notif-icon season-type">
+                    <i data-lucide="sparkles"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message"><strong>겨울왕국 시즌 뱃지</strong> 이벤트가 진행 중이에요</div>
                     <div class="notif-time">오전 10:00</div>
@@ -242,7 +378,9 @@
         <div class="group-header">이번 주</div>
         <div class="notif-list">
             <a href="뱃지.html" class="notif-item animate-in">
-                <div class="notif-icon badge-type">🔥</div>
+                <div class="notif-icon fire-type">
+                    <i data-lucide="flame"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message"><strong>3일 연속 산책</strong> 뱃지를 획득했어요!</div>
                     <div class="notif-time">2월 8일</div>
@@ -250,14 +388,18 @@
                 </div>
             </a>
             <div class="notif-item animate-in">
-                <div class="notif-icon system-type">📢</div>
+                <div class="notif-icon system-type">
+                    <i data-lucide="megaphone"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message">멍이랑 v1.2 업데이트 안내</div>
                     <div class="notif-time">2월 7일</div>
                 </div>
             </div>
             <div class="notif-item animate-in">
-                <div class="notif-icon ranking-type">🏆</div>
+                <div class="notif-icon ranking-type">
+                    <i data-lucide="trophy"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message">이번 주 산책 랭킹 <strong>3위</strong>에 올랐어요!</div>
                     <div class="notif-time">2월 6일</div>
@@ -265,43 +407,78 @@
                 </div>
             </div>
             <div class="notif-item animate-in">
-                <div class="notif-icon reminder-type">🐾</div>
+                <div class="notif-icon reminder-type">
+                    <i data-lucide="map-pin"></i>
+                </div>
                 <div class="notif-content">
                     <div class="notif-message">초코의 산책 기록이 갱신되었어요! 이번 주 총 <strong>12.5km</strong></div>
                     <div class="notif-time">2월 5일</div>
                 </div>
             </div>
             <div class="notif-item animate-in">
-                <div class="notif-icon social-type">👥</div>
+                <div class="notif-icon social-type">
+                    <i data-lucide="heart"></i>
+                </div>
                 <div class="notif-content">
-                    <div class="notif-message"><strong>달이맘</strong>님이 산책 기록에 좋아요를 눌렀어요 ❤️</div>
+                    <div class="notif-message"><strong>달이맘</strong>님이 산책 기록에 좋아요를 눌렀어요</div>
                     <div class="notif-time">2월 5일</div>
                     <span class="notif-action-tag tag-social">소셜</span>
                 </div>
             </div>
         </div>
 
-        <div style="height: 32px;"></div>
+        <div style="height: 16px;"></div>
     </main>
 
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="멍이랑_메인페이지_시안.html" class="nav-item">
+            <i data-lucide="home"></i>
+            <span>홈</span>
+        </a>
+        <a href="산책.html" class="nav-item">
+            <i data-lucide="map"></i>
+            <span>산책</span>
+        </a>
+        <a href="산책.html" class="nav-center" aria-label="산책 시작">
+            <span class="paw-icon">🐾</span>
+        </a>
+        <a href="#" class="nav-item active" style="pointer-events:none;">
+            <i data-lucide="bell"></i>
+            <span>알림</span>
+            <span class="nav-badge"></span>
+        </a>
+        <a href="마이페이지.html" class="nav-item">
+            <i data-lucide="user"></i>
+            <span>MY</span>
+        </a>
+    </nav>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+
     function markAllRead() {
-        document.querySelectorAll('.notif-item.unread').forEach(item => {
+        document.querySelectorAll('.notif-item.unread').forEach(function(item) {
             item.classList.remove('unread');
         });
     }
 
     function acceptChallenge(btn) {
-        const parent = btn.parentElement;
-        parent.innerHTML = '<span style="font-size: 13px; font-weight: 600; color: #10B981;">✅ 참가 완료!</span>';
-        const item = parent.closest('.notif-item');
+        var parent = btn.parentElement;
+        parent.innerHTML = '<div class="challenge-result accepted"><i data-lucide="check-circle"></i> 참가 완료!</div>';
+        lucide.createIcons();
+        var item = parent.closest('.notif-item');
         if (item) item.classList.remove('unread');
     }
 
     function rejectChallenge(btn) {
-        const parent = btn.parentElement;
-        parent.innerHTML = '<span style="font-size: 13px; font-weight: 600; color: #9CA3AF;">거절됨</span>';
-        const item = parent.closest('.notif-item');
+        var parent = btn.parentElement;
+        parent.innerHTML = '<div class="challenge-result rejected"><i data-lucide="x-circle"></i> 거절됨</div>';
+        lucide.createIcons();
+        var item = parent.closest('.notif-item');
         if (item) item.classList.remove('unread');
     }
     </script>

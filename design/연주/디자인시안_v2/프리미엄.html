@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>프리미엄 - 멍이랑</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <style>
+        :root {
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10);
+            --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08);
+            --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12);
+            --glass-blur: blur(20px);
+            --danger: #EF4444;
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
+            --nav-height: 76px;
+            --header-height: 58px;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 0 var(--modal-padding-x);
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1.5px solid var(--glass-border);
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: var(--lime-light);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; text-decoration: none;
+            color: var(--text-primary);
+        }
+        .back-btn:hover { background: var(--lime-glow); }
+        .back-btn i { width: 20px; height: 20px; }
+        .header-title {
+            font-size: 17px; font-weight: 700;
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .header-title i { width: 20px; height: 20px; color: var(--azure); }
+
+        /* ===== Content ===== */
+        .content { padding: 0 0 32px; }
+
+        /* ===== Hero ===== */
+        .premium-hero {
+            background: linear-gradient(135deg, var(--azure-dark) 0%, var(--azure) 50%, #33BBFF 100%);
+            padding: 40px 24px 48px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .premium-hero::before {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(197,217,0,0.18), transparent 70%);
+            border-radius: 50%;
+        }
+        .premium-hero::after {
+            content: '';
+            position: absolute; bottom: -40px; left: -40px;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-deco-circle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-deco-circle.c1 {
+            width: 100px; height: 100px;
+            top: 20px; left: -30px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+        }
+        .hero-deco-circle.c2 {
+            width: 80px; height: 80px;
+            bottom: 30px; right: 20px;
+            background: radial-gradient(circle, rgba(197,217,0,0.12), transparent 70%);
+        }
+        .hero-deco-circle.c3 {
+            width: 60px; height: 60px;
+            top: 50%; left: 80%;
+            background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%);
+        }
+        .hero-icon {
+            width: 80px; height: 80px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 32px rgba(197,217,0,0.35);
+            position: relative; z-index: 1;
+        }
+        .hero-icon i { width: 40px; height: 40px; color: white; }
+        .hero-title {
+            font-size: 28px; font-weight: 800;
+            margin-bottom: 8px;
+            position: relative; z-index: 1;
+        }
+        .hero-title span { color: var(--lime); }
+        .hero-subtitle {
+            font-size: 15px; opacity: 0.85;
+            line-height: 1.6;
+            position: relative; z-index: 1;
+        }
+
+        /* ===== Benefits ===== */
+        .benefits-section { padding: 24px var(--modal-padding-x) 0; }
+        .benefits-title {
+            font-size: 17px; font-weight: 700;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-primary);
+        }
+        .benefits-title i { width: 20px; height: 20px; color: var(--lime); }
+        .benefit-card {
+            display: flex; align-items: center; gap: 16px;
+            padding: 18px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .benefit-card:hover { transform: translateX(4px); border-color: var(--lime-glow); box-shadow: 0 4px 16px rgba(197,217,0,0.08); }
+        .benefit-card.highlight {
+            background: var(--lime-light);
+            border: 2px solid var(--lime);
+        }
+        .benefit-icon {
+            width: 52px; height: 52px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .benefit-icon i { width: 26px; height: 26px; }
+        .benefit-icon.stats { background: var(--azure-light); }
+        .benefit-icon.stats i { color: var(--azure); }
+        .benefit-icon.ranking { background: rgba(139,92,246,0.08); }
+        .benefit-icon.ranking i { color: #8B5CF6; }
+        .benefit-icon.adblock { background: rgba(239,68,68,0.08); }
+        .benefit-icon.adblock i { color: var(--danger); }
+        .benefit-icon.badges { background: var(--lime-light); }
+        .benefit-icon.badges i { color: var(--lime-dark); }
+        .benefit-info { flex: 1; }
+        .benefit-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 2px; color: var(--text-primary); }
+        .benefit-info p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+        .benefit-new {
+            font-size: 10px; font-weight: 700;
+            background: var(--danger); color: white;
+            padding: 2px 6px; border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        /* ===== Comparison Table ===== */
+        .compare-section { padding: 24px var(--modal-padding-x) 0; }
+        .compare-title {
+            font-size: 17px; font-weight: 700;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-primary);
+        }
+        .compare-title i { width: 20px; height: 20px; color: var(--azure); }
+        .compare-table {
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .compare-header {
+            display: grid; grid-template-columns: 1.2fr 1fr 1fr;
+            background: var(--bg-base);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .compare-header div {
+            padding: 12px 14px;
+            font-size: 13px; font-weight: 700;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        .compare-header .premium-col {
+            background: linear-gradient(135deg, var(--azure-dark), var(--azure));
+            color: white;
+        }
+        .compare-header .premium-col i { width: 14px; height: 14px; vertical-align: -2px; margin-right: 2px; }
+        .compare-row {
+            display: grid; grid-template-columns: 1.2fr 1fr 1fr;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .compare-row:last-child { border-bottom: none; }
+        .compare-row div {
+            padding: 12px 14px;
+            font-size: 13px;
+            text-align: center;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .compare-row .feature {
+            text-align: left; justify-content: flex-start;
+            font-weight: 500; color: var(--text-secondary);
+        }
+        .check { color: var(--lime); display: flex; align-items: center; justify-content: center; }
+        .check i { width: 20px; height: 20px; }
+        .cross { color: var(--text-muted); font-size: 14px; }
+        .limited { color: var(--azure); font-size: 12px; font-weight: 600; }
+
+        /* ===== Pricing ===== */
+        .pricing-section { padding: 24px var(--modal-padding-x) 0; }
+        .pricing-title {
+            font-size: 17px; font-weight: 700;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-primary);
+        }
+        .pricing-title i { width: 20px; height: 20px; color: var(--lime); }
+        .pricing-cards { display: flex; flex-direction: column; gap: 12px; }
+        .pricing-card {
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .pricing-card:hover { border-color: var(--lime); }
+        .pricing-card.recommended {
+            border-color: var(--lime);
+            background: var(--lime-light);
+            box-shadow: 0 4px 16px rgba(197,217,0,0.20);
+        }
+        .pricing-card.recommended::before {
+            content: '추천';
+            position: absolute; top: -10px; right: 16px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: white;
+            font-size: 11px; font-weight: 700;
+            padding: 3px 12px; border-radius: var(--radius-xs);
+        }
+        .pricing-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .pricing-name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .pricing-save {
+            font-size: 11px; font-weight: 700;
+            background: var(--danger); color: white;
+            padding: 2px 8px; border-radius: 8px;
+        }
+        .pricing-price { display: flex; align-items: baseline; gap: 4px; }
+        .pricing-amount { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+        .pricing-period { font-size: 14px; color: var(--text-secondary); }
+        .pricing-monthly { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .pricing-card.recommended .pricing-amount { color: var(--lime-dark); }
+
+        /* ===== CTA Button ===== */
+        .cta-section { padding: 24px var(--modal-padding-x) 0; }
+        .cta-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 17px; font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 8px 24px var(--lime-glow);
+            transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .cta-btn i { width: 22px; height: 22px; }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(197,217,0,0.40); }
+        .cta-btn:active { transform: translateY(0); }
+        .cta-sub { text-align: center; margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+
+        /* ===== FAQ ===== */
+        .faq-section { padding: 24px var(--modal-padding-x) 0; }
+        .faq-title {
+            font-size: 17px; font-weight: 700;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-primary);
+        }
+        .faq-title i { width: 20px; height: 20px; color: var(--azure); }
+        .faq-item {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .faq-question {
+            width: 100%;
+            padding: 16px 18px;
+            background: none; border: none;
+            font-size: 14px; font-weight: 600;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--text-primary);
+        }
+        .faq-question .arrow {
+            transition: transform 0.3s;
+            color: var(--text-muted);
+            display: flex; align-items: center;
+        }
+        .faq-question .arrow i { width: 16px; height: 16px; }
+        .faq-answer {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 18px;
+            font-size: 13px; color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+            padding: 0 18px 16px;
+        }
+        .faq-item.open .faq-question .arrow { transform: rotate(180deg); }
+
+        /* ===== Animation ===== */
+        .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="마이페이지.html" class="back-btn" aria-label="뒤로가기">
+                <i data-lucide="arrow-left"></i>
+            </a>
+            <span class="header-title">
+                <i data-lucide="gem"></i> 프리미엄
+            </span>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+        <!-- Hero -->
+        <div class="premium-hero">
+            <div class="hero-deco-circle c1"></div>
+            <div class="hero-deco-circle c2"></div>
+            <div class="hero-deco-circle c3"></div>
+            <div class="hero-icon">
+                <i data-lucide="crown"></i>
+            </div>
+            <h1 class="hero-title">멍이랑 <span>프리미엄</span></h1>
+            <p class="hero-subtitle">산책의 모든 것을 더 특별하게<br>나와 반려동물의 건강한 일상</p>
+        </div>
+
+        <!-- Benefits -->
+        <div class="benefits-section">
+            <div class="benefits-title"><i data-lucide="star"></i> 프리미엄 혜택</div>
+
+            <div class="benefit-card animate-in">
+                <div class="benefit-icon stats"><i data-lucide="bar-chart-2"></i></div>
+                <div class="benefit-info">
+                    <h4>상세 통계 & 리포트</h4>
+                    <p>주간/월간 상세 분석, 속도 변화 그래프, 칼로리 소모 리포트를 확인하세요</p>
+                </div>
+            </div>
+
+            <div class="benefit-card animate-in">
+                <div class="benefit-icon ranking"><i data-lucide="trophy"></i></div>
+                <div class="benefit-info">
+                    <h4>실시간 랭킹 + 지역별</h4>
+                    <p>전국 랭킹, 지역별 랭킹, 견종별 랭킹까지 다양한 랭킹을 즐기세요</p>
+                </div>
+            </div>
+
+            <div class="benefit-card animate-in">
+                <div class="benefit-icon adblock"><i data-lucide="shield"></i></div>
+                <div class="benefit-info">
+                    <h4>광고 완전 제거</h4>
+                    <p>배너 광고, 팝업 광고 없이 깔끔하게 앱을 사용하세요</p>
+                </div>
+            </div>
+
+            <div class="benefit-card highlight animate-in">
+                <div class="benefit-icon badges"><i data-lucide="zap"></i></div>
+                <div class="benefit-info">
+                    <h4>프리미엄 전용 뱃지 <span class="benefit-new">NEW</span></h4>
+                    <p>프리미엄 회원만 도전 가능한 특별한 뱃지 컬렉션을 수집하세요!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="compare-section">
+            <div class="compare-title"><i data-lucide="scale"></i> 무료 vs 프리미엄</div>
+            <div class="compare-table">
+                <div class="compare-header">
+                    <div>기능</div>
+                    <div>무료</div>
+                    <div class="premium-col"><i data-lucide="gem"></i> 프리미엄</div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">GPS 산책 기록</div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">기본 통계</div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">기본 뱃지</div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">동네 랭킹</div>
+                    <div><span class="limited">주간만</span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">상세 리포트</div>
+                    <div><span class="cross">&times;</span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">지역별 랭킹</div>
+                    <div><span class="cross">&times;</span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">광고 제거</div>
+                    <div><span class="cross">&times;</span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="feature">프리미엄 뱃지</div>
+                    <div><span class="cross">&times;</span></div>
+                    <div><span class="check"><i data-lucide="check-circle"></i></span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="pricing-section">
+            <div class="pricing-title"><i data-lucide="wallet"></i> 요금제 선택</div>
+            <div class="pricing-cards">
+                <div class="pricing-card" onclick="selectPlan(this)">
+                    <div class="pricing-header">
+                        <span class="pricing-name">월간 플랜</span>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="pricing-amount">&#8361;3,900</span>
+                        <span class="pricing-period">/월</span>
+                    </div>
+                </div>
+                <div class="pricing-card recommended" onclick="selectPlan(this)">
+                    <div class="pricing-header">
+                        <span class="pricing-name">연간 플랜</span>
+                        <span class="pricing-save">23% 할인</span>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="pricing-amount">&#8361;35,900</span>
+                        <span class="pricing-period">/년</span>
+                    </div>
+                    <div class="pricing-monthly">월 &#8361;2,992 &middot; 연 &#8361;10,900 절약</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <button class="cta-btn">
+                <i data-lucide="crown"></i> 프리미엄 시작하기
+            </button>
+            <div class="cta-sub">언제든 해지 가능 &middot; 7일 무료 체험</div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq-section">
+            <div class="faq-title"><i data-lucide="help-circle"></i> 자주 묻는 질문</div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <button class="faq-question">
+                    <span>결제 후 환불이 가능한가요?</span>
+                    <span class="arrow"><i data-lucide="chevron-down"></i></span>
+                </button>
+                <div class="faq-answer">
+                    결제 후 7일 이내에 환불을 요청하시면 전액 환불됩니다. 앱 설정 > 프리미엄 관리 > 환불 요청에서 진행하실 수 있습니다.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <button class="faq-question">
+                    <span>해지는 어떻게 하나요?</span>
+                    <span class="arrow"><i data-lucide="chevron-down"></i></span>
+                </button>
+                <div class="faq-answer">
+                    앱 설정 > 프리미엄 관리에서 언제든 해지할 수 있습니다. 해지 후에도 결제 기간이 끝날 때까지 프리미엄 혜택을 이용하실 수 있습니다.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <button class="faq-question">
+                    <span>패밀리 공유가 되나요?</span>
+                    <span class="arrow"><i data-lucide="chevron-down"></i></span>
+                </button>
+                <div class="faq-answer">
+                    현재 패밀리 공유는 지원하지 않지만, 곧 출시 예정인 패밀리 플랜을 통해 최대 5명까지 함께 사용할 수 있는 기능을 준비하고 있습니다.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <button class="faq-question">
+                    <span>무료 체험 기간이 끝나면?</span>
+                    <span class="arrow"><i data-lucide="chevron-down"></i></span>
+                </button>
+                <div class="faq-answer">
+                    7일 무료 체험 기간이 끝나면 자동으로 선택하신 요금제로 결제됩니다. 체험 기간 중 해지하시면 비용이 청구되지 않습니다.
+                </div>
+            </div>
+        </div>
+
+        <div style="height: 32px;"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+
+    function selectPlan(card) {
+        document.querySelectorAll('.pricing-card').forEach(function(c) {
+            c.style.borderColor = '';
+            c.style.background = '';
+            c.classList.remove('recommended');
+        });
+        card.style.borderColor = 'var(--lime)';
+        card.style.background = 'var(--lime-light)';
+    }
+
+    function toggleFaq(item) {
+        var wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+        if (!wasOpen) item.classList.add('open');
+    }
+    </script>
+</body>
+</html>

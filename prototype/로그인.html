@@ -4,28 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>로그인 - 멍이랑</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <style>
         :root {
-            --primary: #10B981;
-            --primary-dark: #059669;
-            --primary-light: #D1FAE5;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --text-light: #9CA3AF;
-            --bg: #F9FAFB;
-            --white: #FFFFFF;
-            --border: #E5E7EB;
-            --radius: 16px;
-            --radius-sm: 12px;
+            /* Lime */
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10);
+            --lime-glow: rgba(197,217,0,0.25);
+            /* Azure */
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08);
+            --azure-glow: rgba(0,153,255,0.20);
+            /* Text */
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            /* Backgrounds */
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            /* Glass */
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12);
+            --glass-blur: blur(20px);
+            /* Danger */
+            --danger: #EF4444;
+            /* Radius */
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            /* Layout */
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
+            --nav-height: 76px;
+            --header-height: 58px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--white);
-            color: var(--text);
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
@@ -39,6 +63,34 @@
             padding: 0 24px;
         }
 
+        /* ===== Decorative Background Blobs ===== */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            background: var(--lime-glow);
+            top: -80px;
+            right: -60px;
+            filter: blur(80px);
+        }
+
+        body::after {
+            width: 250px;
+            height: 250px;
+            background: var(--azure-glow);
+            bottom: -60px;
+            left: -50px;
+            filter: blur(80px);
+        }
+
         /* ===== Layout Container ===== */
         .login-container {
             width: 100%;
@@ -46,6 +98,8 @@
             flex-direction: column;
             align-items: center;
             padding-bottom: 40px;
+            position: relative;
+            z-index: 1;
         }
 
         /* ===== Logo Area ===== */
@@ -55,35 +109,45 @@
             align-items: center;
             margin-bottom: 48px;
             opacity: 0;
-            transform: translateY(-24px);
-            animation: fadeInDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+            transform: translateY(24px);
+            animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
         }
 
         .logo-icon {
-            width: 64px;
-            height: 64px;
-            background: var(--primary);
-            border-radius: 18px;
+            width: 68px;
+            height: 68px;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
             margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 24px var(--lime-glow);
+            color: var(--lime-dark);
+        }
+
+        .logo-icon i[data-lucide] {
+            width: 34px;
+            height: 34px;
+            stroke-width: 2;
         }
 
         .app-name {
             font-size: 28px;
             font-weight: 800;
-            color: var(--text);
+            color: var(--text-primary);
             letter-spacing: -0.5px;
             margin-bottom: 8px;
         }
 
         .app-subtitle {
             font-size: 14px;
-            color: var(--text-light);
-            font-weight: 400;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: -0.2px;
         }
 
         /* ===== Login Buttons ===== */
@@ -107,7 +171,7 @@
             border: none;
             font-size: 15px;
             font-weight: 600;
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
             cursor: pointer;
             position: relative;
             padding: 0 16px;
@@ -118,7 +182,7 @@
 
         .login-btn:hover {
             filter: brightness(0.96);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
         }
 
         .login-btn:active {
@@ -182,7 +246,7 @@
         .btn-google {
             background: #FFFFFF;
             color: #191919;
-            border: 1px solid var(--border);
+            border: 1px solid var(--glass-border);
         }
 
         .btn-google .btn-icon svg {
@@ -193,42 +257,61 @@
         /* ===== Bottom Terms ===== */
         .terms-text {
             font-size: 12px;
-            color: var(--text-light);
+            color: var(--text-muted);
             text-align: center;
             line-height: 1.6;
             opacity: 0;
-            animation: fadeIn 0.6s ease 0.8s forwards;
+            animation: fadeInUp 0.6s ease 0.8s forwards;
         }
 
         .terms-text a {
-            color: var(--text-light);
+            color: var(--text-muted);
             text-decoration: underline;
             text-underline-offset: 2px;
+            transition: color 0.15s ease;
         }
 
         .terms-text a:hover {
             color: var(--text-secondary);
         }
 
-        /* ===== Toast ===== */
+        /* ===== Toast (Glassmorphism) ===== */
         .toast {
             position: fixed;
             bottom: 60px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: var(--text);
-            color: var(--white);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
             padding: 14px 24px;
             border-radius: var(--radius-sm);
             font-size: 14px;
             font-weight: 500;
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 1000;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px var(--lime-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--lime-dark);
+        }
+
+        .toast .toast-icon i[data-lucide] {
+            width: 18px;
+            height: 18px;
         }
 
         .toast.show {
@@ -237,17 +320,6 @@
         }
 
         /* ===== Animations ===== */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-24px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -263,6 +335,20 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        @keyframes floatBtn {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        @keyframes limePulse {
+            0%, 100% { box-shadow: 0 8px 24px var(--lime-glow); }
+            50% { box-shadow: 0 8px 32px rgba(197,217,0,0.40); }
+        }
+
+        .logo-icon {
+            animation: limePulse 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
@@ -270,7 +356,9 @@
 <div class="login-container">
     <!-- Logo Area -->
     <div class="logo-area">
-        <div class="logo-icon">🐾</div>
+        <div class="logo-icon">
+            <i data-lucide="paw-print"></i>
+        </div>
         <div class="app-name">멍이랑</div>
         <div class="app-subtitle">반려동물과 함께하는 즐거운 산책</div>
     </div>
@@ -324,9 +412,18 @@
 </div>
 
 <!-- Toast -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">
+    <span class="toast-icon"><i data-lucide="loader-circle"></i></span>
+    <span class="toast-text"></span>
+</div>
 
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+
     let isNavigating = false;
 
     function handleLogin(service) {
@@ -334,11 +431,13 @@
         isNavigating = true;
 
         const toast = document.getElementById('toast');
-        toast.textContent = service + '으로 로그인 중...';
+        const toastText = toast.querySelector('.toast-text');
 
         // Korean postposition correction
         if (service === 'Apple' || service === 'Google') {
-            toast.textContent = service + '로 로그인 중...';
+            toastText.textContent = service + '로 로그인 중...';
+        } else {
+            toastText.textContent = service + '으로 로그인 중...';
         }
 
         toast.classList.add('show');

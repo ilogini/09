@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>산책 상세 - 멍이랑</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --lime: #C5D900;
+            --lime-dark: #9FB300;
+            --lime-light: rgba(197,217,0,0.10);
+            --lime-glow: rgba(197,217,0,0.25);
+            --azure: #0099FF;
+            --azure-dark: #0077CC;
+            --azure-light: rgba(0,153,255,0.08);
+            --azure-glow: rgba(0,153,255,0.20);
+            --text-primary: #1A2B3C;
+            --text-secondary: #5C6F82;
+            --text-muted: #94A3B8;
+            --bg-base: #F8FCFA;
+            --bg-white: #FFFFFF;
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-bg-heavy: rgba(255,255,255,0.80);
+            --glass-border: rgba(197,217,0,0.12);
+            --glass-blur: blur(20px);
+            --danger: #EF4444;
+            --radius-xl: 28px;
+            --radius-lg: 24px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            --modal-width: 480px;
+            --modal-padding-x: 20px;
+            --nav-height: 76px;
+            --header-height: 58px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            max-width: var(--modal-width);
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== Header (Glassmorphism) ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 0 var(--modal-padding-x);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: var(--header-height);
+            border-bottom: 1.5px solid var(--glass-border);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .back-btn:hover {
+            background: var(--lime-light);
+            border-color: var(--lime);
+        }
+        .back-btn i {
+            width: 18px;
+            height: 18px;
+        }
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-title i {
+            width: 20px;
+            height: 20px;
+            color: var(--lime-dark);
+        }
+        .share-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+        .share-btn:hover {
+            background: var(--lime-light);
+            border-color: var(--lime);
+        }
+        .share-btn i {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== Content ===== */
+        .content {
+            padding: 0 0 32px;
+        }
+
+        /* ===== Date/Pet Info ===== */
+        .walk-info-bar {
+            padding: 14px var(--modal-padding-x);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .walk-date-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .walk-date-text i {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+        }
+        .walk-pet-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--lime-light);
+            color: var(--lime-dark);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        .walk-pet-chip i {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ===== Route Map ===== */
+        .route-map {
+            margin: 16px var(--modal-padding-x);
+            height: 200px;
+            background: linear-gradient(135deg, #EEF2E6, #E4E9D8);
+            border-radius: var(--radius-md);
+            position: relative;
+            overflow: hidden;
+            border: 1.5px solid var(--glass-border);
+        }
+        .route-map-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(197,217,0,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(197,217,0,0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .route-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .route-start, .route-end {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+        }
+        .route-start {
+            background: var(--lime);
+            top: 65%;
+            left: 12%;
+            box-shadow: 0 0 12px var(--lime-glow);
+        }
+        .route-end {
+            background: var(--danger);
+            top: 20%;
+            right: 15%;
+            box-shadow: 0 0 12px rgba(239,68,68,0.25);
+        }
+        .route-label {
+            position: absolute;
+            bottom: 10px;
+            right: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 3px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .route-label i {
+            width: 12px;
+            height: 12px;
+            color: var(--lime-dark);
+        }
+
+        /* ===== Stats Grid ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 var(--modal-padding-x);
+        }
+        .stat-card {
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius-sm);
+            padding: 18px 16px;
+            text-align: center;
+            border: 1.5px solid var(--glass-border);
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            border-color: var(--lime-glow);
+            background: var(--glass-bg);
+        }
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            margin: 0 auto 8px;
+            background: var(--lime-light);
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stat-icon i {
+            width: 20px;
+            height: 20px;
+            color: var(--lime-dark);
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        .stat-value .unit {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ===== Section Card (Glass) ===== */
+        .section-card {
+            margin: 16px var(--modal-padding-x);
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1.5px solid var(--glass-border);
+        }
+        .section-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+        .section-card h3 i {
+            width: 18px;
+            height: 18px;
+            color: var(--lime-dark);
+        }
+
+        /* ===== Speed Chart ===== */
+        .chart-area {
+            position: relative;
+            height: 120px;
+        }
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 100%;
+        }
+        .chart-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .chart-bar {
+            width: 100%;
+            border-radius: 5px 5px 0 0;
+            min-height: 8px;
+            transition: height 0.6s ease;
+        }
+        .chart-bar.low {
+            background: linear-gradient(to top, rgba(197,217,0,0.15), rgba(197,217,0,0.30));
+        }
+        .chart-bar.mid {
+            background: linear-gradient(to top, rgba(197,217,0,0.30), rgba(197,217,0,0.50));
+        }
+        .chart-bar.high {
+            background: linear-gradient(to top, rgba(197,217,0,0.50), rgba(197,217,0,0.75));
+        }
+        .chart-bar.peak {
+            background: linear-gradient(to top, rgba(197,217,0,0.75), var(--lime));
+        }
+        .chart-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .chart-avg {
+            position: absolute;
+            top: 45%;
+            left: 0;
+            right: 0;
+            border-top: 2px dashed var(--lime-glow);
+        }
+        .chart-avg-label {
+            position: absolute;
+            top: 42%;
+            right: 0;
+            background: var(--lime-light);
+            color: var(--lime-dark);
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* ===== Photo Gallery ===== */
+        .photo-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+        }
+        .photo-scroll::-webkit-scrollbar { display: none; }
+        .photo-item {
+            min-width: 140px;
+            height: 140px;
+            background: var(--bg-base);
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 2px dashed var(--glass-border);
+            transition: all 0.2s ease;
+        }
+        .photo-item:hover {
+            border-color: var(--lime-glow);
+            background: var(--lime-light);
+        }
+        .photo-item .photo-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+        .photo-item .photo-icon i {
+            width: 28px;
+            height: 28px;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        .photo-item .photo-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ===== Badge Earned ===== */
+        .badge-earned-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--lime-light), rgba(197,217,0,0.18));
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--glass-border);
+        }
+        .badge-earned-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--glass-bg-heavy);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--glass-border);
+        }
+        .badge-earned-icon i {
+            width: 28px;
+            height: 28px;
+            color: var(--lime-dark);
+        }
+        .badge-earned-info { flex: 1; }
+        .badge-earned-info .label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--lime-dark);
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+        .badge-earned-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .badge-earned-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ===== Share Buttons ===== */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 0 var(--modal-padding-x);
+            margin-top: 20px;
+        }
+        .share-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .share-action:hover {
+            transform: translateY(-2px);
+        }
+        .share-action:active {
+            transform: translateY(0);
+        }
+        .share-action i {
+            width: 18px;
+            height: 18px;
+        }
+        .share-lime {
+            background: var(--lime);
+            color: var(--text-primary);
+        }
+        .share-lime:hover {
+            background: var(--lime-dark);
+            box-shadow: 0 4px 16px var(--lime-glow);
+        }
+        .share-azure {
+            background: var(--azure);
+            color: var(--bg-white);
+        }
+        .share-azure:hover {
+            background: var(--azure-dark);
+            box-shadow: 0 4px 16px var(--azure-glow);
+        }
+
+        /* ===== Animation ===== */
+        .animate-in {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stagger animation delays */
+        .animate-in:nth-child(1) { animation-delay: 0s; }
+        .animate-in:nth-child(2) { animation-delay: 0.06s; }
+        .animate-in:nth-child(3) { animation-delay: 0.12s; }
+        .animate-in:nth-child(4) { animation-delay: 0.18s; }
+        .animate-in:nth-child(5) { animation-delay: 0.24s; }
+        .animate-in:nth-child(6) { animation-delay: 0.30s; }
+        .animate-in:nth-child(7) { animation-delay: 0.36s; }
+    </style>
+</head>
+<body>
+
+    <!-- Header (Glassmorphism) -->
+    <header class="header">
+        <div class="header-left">
+            <a href="마이페이지.html" class="back-btn" aria-label="뒤로가기">
+                <i data-lucide="arrow-left"></i>
+            </a>
+            <span class="header-title">
+                <i data-lucide="bar-chart-3"></i>
+                산책 상세
+            </span>
+        </div>
+        <button class="share-btn" aria-label="공유">
+            <i data-lucide="share-2"></i>
+        </button>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+        <!-- Date & Pet -->
+        <div class="walk-info-bar">
+            <span class="walk-date-text">
+                <i data-lucide="calendar"></i>
+                2026.02.10 오전 7:30
+            </span>
+            <span class="walk-pet-chip">
+                <i data-lucide="dog"></i>
+                초코와 산책
+            </span>
+        </div>
+
+        <!-- Route Map -->
+        <div class="route-map animate-in">
+            <div class="route-map-grid"></div>
+            <svg class="route-svg" viewBox="0 0 400 200" fill="none" preserveAspectRatio="none">
+                <path d="M 60 140 C 80 120, 100 80, 140 90 S 180 110, 220 70 S 280 40, 320 50 L 340 45"
+                      stroke="#C5D900" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"
+                      stroke-dasharray="500" stroke-dashoffset="500">
+                    <animate attributeName="stroke-dashoffset" from="500" to="0" dur="2s" fill="freeze" />
+                </path>
+                <path d="M 60 140 C 80 120, 100 80, 140 90 S 180 110, 220 70 S 280 40, 320 50 L 340 45"
+                      stroke="#C5D900" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"
+                      opacity="0.15" />
+            </svg>
+            <div class="route-start">S</div>
+            <div class="route-end">E</div>
+            <div class="route-label">
+                <i data-lucide="navigation"></i>
+                보라매공원 코스
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid animate-in">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="map-pin"></i>
+                </div>
+                <div class="stat-value">3.2<span class="unit">km</span></div>
+                <div class="stat-label">거리</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div class="stat-value">42<span class="unit">분</span></div>
+                <div class="stat-label">시간</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="flame"></i>
+                </div>
+                <div class="stat-value">165<span class="unit">kcal</span></div>
+                <div class="stat-label">칼로리</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="footprints"></i>
+                </div>
+                <div class="stat-value">4.6<span class="unit">km/h</span></div>
+                <div class="stat-label">평균 속도</div>
+            </div>
+        </div>
+
+        <!-- Speed Chart -->
+        <div class="section-card animate-in">
+            <h3>
+                <i data-lucide="trending-up"></i>
+                구간별 속도
+            </h3>
+            <div class="chart-area">
+                <div class="chart-bars">
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar mid" style="height:50%"></div>
+                        <span class="chart-label">1</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar mid" style="height:55%"></div>
+                        <span class="chart-label">2</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar high" style="height:72%"></div>
+                        <span class="chart-label">3</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar peak" style="height:85%"></div>
+                        <span class="chart-label">4</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar peak" style="height:90%"></div>
+                        <span class="chart-label">5</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar high" style="height:68%"></div>
+                        <span class="chart-label">6</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar low" style="height:35%"></div>
+                        <span class="chart-label">7</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar mid" style="height:50%"></div>
+                        <span class="chart-label">8</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar high" style="height:75%"></div>
+                        <span class="chart-label">9</span>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar mid" style="height:45%"></div>
+                        <span class="chart-label">10</span>
+                    </div>
+                </div>
+                <div class="chart-avg"></div>
+                <span class="chart-avg-label">평균 4.6km/h</span>
+            </div>
+        </div>
+
+        <!-- Photo Gallery -->
+        <div class="section-card animate-in">
+            <h3>
+                <i data-lucide="camera"></i>
+                산책 사진
+            </h3>
+            <div class="photo-scroll">
+                <div class="photo-item">
+                    <span class="photo-icon"><i data-lucide="image"></i></span>
+                    <span class="photo-text">07:35 촬영</span>
+                </div>
+                <div class="photo-item">
+                    <span class="photo-icon"><i data-lucide="image"></i></span>
+                    <span class="photo-text">07:48 촬영</span>
+                </div>
+                <div class="photo-item">
+                    <span class="photo-icon"><i data-lucide="image"></i></span>
+                    <span class="photo-text">08:05 촬영</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge Earned -->
+        <div class="section-card animate-in">
+            <h3>
+                <i data-lucide="award"></i>
+                이 산책에서 획득한 뱃지
+            </h3>
+            <div class="badge-earned-card">
+                <div class="badge-earned-icon">
+                    <i data-lucide="medal"></i>
+                </div>
+                <div class="badge-earned-info">
+                    <div class="label">NEW BADGE!</div>
+                    <h4>5km 워커</h4>
+                    <p>누적 5km 산책 달성! 대단해요!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="share-buttons animate-in">
+            <button class="share-action share-lime">
+                <i data-lucide="message-circle"></i>
+                카카오톡 공유
+            </button>
+            <button class="share-action share-azure">
+                <i data-lucide="instagram"></i>
+                인스타 스토리
+            </button>
+        </div>
+
+        <div style="height: 20px;"></div>
+    </main>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

@@ -205,56 +205,48 @@
         .challenge-result.accepted { color: var(--lime-dark); }
         .challenge-result.rejected { color: var(--text-muted); }
 
-        /* ===== Bottom Nav (Glass) ===== */
+        /* ===== Bottom Nav — glass ===== */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 50%;
-            transform: translateX(-50%);
-            width: 100%; max-width: var(--modal-width);
-            height: var(--nav-height);
-            background: rgba(255,255,255,0.70);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-top: 1px solid var(--glass-border);
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(197,217,0,0.08);
             display: flex; align-items: center; justify-content: space-around;
+            padding: 0 4px; padding-bottom: env(safe-area-inset-bottom, 0);
             z-index: 200;
-            padding: 0 8px;
-            padding-bottom: env(safe-area-inset-bottom, 0);
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
-            gap: 3px; text-decoration: none;
-            color: var(--text-muted); font-size: 10px; font-weight: 600;
-            padding: 6px 12px;
-            transition: color 0.2s ease;
-            position: relative;
+            gap: 3px; padding: 8px 14px; border: none; background: none;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            position: relative; min-width: 52px; text-decoration: none; color: inherit;
         }
-        .nav-item i { width: 24px; height: 24px; }
-        .nav-item.active { color: var(--lime-dark); }
-        .nav-item:hover { color: var(--text-secondary); }
-
-        /* Center paw button */
-        .nav-center {
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-            width: 56px; height: 56px;
-            border-radius: 50%;
+        .nav-item .nav-icon-wrap {
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-item .nav-icon-wrap .lucide { width: 22px; height: 22px; stroke-width: 1.6; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+        .nav-item.active .nav-icon-wrap { color: var(--lime-dark); }
+        .nav-item.active .nav-label { color: var(--lime-dark); font-weight: 600; }
+        .nav-item.active::after {
+            content: ''; position: absolute; bottom: 4px;
+            width: 4px; height: 4px; background: var(--lime); border-radius: 50%;
+        }
+        .nav-item.center-btn { position: relative; top: -16px; }
+        .nav-item.center-btn .nav-icon-wrap {
+            width: 54px; height: 54px;
             background: linear-gradient(135deg, var(--lime), var(--lime-dark));
-            box-shadow: 0 4px 20px var(--lime-glow), 0 2px 8px rgba(197,217,0,0.15);
-            margin-top: -24px;
-            text-decoration: none;
-            transition: all 0.25s ease;
+            border-radius: 50%; color: white;
+            box-shadow: 0 4px 20px var(--lime-glow);
+            animation: navFloat 3s ease-in-out infinite;
+            font-size: 24px;
         }
-        .nav-center:hover { transform: scale(1.06); box-shadow: 0 6px 28px var(--lime-glow); }
-        .nav-center .paw-icon { font-size: 26px; line-height: 1; }
-
-        /* Notification badge on bell */
-        .nav-badge {
-            position: absolute; top: 2px; right: 6px;
-            width: 8px; height: 8px;
-            background: var(--danger);
-            border-radius: 50%;
-            border: 2px solid var(--bg-white);
-        }
+        .nav-item.center-btn .nav-icon-wrap .lucide { width: 24px; height: 24px; stroke-width: 2; }
+        .nav-item.center-btn:hover .nav-icon-wrap { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(197,217,0,0.4); }
+        @keyframes navFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+        .nav-item.center-btn .nav-label { color: var(--lime-dark); font-weight: 600; margin-top: 6px; }
 
         /* ===== Animations ===== */
         .animate-in { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
@@ -440,25 +432,25 @@
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="멍이랑_메인페이지_시안.html" class="nav-item">
-            <i data-lucide="home"></i>
-            <span>홈</span>
+        <a class="nav-item" href="멍이랑_메인페이지_시안.html">
+            <span class="nav-icon-wrap"><i data-lucide="home"></i></span>
+            <span class="nav-label">홈</span>
         </a>
-        <a href="산책.html" class="nav-item">
-            <i data-lucide="map"></i>
-            <span>산책</span>
+        <a class="nav-item" href="소셜.html">
+            <span class="nav-icon-wrap"><i data-lucide="users"></i></span>
+            <span class="nav-label">소셜</span>
         </a>
-        <a href="산책.html" class="nav-center" aria-label="산책 시작">
-            <span class="paw-icon">🐾</span>
+        <button class="nav-item center-btn" onclick="location.href='멍이랑_메인페이지_시안.html'">
+            <span class="nav-icon-wrap">🐾</span>
+            <span class="nav-label">산책</span>
+        </button>
+        <a class="nav-item" href="랭킹.html">
+            <span class="nav-icon-wrap"><i data-lucide="trophy"></i></span>
+            <span class="nav-label">랭킹</span>
         </a>
-        <a href="#" class="nav-item active" style="pointer-events:none;">
-            <i data-lucide="bell"></i>
-            <span>알림</span>
-            <span class="nav-badge"></span>
-        </a>
-        <a href="마이페이지.html" class="nav-item">
-            <i data-lucide="user"></i>
-            <span>MY</span>
+        <a class="nav-item" href="마이페이지.html">
+            <span class="nav-icon-wrap"><i data-lucide="user"></i></span>
+            <span class="nav-label">MY</span>
         </a>
     </nav>
 

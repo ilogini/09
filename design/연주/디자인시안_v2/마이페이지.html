@@ -628,8 +628,12 @@
             background: linear-gradient(135deg, var(--lime), var(--lime-dark));
             border-radius: 50%; color: white;
             box-shadow: 0 4px 20px var(--lime-glow);
+            animation: navFloat 3s ease-in-out infinite;
             font-size: 24px;
         }
+        .nav-item.center-btn .nav-icon-wrap .lucide { width: 24px; height: 24px; stroke-width: 2; }
+        .nav-item.center-btn:hover .nav-icon-wrap { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(197,217,0,0.4); }
+        @keyframes navFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
         .nav-item.center-btn .nav-label { color: var(--lime-dark); font-weight: 600; margin-top: 6px; }
 
         /* ===== Animations ===== */

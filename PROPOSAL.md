@@ -65,11 +65,14 @@
 ### 2.4 결제 연동
 
 ```
-PG사: 토스페이먼츠 (Toss Payments)
+PG사: 토스페이먼츠 (Toss Payments) — 백엔드 httpx로 REST API 호출
 - 카드 결제, 카카오페이, 네이버페이
 - 앱 내 결제: iOS IAP / Google Play Billing
 - 정기결제(빌링키) 지원
+- 구독 상태: trial(7일) → active → cancelled → expired
 ```
+
+> 상세 결제 설계: [backend/06_payment.md](backend/06_payment.md)
 
 ---
 
@@ -171,120 +174,202 @@ PG사: 토스페이먼츠 (Toss Payments)
 ### 5.1 프론트엔드 (모바일 앱)
 
 ```
-Framework:    React Native (Expo SDK 52)
-Navigation:   React Navigation v7 (Tab + Stack)
-UI Library:   React Native Paper / NativeWind (Tailwind)
-State:        Zustand (경량 상태관리)
-Maps:         react-native-naver-map 또는 react-native-maps
-Charts:       react-native-chart-kit (산책 통계 그래프)
-Camera:       expo-camera
-Location:     expo-location (foreground + background)
-Notifications: expo-notifications + FCM/APNs
-Storage:      expo-secure-store (토큰), AsyncStorage (캐시)
+Framework:    React Native 0.81 (Expo SDK 54)
+Language:     TypeScript 5.x (Strict mode)
+Navigation:   React Navigation v7 (Bottom Tabs + Native Stack)
+Styling:      NativeWind v4.1 (Tailwind CSS for RN)
+State:        Zustand 5.x (경량 전역 상태)
+Server State: TanStack Query v5 (API 캐싱, 리트라이, 백그라운드 리페치)
+Animation:    react-native-reanimated v3 (~3.16.x, NativeWind v4 호환)
+HTTP:         axios 1.13.x
+Maps:         @mj-studio/react-native-naver-map v2.x (한국 시장 필수)
+Location:     expo-location + expo-task-manager (foreground + background GPS)
+Camera:       expo-image-picker (사진 촬영/갤러리 선택)
+Push:         expo-notifications + FCM/APNs
+Storage:      expo-secure-store (JWT 토큰), AsyncStorage (캐시)
+Social Login: @react-native-kakao/core, expo-apple-authentication, expo-auth-session
 ```
+
+> **참고**: Expo Go 미지원 — Development Build 필수 (네이버 지도, 카카오 SDK 등 네이티브 모듈 사용)
+> 상세 환경 설정: [frontend/env_setup.md](frontend/env_setup.md)
 
 ### 5.2 백엔드
 
 ```
-API:          Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
-Auth:         Supabase Auth (카카오, 네이버, Apple 로그인)
-Database:     Supabase (PostgreSQL + PostGIS)
-Storage:      Supabase Storage (사진 업로드)
-Payment:      Toss Payments SDK + iOS IAP + Google Play Billing
-Push:         Firebase Cloud Messaging (Android) + APNs (iOS)
+Language:     Python 3.11+ (3.12 권장)
+Framework:    FastAPI 0.115+ (비동기, 자동 Swagger UI)
+ORM:          SQLAlchemy 2.0 (async 지원) + GeoAlchemy2
+Migration:    Alembic 1.13+
+Database:     PostgreSQL 15+ (자체 운영) + PostGIS 확장
+Auth:         python-jose (JWT 발급/검증) + httpx (소셜 OAuth)
+WebSocket:    FastAPI WebSocket (함께 산책 위치 공유)
+Scheduler:    APScheduler (랭킹 집계, 날씨 캐싱, 계정 정리)
+Cache:        Redis 7+ (날씨 캐시, 빈도 제한)
+Push:         firebase-admin (FCM/APNs 크로스 플랫폼)
+Payment:      httpx (Toss Payments REST API) + iOS IAP + Google Play Billing
+Storage:      Cloudflare R2 (S3 호환, boto3) — 무료 10GB, 이그레스 무료
+Deploy:       Render (Docker) — Free → Starter $7/월
+Validation:   Pydantic v2.6+ (요청/응답 스키마)
+Image:        Pillow 10.2+ (서버사이드 리사이징)
 ```
+
+> 상세 설계: [backend/00_overview.md](backend/00_overview.md)
+> 환경 설정: [backend/env_setup.md](backend/env_setup.md)
 
 ### 5.3 외부 API
 
-| API | 용도 | 비용 |
-|-----|------|------|
-| 네이버 지도 API | 산책 경로 표시, 장소 검색 | 무료 (일 200,000건) |
-| 카카오맵 API | 지도 대안, 로컬 검색 | 무료 (일 300,000건) |
-| 기상청 단기예보 | 산책 전 날씨 확인 | 무료 (공공데이터) |
-| 동물병원 현황 | 주변 병원 표시 | 무료 (공공데이터) |
-| 네이티브 GPS | 위치 추적 (foreground + background) | 무료 (OS 내장) |
-| 카카오 AdFit | 배너 광고 | 수익 (CPC/CPM) |
-| Toss Payments | 결제 처리 | 수수료 3.3% |
+| API | 용도 | 호출 방식 | 비용 |
+|-----|------|----------|------|
+| 네이버 지도 API | 산책 경로 표시 | 프론트 직접 호출 | 무료 (일 200,000건) |
+| 카카오 로컬 API | 반려동물 카페/장소 검색, 역지오코딩 | 백엔드 프록시 | 무료 (일 300,000건) |
+| 기상청 단기예보 | 기온, 강수, 하늘 상태 | 백엔드 (Redis 1시간 캐싱) | 무료 (공공데이터) |
+| 에어코리아 | 미세먼지 PM10/PM2.5 | 백엔드 (Redis 1시간 캐싱) | 무료 (공공데이터) |
+| 동물병원 현황 | 주변 병원 표시 | 백엔드 (DB 24시간 동기화) | 무료 (공공데이터) |
+| 반려동물 놀이터 | 반려동물 공원 정보 | 백엔드 (DB 24시간 동기화) | 무료 (공공데이터) |
+| 네이티브 GPS | 위치 추적 (foreground + background) | 프론트 직접 | 무료 (OS 내장) |
+| 카카오 AdFit | 배너 광고 | 프론트 직접 | 수익 (CPC/CPM) |
+| Toss Payments | 결제 처리 | 백엔드 REST API | 수수료 3.3% |
+| Firebase | FCM 푸시 알림 | 백엔드 (firebase-admin) | 무료 (Spark) |
+
+> 상세 연동: [backend/04_external_apis.md](backend/04_external_apis.md)
 
 ### 5.4 인프라
 
 ```
-Backend:      Supabase (managed)
+Backend:      Render (Docker) — Free → Starter $7/월
+Database:     PostgreSQL 15+ (Render 또는 자체 운영)
+Cache:        Redis 7+ (Render Redis 또는 Upstash 무료)
+Storage:      Cloudflare R2 (S3 호환, 무료 10GB)
 App Store:    Apple App Store + Google Play Store
-CI/CD:        EAS Build + EAS Submit (Expo)
+CI/CD (FE):   EAS Build + EAS Submit (Expo)
+CI/CD (BE):   GitHub → Render 자동 배포
 OTA Update:   EAS Update (코드 푸시)
-Monitoring:   Sentry (React Native)
+Monitoring:   Sentry (React Native + FastAPI)
 Analytics:    Firebase Analytics / Amplitude
 ```
 
 ---
 
-## 6. 데이터 모델 (주요 테이블)
+## 6. 데이터 모델 (21개 테이블)
+
+> 전체 스키마(CREATE TABLE, 인덱스, Stored Procedures)는 [backend/01_database_schema.md](backend/01_database_schema.md) 참조
+> ORM: SQLAlchemy 2.0 + GeoAlchemy2 / 마이그레이션: Alembic
+
+### 6.1 ER 관계 요약
+
+```
+users ──┬── pets ──── pet_health
+        │
+        ├── walks (route_geojson, route_geometry)
+        │     └── walk_photos
+        │
+        ├── user_badges ──── badge_definitions (45개 뱃지)
+        │
+        ├── rankings
+        │     └── hall_of_fame
+        │
+        ├── follows (self-referencing)
+        ├── likes / comments ──── walks
+        ├── invitations / meetups ──── meetup_participants
+        │
+        ├── blocks / reports
+        │
+        ├── push_tokens / notifications
+        └── subscriptions (결제/구독)
+```
+
+### 6.2 테이블별 핵심 컬럼
 
 ```sql
--- 사용자
+-- 사용자 (소셜 로그인 기반)
 users (
-  id, email, nickname,
-  region, premium_until, created_at
+  id UUID, email, nickname,
+  provider, provider_id,              -- kakao / naver / apple
+  region_sido, region_sigungu, region_dong,  -- 지역 3단계
+  is_premium, premium_until,
+  weekly_goal_km, notification_settings JSONB,
+  hashed_refresh_token,               -- JWT 리프레시 토큰 해시
+  deleted_at                          -- 소프트 삭제 (30일 유예)
 )
 
 -- 반려동물
 pets (
-  id, user_id, name, species, breed,
-  age, weight, photo_url
+  id UUID, user_id FK, name, species, breed,
+  size, birth_date, weight_kg, photo_url,
+  is_primary                          -- 대표 반려동물
 )
 
--- 산책 기록
+-- 반려동물 건강 기록
+pet_health (
+  id UUID, pet_id FK, record_type,    -- weight / vaccination / hospital_visit
+  record_date, value_numeric, title, memo
+)
+
+-- 산책 기록 (핵심 테이블, PostGIS)
 walks (
-  id, user_id, pet_id,
-  started_at, ended_at,
-  distance_m, duration_sec,
-  calories,
-  route_geojson, -- GPS 경로 데이터
-  photos, weather
+  id UUID, user_id FK, pet_id FK,
+  started_at, ended_at, duration_sec, distance_m, calories,
+  avg_speed_kmh,
+  route_geojson JSONB,                -- GeoJSON LineString
+  route_geometry GEOMETRY(LineString, 4326),  -- PostGIS 인덱스
+  start_point GEOMETRY(Point, 4326),
+  end_point GEOMETRY(Point, 4326),
+  weather JSONB,                      -- {"temp": 12, "sky": "맑음", "pm10": 30}
+  is_valid, shared_to_feed
 )
 
--- 챌린지
-challenges (
-  id, title, description, type,
-  goal_distance, goal_days,
-  start_date, end_date
+-- 산책 사진
+walk_photos (
+  id UUID, walk_id FK,
+  photo_url, thumbnail_url,           -- Cloudflare R2 URL
+  location GEOMETRY(Point, 4326)
 )
 
--- 리더보드 (주간/월간 집계)
-leaderboards (
-  id, user_id, period_type, period_key,
-  total_distance, total_time, walk_count,
-  rank, region
+-- 뱃지 정의 (45개, 6카테고리)
+badge_definitions (
+  id UUID, category,                  -- distance/streak/exploration/time/special/season
+  name, description, icon,
+  condition_type, condition_value, condition_extra JSONB,
+  difficulty,                         -- beginner~mythic (7단계)
+  season_start, season_end
 )
 
--- 뱃지
-badges (
-  id, user_id, badge_type,
-  earned_at
+-- 사용자별 뱃지 상태
+user_badges (
+  id UUID, user_id FK, badge_id FK,
+  status,                             -- locked / in_progress / earned
+  progress_value, progress_percent,
+  earned_at, earned_walk_id FK
 )
 
--- 푸시 알림 토큰
-push_tokens (
-  id, user_id, platform,
-  token, created_at
+-- 랭킹 (주간/월간/전체)
+rankings (
+  id UUID, user_id FK, pet_id FK,
+  period_type, period_key,            -- "2026-W07", "2026-02", "alltime"
+  total_distance_m, total_duration_sec, walk_count,
+  rank, prev_rank,
+  region_sigungu, region_dong
 )
 
--- 등급 (산책 등급 시스템)
-user_grades (
-  user_id,          -- FK → users.id
-  current_level,    -- 1-10
-  total_distance_km,-- decimal
-  level_up_at       -- timestamp
-)
+-- 명예의 전당
+hall_of_fame (id UUID, user_id FK, category, period_key, record_value)
 
--- 칭호 (업적 칭호 시스템)
-user_titles (
-  user_id,          -- FK → users.id
-  title_id,         -- string (e.g. 'early_bird', 'marathoner')
-  earned_at,        -- timestamp
-  is_active         -- boolean (현재 표시 중인 칭호)
-)
+-- 소셜
+follows (follower_id FK, following_id FK)
+likes (user_id FK, walk_id FK)
+comments (user_id FK, walk_id FK, content)
+invitations (inviter_id FK, invitee_id FK, scheduled_at, location_point, status)
+meetups (creator_id FK, title, location_point, scheduled_at, max_participants)
+meetup_participants (meetup_id FK, user_id FK)
+
+-- 안전
+blocks (blocker_id FK, blocked_id FK)
+reports (reporter_id FK, target_type, target_id, reason, status)
+
+-- 시스템
+push_tokens (user_id FK, platform, token, is_active)
+notifications (user_id FK, type, title, body, data JSONB, is_read)
+subscriptions (user_id FK, plan_type, status, payment_provider, current_period_end)
 ```
 
 ---
@@ -384,43 +469,60 @@ user_titles (
 
 ### 8.1 GPS 트래킹 (네이티브)
 
-```javascript
-// expo-location 활용
+```typescript
+// expo-location + expo-task-manager 활용
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 
-// 포그라운드 + 백그라운드 위치 권한
-const { status: fg } = await Location.requestForegroundPermissionsAsync();
-const { status: bg } = await Location.requestBackgroundPermissionsAsync();
+const WALK_TRACKING_TASK = 'walk-background-tracking';
 
-// 백그라운드 위치 추적 (앱이 백그라운드여도 동작)
-await Location.startLocationUpdatesAsync('walk-tracking', {
-  accuracy: Location.Accuracy.BestForNavigation,
-  distanceInterval: 5,        // 5m마다 업데이트
-  deferredUpdatesInterval: 3000,
-  showsBackgroundLocationIndicator: true,
-  foregroundService: {
-    notificationTitle: '멍이랑 - 산책 중',
-    notificationBody: '산책을 기록하고 있습니다 🐾',
-  },
+// 반드시 글로벌 스코프에서 정의 (컴포넌트 밖)
+TaskManager.defineTask(WALK_TRACKING_TASK, ({ data, error }) => {
+  if (error) return;
+  const { locations } = data as { locations: Location.LocationObject[] };
+  // Zustand store에 경로 포인트 추가
 });
+
+// 산책 시작 시 호출
+export async function startWalkTracking() {
+  await Location.startLocationUpdatesAsync(WALK_TRACKING_TASK, {
+    accuracy: Location.Accuracy.Balanced,    // 배터리 최적화 (~5-8%/시간)
+    timeInterval: 10000,                     // 10초마다
+    distanceInterval: 10,                    // 10m 이동 시에만 업데이트
+    deferredUpdatesInterval: 15000,          // 15초 배치 처리
+    showsBackgroundLocationIndicator: true,  // iOS 상단 파란 바
+    foregroundService: {                     // Android 알림
+      notificationTitle: '멍이랑 - 산책 중',
+      notificationBody: '산책을 기록하고 있습니다',
+      notificationColor: '#FF6B35',
+    },
+    pausesUpdatesAutomatically: false,
+  });
+}
 ```
+
+> 상세 GPS 최적화: [frontend/env_setup.md](frontend/env_setup.md) §7
 
 ### 8.2 네이버 지도 연동
 
-```javascript
-// react-native-naver-map 사용 예시
+```typescript
+// @mj-studio/react-native-naver-map v2.x 사용
+import { NaverMapView, NaverMapPath, NaverMapMarker } from '@mj-studio/react-native-naver-map';
+
 <NaverMapView
   center={{ latitude: 37.5665, longitude: 126.978, zoom: 16 }}
-  showsMyLocationButton={true}
+  isShowMyLocationButton={true}
 >
-  <Path
+  <NaverMapPath
     coordinates={walkRoute}
     color="#10B981"
     width={5}
   />
-  <Marker coordinate={currentPosition} />
+  <NaverMapMarker coordinate={currentPosition} />
 </NaverMapView>
 ```
+
+> New Architecture 필수 (Expo SDK 54 기본 활성화)
 
 ### 8.3 기상청 API
 
@@ -446,19 +548,36 @@ import { KakaoAdFitBanner } from 'react-native-kakao-adfit';
 
 ### 8.5 푸시 알림
 
-```javascript
-// expo-notifications 활용
+```typescript
+// 클라이언트: expo-notifications (로컬 리마인더)
 import * as Notifications from 'expo-notifications';
 
-// 산책 리마인더 로컬 알림
 await Notifications.scheduleNotificationAsync({
   content: {
-    title: '🐾 산책 시간이에요!',
+    title: '산책 시간이에요!',
     body: '초코가 산책을 기다리고 있어요',
   },
   trigger: { hour: 18, minute: 0, repeats: true },
 });
 ```
+
+```python
+# 서버: firebase-admin (FCM/APNs 원격 푸시)
+from firebase_admin import messaging
+
+message = messaging.Message(
+    token=user_push_token,
+    notification=messaging.Notification(
+        title="새 뱃지를 획득했어요!",
+        body="50km 마라토너 뱃지를 달성했어요!",
+    ),
+    data={"type": "badge_earned", "badge_id": "..."},
+)
+messaging.send(message)
+```
+
+> 7가지 알림 유형, 일일 최대 10회 제한, 야간 금지(22~08시)
+> 상세: [backend/05_push_notifications.md](backend/05_push_notifications.md)
 
 ---
 
@@ -554,33 +673,55 @@ await Notifications.scheduleNotificationAsync({
 
 ## 13. MVP 개발 로드맵
 
-### Phase 1: MVP (5주)
+> 프론트엔드(React Native)와 백엔드(FastAPI) 병행 개발 기준
+> 백엔드 상세 로드맵: [backend/09_roadmap.md](backend/09_roadmap.md)
 
-| 주차 | 작업 |
-|------|------|
-| 1주 | 프로젝트 셋업 (Expo), 인증(카카오/네이버/Apple 로그인), DB 설계 |
-| 2주 | 산책 트래킹 (GPS foreground + background + 지도), 기록 저장 |
-| 3주 | 지도 탭 (주변 장소 탐색), 펫 프로필, 주간 통계 |
-| 4주 | 푸시 알림, 오프라인 저장, 앱 안정화 |
-| 5주 | 광고 연동, TestFlight/내부 테스트, 스토어 심사 준비 |
+### Phase 1: 기반 구축 + MVP 핵심 (1~2주)
 
-### Phase 2: 소셜 (3주)
+| 주차 | 프론트엔드 (Expo SDK 54) | 백엔드 (FastAPI) |
+|------|------------------------|-----------------|
+| 1주 | Expo 프로젝트 셋업, Development Build 구성, 소셜 로그인 UI | FastAPI + SQLAlchemy + Alembic 셋업, 핵심 DB 마이그레이션, JWT 인증 + 카카오/네이버/Apple OAuth |
+| 2주 | 산책 GPS 트래킹 (foreground + background), 네이버 지도 연동 | 산책 CRUD API, validate_walk 서비스, R2 사진 업로드, 연속일수 계산 함수 |
 
-- 팔로잉/팔로워
-- 산책 피드
-- 통합 뱃지 시스템
+### Phase 2: 게이미피케이션 (3주차)
 
-### Phase 3: 수익화 (2주)
+| 프론트엔드 | 백엔드 |
+|-----------|--------|
+| 뱃지 컬렉션 UI, 진행률 바, 획득 애니메이션 | badge_definitions 45개 시드, badge_service 6카테고리 진행률, APScheduler 랭킹 집계 |
+| 랭킹 화면 (주간/월간, 지역 필터) | rankings 테이블 + refresh_weekly_rankings, hall_of_fame |
+| 푸시 알림 연동 (expo-notifications) | Firebase Admin + push_service (7가지 알림, 빈도 제한) |
 
-- 프리미엄 구독 (iOS IAP / Google Play Billing)
-- 인앱 결제
-- 광고 최적화
+### Phase 3: 소셜 (4주차)
 
-### Phase 4: 확장 (지속)
+| 프론트엔드 | 백엔드 |
+|-----------|--------|
+| 소셜 피드, 팔로우/좋아요/댓글 UI | follows/likes/comments API, 피드 정렬 알고리즘 |
+| 산책 초대/모임 화면 | invitations + WebSocket (함께 산책 위치 공유) |
+| 친구 추천 UI | recommend_service (지역40% + 시간25% + 견종20% + 활동량15%) |
+| 차단/신고 기능 | blocks/reports + 피드/추천 필터링 |
+
+### Phase 4: 수익화 + 외부 API (5주차)
+
+| 프론트엔드 | 백엔드 |
+|-----------|--------|
+| 프리미엄 가입 화면, 결제 UI | Toss Payments 연동, iOS IAP/Google Play 웹훅, 구독 상태 머신 |
+| 날씨/미세먼지 위젯 | weather_service (기상청 + 에어코리아 → Redis 캐싱) |
+| 지도 탭 (주변 장소 탐색) | 공공데이터 동기화 (동물병원/공원), 카카오 로컬 검색 프록시 |
+
+### Phase 5: 안정화 + 배포 (6주차)
+
+- 에러 핸들링 표준화, DB 쿼리 최적화, 보안 검증
+- Render 배포, Sentry 모니터링 연동
+- EAS Build → TestFlight/Google Play 내부 테스트
+- Cron Job 동작 확인 (랭킹/날씨/계정 정리)
+- 스토어 심사 준비
+
+### Phase 6: 확장 (지속)
 
 - Apple Watch / WearOS 연동
 - 홈 화면 위젯
 - 건강 기록 기능
+- 광고 최적화 (카카오 AdFit)
 
 ---
 
@@ -600,4 +741,5 @@ await Notifications.scheduleNotificationAsync({
 ---
 
 *작성일: 2026-02-11*
-*버전: 1.0*
+*최종 수정: 2026-02-20*
+*버전: 2.0 — 백엔드 FastAPI 전환, 프론트엔드 Expo SDK 54 업그레이드 반영*

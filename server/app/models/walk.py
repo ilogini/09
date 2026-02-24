@@ -10,6 +10,7 @@ from sqlalchemy import (
     Text,
     func,
 )
+from geoalchemy2 import Geometry
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -29,6 +30,9 @@ class Walk(Base):
     calories: Mapped[int | None] = mapped_column(Integer)
     avg_speed_kmh: Mapped[float | None] = mapped_column(Numeric(5, 2))
     route_geojson: Mapped[dict | None] = mapped_column(JSONB)
+    route_geometry = mapped_column(Geometry(geometry_type="LINESTRING", srid=4326), nullable=True)
+    start_point = mapped_column(Geometry(geometry_type="POINT", srid=4326), nullable=True)
+    end_point = mapped_column(Geometry(geometry_type="POINT", srid=4326), nullable=True)
     weather: Mapped[dict | None] = mapped_column(JSONB)
     memo: Mapped[str | None] = mapped_column(Text)
     is_valid: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -51,9 +55,11 @@ class WalkPhoto(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     walk_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("walks.id"), nullable=False)
     photo_url: Mapped[str] = mapped_column(Text, nullable=False)
+    thumbnail_url: Mapped[str | None] = mapped_column(Text)
     latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
     longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
     taken_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

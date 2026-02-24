@@ -56,6 +56,7 @@ CREATE TABLE users (
   weekly_goal_km NUMERIC DEFAULT 20,
   walk_unit TEXT DEFAULT 'km',
   notification_settings JSONB DEFAULT '{}',
+  active_title_id UUID REFERENCES title_definitions(id),  -- 현재 활성 칭호
   hashed_refresh_token TEXT,               -- 리프레시 토큰 해시 저장
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -466,6 +467,87 @@ CREATE TABLE reports (
 -- 인덱스
 CREATE INDEX idx_reports_status ON reports(status) WHERE status = 'pending';
 ```
+
+### 2.20 grade_definitions (산책 등급 정의)
+
+```sql
+CREATE TABLE grade_definitions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  level INTEGER NOT NULL UNIQUE,             -- 1~10
+  name TEXT NOT NULL,                        -- 등급명 (예: "첫걸음", "산책의 신")
+  required_km INTEGER NOT NULL DEFAULT 0,    -- 필요 누적 km
+  icon TEXT,                                 -- 이모지 아이콘
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**시드 데이터:**
+
+```sql
+INSERT INTO grade_definitions (level, name, required_km, icon) VALUES
+(1,  '첫걸음',       0,      '🐣'),
+(2,  '산책 견습생',   10,     '🥾'),
+(3,  '동네 산책러',   50,     '🐕'),
+(4,  '산책 매니아',   100,    '🏃'),
+(5,  '산책 전문가',   250,    '⭐'),
+(6,  '산책 달인',     500,    '🌟'),
+(7,  '산책 영웅',     1000,   '💪'),
+(8,  '산책 전설',     2000,   '🔥'),
+(9,  '산책 챔피언',   5000,   '👑'),
+(10, '산책의 신',     10000,  '💎');
+```
+
+> 등급은 사용자의 누적 산책 거리(km)로 계산되며, 마이페이지 프로필 아래에 등급 카드 + 프로그레스바로 표시됩니다.
+
+### 2.21 title_definitions (칭호 정의)
+
+```sql
+CREATE TABLE title_definitions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,                        -- 칭호명 (예: "얼리버드", "마라토너")
+  icon TEXT,                                 -- 이모지 아이콘
+  condition_type TEXT NOT NULL,              -- 획득 조건 유형
+  condition_value INTEGER NOT NULL,          -- 조건 수치
+  condition_description TEXT,                -- 조건 설명 (예: "새벽 산책 10회")
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**시드 데이터:**
+
+```sql
+INSERT INTO title_definitions (name, icon, condition_type, condition_value, condition_description) VALUES
+('얼리버드',     '🌅', 'early_walk_count',     10, '새벽 산책(오전 6시 이전) 10회'),
+('올빼미',       '🦉', 'night_walk_count',     10, '야간 산책(오후 9시 이후) 10회'),
+('마라토너',     '🏃', 'cumulative_km',        42, '누적 42.195km 달성'),
+('탐험가',       '🧭', 'unique_places',        10, '서로 다른 10개 장소 방문'),
+('연속왕',       '🔥', 'streak_days',           7, '7일 연속 산책 달성'),
+('사진왕',       '📸', 'photo_count',          50, '산책 중 사진 50장 촬영'),
+('소셜스타',     '⭐', 'received_likes',      100, '받은 좋아요 100개'),
+('동네챔피언',   '👑', 'weekly_rank_first',     1, '주간 리더보드 1위 달성'),
+('비바람워커',   '🌧️', 'rain_snow_walk_count',  5, '비/눈 오는 날 산책 5회'),
+('원년멤버',     '🏅', 'early_adopter',        30, '서비스 출시 후 30일 이내 가입');
+```
+
+> 칭호는 특정 업적 달성 시 자동 획득됩니다.
+> 마이페이지에서 활성 칭호를 선택할 수 있으며, "🏃 마라토너 초코아빠" 형식으로 닉네임 왼쪽에 표시됩니다.
+
+### 2.22 user_titles (사용자별 칭호)
+
+```sql
+CREATE TABLE user_titles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title_id UUID NOT NULL REFERENCES title_definitions(id),
+  earned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, title_id)
+);
+
+-- 인덱스
+CREATE INDEX idx_user_titles_user ON user_titles(user_id);
+```
+
+> `users.active_title_id`로 현재 활성 칭호를 참조합니다 (users 테이블에 FK 추가).
 
 ---
 

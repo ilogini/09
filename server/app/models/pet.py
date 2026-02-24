@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, Numeric, String, Text, func
+from sqlalchemy import BigInteger, Boolean, Date, DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -14,9 +14,11 @@ class Pet(Base):
     name: Mapped[str] = mapped_column(String(30), nullable=False)
     species: Mapped[str] = mapped_column(String(10), default="dog")  # dog, cat
     breed: Mapped[str | None] = mapped_column(String(50))
-    birth_year: Mapped[int | None] = mapped_column(Integer)
+    size: Mapped[str | None] = mapped_column(String(10))  # small, medium, large
+    birth_date: Mapped[date | None] = mapped_column(Date)
     weight_kg: Mapped[float | None] = mapped_column(Numeric(5, 2))
     photo_url: Mapped[str | None] = mapped_column(Text)
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

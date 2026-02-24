@@ -24,9 +24,11 @@ class WalkComplete(BaseModel):
 class WalkPhotoResponse(BaseModel):
     id: int
     photo_url: str
+    thumbnail_url: str | None = None
     latitude: float | None = None
     longitude: float | None = None
     taken_at: datetime | None = None
+    sort_order: int = 0
 
     model_config = {"from_attributes": True}
 

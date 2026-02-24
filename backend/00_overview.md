@@ -61,7 +61,7 @@
 ```
 ┌─────────────────────────────────────────────────────┐
 │                    React Native App                  │
-│               (Expo SDK 52 + TypeScript)             │
+│               (Expo SDK 54 + TypeScript)             │
 └──────────┬──────────┬──────────┬──────────┬─────────┘
            │          │          │          │
        REST API    WebSocket   R2 URL    FCM/APNs
@@ -179,22 +179,27 @@ backend/
 
 ## 5. 데이터 모델 요약
 
-### 5.1 핵심 테이블 (19개)
+### 5.1 핵심 테이블 (23개)
 
 ```
 users ──┬── pets ──── pet_health
         │
-        ├── walks (route_geojson, photos)
+        ├── walks (route_geojson, route_geometry)
         │     └── walk_photos
         │
-        ├── user_badges ──── badge_definitions
+        ├── user_badges ──── badge_definitions (45개 뱃지)
         │
         ├── rankings
         │     └── hall_of_fame
         │
+        ├── grade_definitions (10단계 산책 등급)
+        ├── title_definitions ──── user_titles (10개 칭호)
+        │
         ├── follows
         ├── likes / comments
         ├── invitations / meetups
+        │
+        ├── blocks / reports
         │
         ├── push_tokens
         ├── notifications
@@ -211,7 +216,7 @@ users ──┬── pets ──── pet_health
 | `pet_health` | 건강 기록 (체중 변화, 접종, 병원 방문) | 마이페이지 |
 | `walks` | 산책 기록 (경로 GeoJSON, 거리, 시간, 칼로리) | 핵심 데이터 |
 | `walk_photos` | 산책 중 촬영 사진 (GPS 좌표 + 파일 URL) | 산책, 소셜 피드 |
-| `badge_definitions` | 뱃지 정의 (47개, 6카테고리) | 뱃지 시스템 |
+| `badge_definitions` | 뱃지 정의 (45개, 6카테고리) | 뱃지 시스템 |
 | `user_badges` | 사용자별 뱃지 상태 (locked/in_progress/earned) | 뱃지 시스템 |
 | `rankings` | 기간별 랭킹 집계 (주간/월간/전체) | 랭킹 탭 |
 | `follows` | 팔로우 관계 | 소셜 탭 |
@@ -221,6 +226,11 @@ users ──┬── pets ──── pet_health
 | `push_tokens` | FCM/APNs 토큰 | 푸시 알림 |
 | `notifications` | 알림 내역 | 알림 스크린 |
 | `subscriptions` | 구독/결제 이력 | 결제 시스템 |
+| `grade_definitions` | 산책 등급 정의 (10단계, 누적 km 기반) | 마이페이지 등급 |
+| `title_definitions` | 칭호 정의 (10개, 업적 기반) | 닉네임 칭호 |
+| `user_titles` | 사용자별 칭호 획득/활성 상태 | 닉네임 칭호 |
+| `blocks` | 사용자 차단 | 안전 |
+| `reports` | 콘텐츠 신고 | 안전 |
 
 > 전체 스키마 정의(CREATE TABLE, 인덱스)는 [01_database_schema.md](./01_database_schema.md) 참조
 
@@ -260,7 +270,7 @@ users ──┬── pets ──── pet_health
 
 | 순서 | 작업 | 관련 문서 |
 |------|------|----------|
-| 7 | badge_definitions 시드 데이터 (47개 뱃지) | 01_database_schema.md |
+| 7 | badge_definitions 시드 데이터 (45개 뱃지) | 01_database_schema.md |
 | 8 | on-walk-complete → 뱃지 진행률 업데이트 | 03_api_routes.md |
 | 9 | calculate-rankings APScheduler Job | 03_api_routes.md |
 | 10 | 푸시 알림 (산책 리마인더, 뱃지 획득) | 05_push_notifications.md |
@@ -292,7 +302,7 @@ users ──┬── pets ──── pet_health
 ```
 플랫폼: Render
 서비스 타입: Web Service (Docker)
-리전: Oregon (US West) — 한국 사용자 대상이지만 Render는 미국 리전만 제공
+리전: Singapore (Southeast Asia) — 한국 사용자 대상, 아시아 리전 선택
 플랜: Free → Starter ($7/월) 전환 시점: 슬립 없는 서비스 필요 시
 ```
 

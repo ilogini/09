@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>랭킹 - 멍이랑 withbowwow</title>
+    <title>리더보드 - 멍이랑 withbowwow</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <style>
         :root {
@@ -404,7 +404,7 @@
 
     <!-- Header -->
     <header class="header">
-        <h1 class="header-title"><i data-lucide="trophy"></i> 랭킹</h1>
+        <h1 class="header-title"><i data-lucide="trophy"></i> 리더보드</h1>
         <div class="header-actions">
             <button class="header-btn" aria-label="알림">
                 <i data-lucide="bell"></i>
@@ -564,9 +564,9 @@
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
         <a class="nav-item" href="멍이랑_메인페이지_시안.html"><span class="nav-icon-wrap"><i data-lucide="home"></i></span><span class="nav-label">홈</span></a>
-        <a class="nav-item" href="소셜.html"><span class="nav-icon-wrap"><i data-lucide="users"></i></span><span class="nav-label">소셜</span></a>
+        <a class="nav-item active" href="소셜.html"><span class="nav-icon-wrap"><i data-lucide="users"></i></span><span class="nav-label">소셜</span></a>
         <button class="nav-item center-btn" onclick="location.href='멍이랑_메인페이지_시안.html'"><span class="nav-icon-wrap">🐾</span><span class="nav-label">산책</span></button>
-        <a class="nav-item active" href="랭킹.html"><span class="nav-icon-wrap"><i data-lucide="trophy"></i></span><span class="nav-label">랭킹</span></a>
+        <a class="nav-item" href="지도.html"><span class="nav-icon-wrap"><i data-lucide="map"></i></span><span class="nav-label">지도</span></a>
         <a class="nav-item" href="마이페이지.html"><span class="nav-icon-wrap"><i data-lucide="user"></i></span><span class="nav-label">MY</span></a>
     </nav>
 
@@ -584,7 +584,7 @@
     function switchSegment(btn) {
         document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        toast(btn.textContent + ' 랭킹');
+        toast(btn.textContent + ' 리더보드');
     }
 
     // Toast

@@ -153,6 +153,71 @@ async def naver_login(body: SocialLoginRequest, db: AsyncSession = Depends(get_d
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
+@router.post("/apple", response_model=TokenResponse)
+async def apple_login(body: SocialLoginRequest, db: AsyncSession = Depends(get_db)):
+    """Apple 소셜 로그인 (Sign in with Apple)"""
+    # 1. identity_token (JWT) 검증
+    try:
+        # Apple의 공개 키로 identity_token 검증
+        # body.code에 identity_token이 전달됨
+        header = jwt.get_unverified_header(body.code)
+        # Apple 공개 키 가져오기
+        async with httpx.AsyncClient() as client:
+            keys_resp = await client.get("https://appleid.apple.com/auth/keys")
+            if keys_resp.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Apple 공개 키 조회 실패",
+                )
+            apple_keys = keys_resp.json().get("keys", [])
+
+        # kid가 일치하는 키 찾기
+        matching_key = None
+        for key in apple_keys:
+            if key["kid"] == header.get("kid"):
+                matching_key = key
+                break
+
+        if not matching_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Apple 키 매칭 실패",
+            )
+
+        # JWT 디코딩 (Apple identity_token)
+        from jose import jwk
+        from jose.utils import base64url_decode
+
+        public_key = jwk.construct(matching_key)
+        payload = jwt.decode(
+            body.code,
+            public_key,
+            algorithms=["RS256"],
+            audience=settings.APPLE_CLIENT_ID,
+            issuer="https://appleid.apple.com",
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Apple 토큰 검증 실패",
+        )
+
+    provider_id = payload.get("sub", "")
+    email = payload.get("email", "")
+    nickname = email.split("@")[0] if email else f"user_{provider_id[:8]}"
+
+    # 2. DB 사용자 조회/생성
+    user = await get_or_create_user(db, "apple", provider_id, nickname)
+
+    # 3. JWT 토큰 발급
+    access_token = create_access_token(user.id)
+    refresh_token = create_refresh_token(user.id)
+    user.hashed_refresh_token = pwd_context.hash(refresh_token)
+    await db.commit()
+
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)):
     """리프레시 토큰으로 새 토큰 발급"""

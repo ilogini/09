@@ -15,14 +15,14 @@
 | 03 | [03_pets.md](./03_pets.md) | 반려동물 CRUD, 온보딩 시 필수 등록 | 1 | **완료** |
 | 04 | [04_map_places.md](./04_map_places.md) | 지도, 주변 장소 검색, 카카오 로컬 API, 즐겨찾기 | 1 | **완료** |
 | 05 | [05_storage.md](./05_storage.md) | 사진 업로드, R2 presigned URL, 이미지 리사이징 | 1 | **완료** |
-| 06 | 06_badges.md | 뱃지 45개 (6카테고리), 진행률, 산책 완료 시 자동 체크 | 2 | TODO |
-| 07 | 07_grades_titles.md | 등급 10단계, 칭호 10개, 레벨업 로직 | 2 | TODO |
-| 08 | 08_rankings.md | 주간/월간/전체 랭킹, 지역별, 명예의 전당 | 2 | TODO |
-| 09 | 09_social.md | 팔로우, 피드, 좋아요/댓글, 차단/신고 | 3 | TODO |
-| 10 | 10_challenges.md | 챌린지 생성/참가/리더보드, 산책 초대 | 3 | TODO |
-| 11 | 11_notifications.md | 푸시 알림, 알림 내역, FCM 연동 | 4 | TODO |
-| 12 | 12_premium.md | 구독/결제, Toss/Apple/Google 웹훅 | 4 | TODO |
-| 13 | 13_weather.md | 날씨/미세먼지, 산책 추천, Redis 캐싱 | 4 | TODO |
+| 06 | [06_badges.md](./06_badges.md) | 뱃지 45개 (6카테고리), 자동 달성, 진행률, 뱃지 vs 챌린지 구분 | 2 | **완료** |
+| 07 | [07_grades_titles.md](./07_grades_titles.md) | 등급 10단계, 칭호 10개, 레벨업 로직 | 2 | **완료** |
+| 08 | [08_rankings.md](./08_rankings.md) | 주간/월간/전체 랭킹, 지역별, 명예의 전당 | 2 | **완료** |
+| 09 | [09_social.md](./09_social.md) | 친구(양방향), 태그 검색, 리더보드, 차단/신고 | 3 | **완료** |
+| 10 | [10_challenges.md](./10_challenges.md) | 챌린지 생성/참가/리더보드, 보상 연동 (관리자+유저) | 3 | **완료** |
+| 11 | [11_notifications.md](./11_notifications.md) | 푸시 알림 (FCM), 알림 내역, 리마인더, 유형별 설정 | 4 | **완료** |
+| 12 | [12_premium.md](./12_premium.md) | 구독/결제 (보류 — 프로토타입 기준 정리만) | 4 | **보류** |
+| 13 | [13_weather.md](./13_weather.md) | 날씨 (기상청) / 미세먼지 (에어코리아) / 산책 추천 4단계 | 4 | **완료** |
 
 ---
 
@@ -68,4 +68,4 @@
 
 ---
 
-*최종 수정: 2026-02-26*
+*최종 수정: 2026-03-03*
